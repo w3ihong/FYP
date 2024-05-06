@@ -1,8 +1,19 @@
 import NextLogo from "./NextLogo";
 import SupabaseLogo from "./SupabaseLogo";
+import Button from "./Button";
+import Link from 'next/link';
+
+
+declare global {
+  interface Window {
+    voiceflow: any;
+  }
+}
 
 export default function Header() {
+
   return (
+
     <div className="flex flex-col gap-16 items-center">
       <div className="flex gap-8 justify-center items-center">
         <a
@@ -38,7 +49,27 @@ export default function Header() {
           Next.js
         </a>
       </p>
+      <Link href="/test2">
+        <Button children="Go to New Page" />
+      </Link>
       <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(d, t) {
+              var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+              v.onload = function() {
+                window.voiceflow.chat.load({
+                  verify: { projectID: '661bab099f0a7cb3f08a6340' },
+                  url: 'https://general-runtime.voiceflow.com/',
+                  versionID: 'production'
+                });
+              }
+              v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+            })(document, 'script');
+          `
+        }}
+      />
     </div>
   );
 }

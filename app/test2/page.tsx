@@ -2,6 +2,8 @@
 
 import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState } from 'react'
+import Button from '@/components/Button'
+import Link from 'next/link'
 
 export default function Page() {
   const [user_reports, setNotes] = useState<any[] | null>(null)
@@ -15,5 +17,13 @@ export default function Page() {
     getData()
   }, [])
 
-  return <pre>{JSON.stringify(user_reports, null, 2)}</pre>
+  return ( 
+  <div>
+  <pre>{JSON.stringify(user_reports, null, 2)}</pre>
+  
+  <Link href="/">
+        <Button children="go back" />
+      </Link>
+      </div>
+  );
 }
