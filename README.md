@@ -1,3 +1,9 @@
+// to do this sprint
+- login
+- register 
+- sidebar
+
+
 For code samples/testing , use the test branch
 Work should be done on the master branch, any confirmed code will be subseqently pulled into the main branch(deployed)
 
