@@ -13,10 +13,10 @@ module.exports = {
       colors: {
         background: "#FAF0CA",  // the background color of the page
         primary: "#F8F8FF",     // off -white the card background
-        secondary: "#F7DF8B",   // the yellowish background
-        accent: "#133048",      // the dark blue color
+        secondary: "#F7DF8B",   // the yellowish background also sued for card
+        accent: "#133048",      // the dark blue color ,side bar and text
         red: "#E7310E",
-        green: "#27C124",
+        green: "#27C124"
       },
     },
   },
