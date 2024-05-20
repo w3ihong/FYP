@@ -21,9 +21,9 @@ export default function RegisterPage() {
     };
 
     function validatePassword (password : string){
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const passwordRegex = /^.{8,}$/;
         if (!passwordRegex.test(password)) {
-            setPasswordError('Must have at least 8 characters, 1 letter and 1 number');
+            setPasswordError('Password must have at least 8 characters');
         } else {
             setPasswordError('');
         }
@@ -55,6 +55,13 @@ export default function RegisterPage() {
         setConfirmPassword(newConfirmPassword);
         validateConfirmPassword(password, newConfirmPassword);
     };
+
+    function signup (e : any) {
+        e.preventDefault();
+        if (emailError === '' && passwordError === '' && confirmPasswordError === '') {
+            signup({email, password});
+        }
+    }
 
   return (
     <div>
