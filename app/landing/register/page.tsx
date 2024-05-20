@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import { useState } from "react";
-
+import { signup } from "./landing/actions";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -60,7 +60,8 @@ export default function RegisterPage() {
     function handleSubmit(e : any) {
         e.preventDefault();
         if (emailError === '' && passwordError === '' && confirmPasswordError === '') {
-            console.log('submit');
+            console.log('submitting');
+            {signup(email, password)};
         }
     };
 
@@ -70,7 +71,7 @@ export default function RegisterPage() {
         <div className="bg-accent min-h-14 w-full p-4">
             <Link href="/landing">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 stroke-background fill-background">
-                    <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
                 </svg>
             </Link>
         </div>
@@ -97,7 +98,7 @@ export default function RegisterPage() {
                 className="w-80 h-10 p-2 border border-accent rectangle-generic" />
                 <p className="text-red-500 text-xs mb-3 h-2 w-80">{confirmPasswordError}</p>
 
-                <button className="w-80 h-10 p-2 mt-16 bg-accent text-primary rectangle-generic">Sign up</button>
+                <button className="w-80 h-10 p-2 mt-16 bg-accent text-primary rectangle-generic" onClick={handleSubmit}>Sign up</button>
             </form>
             <p className="mt-2 text-xs">Already have an account? <Link href="/landing" className="underline">Log in</Link></p>
         </div>
