@@ -5,3 +5,9 @@
 @layer base {
 
 }
+
+@layer components {
+    .rectangle-generic {
+        @apply rounded shadow-md;
+    }
+}

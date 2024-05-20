@@ -1,6 +1,69 @@
+"use client"
 import Link from "next/link";
+import { useState } from "react";
+
 
 export default function RegisterPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    function validateEmail (email: string) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setEmailError('Invalid email address');
+        } else {
+            setEmailError('');
+        }
+    };
+
+    function validatePassword (password : string){
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            setPasswordError('Must have at least 8 characters, 1 letter and 1 number');
+        } else {
+            setPasswordError('');
+        }
+    };
+
+    function validateConfirmPassword (password : string, confirmPassword :string) {
+        if (password !== confirmPassword) {
+            setConfirmPasswordError('Passwords do not match');
+        } else {
+            setConfirmPasswordError('');
+        }
+    };
+
+    function handleEmailChange (e : any) {
+        const newEmail = e.target.value;
+        setEmail(newEmail);
+        validateEmail(newEmail);
+    };
+
+    function handlePasswordChange (e : any) {
+        const newPassword = e.target.value;
+        setPassword(newPassword);
+        validatePassword(newPassword);
+        validateConfirmPassword(newPassword, confirmPassword);
+    };
+
+    function handleConfirmPasswordChange (e : any) {
+        const newConfirmPassword = e.target.value;
+        setConfirmPassword(newConfirmPassword);
+        validateConfirmPassword(password, newConfirmPassword);
+    };
+
+    function handleSubmit(e : any) {
+        e.preventDefault();
+        if (emailError === '' && passwordError === '' && confirmPasswordError === '') {
+            console.log('submit');
+        }
+    };
+
   return (
     <div>
         {/* header */}
@@ -15,16 +78,29 @@ export default function RegisterPage() {
         <div className="flex flex-col items-center justify-center ">
             <h1 className="text-2xl font-bold text-accent m-10">Set up your account</h1>
             <form className="flex flex-col items-center justify-center">
-                <p className="font-bold self-left">Email Address</p>
-                <input type="text" placeholder="Email" className="w-80 h-10 p-2 mb-5 border border-accent rounded shadow-md" />
-                <p className="font-bold">Password</p>
-                <input type="password" placeholder="Password" className="w-80 h-10 p-2 mb-5 border border-accent rounded shadow-md" />
-                <p className="font-bold">Confirm Password</p>
-                <input type="password" placeholder="Confirm Password" className="w-80 h-10 p-2 mb-5 border border-accent rounded shadow-md" />
-                <button className="w-80 h-10 p-2 m-2 bg-accent text-primary rounded shadow-md">Sign up</button>
+
+                <p className="font-bold self-left w-80">Email Address</p>
+                <input type="text" placeholder="Email" 
+                value={email} onChange={handleEmailChange}
+                className="w-80 h-10 p-2 border border-accent color-primary rectangle-generic" />
+                <p className="text-red-500 text-xs mb-3 h-2 w-80">{emailError}</p>
+
+                <p className="font-bold w-80">Password</p>
+                <input type="password" placeholder="Password" 
+                value={password} onChange={handlePasswordChange}
+                className="w-80 h-10 p-2 border border-accent rectangle-generic" />
+                <p className="text-red-500 text-xs mb-3 h-2 w-80">{passwordError}</p>
+
+                <p className="font-bold w-80">Confirm Password</p>
+                <input type="password" placeholder="Confirm Password" 
+                value={confirmPassword} onChange={handleConfirmPasswordChange}
+                className="w-80 h-10 p-2 border border-accent rectangle-generic" />
+                <p className="text-red-500 text-xs mb-3 h-2 w-80">{confirmPasswordError}</p>
+
+                <button className="w-80 h-10 p-2 mt-16 bg-accent text-primary rectangle-generic">Sign up</button>
             </form>
+            <p className="mt-2 text-xs">Already have an account? <Link href="/landing" className="underline">Log in</Link></p>
         </div>
     </div>
-
   );
 }

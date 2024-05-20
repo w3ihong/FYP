@@ -15,8 +15,8 @@ module.exports = {
         primary: "#F8F8FF",     // off -white the card background
         secondary: "#F7DF8B",   // the yellowish background also sued for card
         accent: "#133048",      // the dark blue color ,side bar and text
-        red: "#E7310E",
-        green: "#27C124"
+        cred: "#E7310E",
+        cgreen: "#27C124"
       },
     },
   },
