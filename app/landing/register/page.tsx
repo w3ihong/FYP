@@ -1,13 +1,12 @@
 "use client"
 import Link from "next/link";
 import { useState } from "react";
-import { signup } from "./landing/actions";
+import { signup } from "../actions";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
@@ -57,14 +56,6 @@ export default function RegisterPage() {
         validateConfirmPassword(password, newConfirmPassword);
     };
 
-    function handleSubmit(e : any) {
-        e.preventDefault();
-        if (emailError === '' && passwordError === '' && confirmPasswordError === '') {
-            console.log('submitting');
-            {signup(email, password)};
-        }
-    };
-
   return (
     <div>
         {/* header */}
@@ -98,7 +89,7 @@ export default function RegisterPage() {
                 className="w-80 h-10 p-2 border border-accent rectangle-generic" />
                 <p className="text-red-500 text-xs mb-3 h-2 w-80">{confirmPasswordError}</p>
 
-                <button className="w-80 h-10 p-2 mt-16 bg-accent text-primary rectangle-generic" onClick={handleSubmit}>Sign up</button>
+                <button className="w-80 h-10 p-2 mt-16 bg-accent text-primary rectangle-generic" formAction={signup}>Sign up</button>
             </form>
             <p className="mt-2 text-xs">Already have an account? <Link href="/landing" className="underline">Log in</Link></p>
         </div>
