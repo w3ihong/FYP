@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signup } from "../actions";
 import Modal from "@/components/modalSuccess";
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export default function RegisterPage() {
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const router = useRouter()
 
     function validateEmail (email: string) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,20 +67,28 @@ export default function RegisterPage() {
         validateConfirmPassword(password, newConfirmPassword);
     };
  
-    function handleSignup (e :any) {
+    async function handleSignup (e :any) {
         e.preventDefault();
         const isEmailValid = validateEmail(email);
         const isPasswordValid = validatePassword(password);
         const isConfirmPasswordValid = validateConfirmPassword(password, confirmPassword);
 
         if (isEmailValid && isPasswordValid && isConfirmPasswordValid) {
-            signup( email, password );
-            console.log('Sign up successful');
-            setShowModal(true);
+            // commented out as theres a limit to the email signup in supabase
+            // const success =  await signup( email, password );
+            if ( true) {
+                setShowModal(true);
+            }
+            
         } else {
             console.log('Sign up failed');
         }
     };
+
+    function handleModalClose () {
+        setShowModal(false);
+        router.push('/landing')
+    }
 
   return (
     <div>
@@ -119,7 +129,7 @@ export default function RegisterPage() {
         </div>
         
         {showModal && createPortal(
-            <Modal message="Sign up succesfull, Please check your email to continue" onClose={() => setShowModal(false)}/>
+            <Modal message="Sign up succesfull, Please check your email to continue" onClose={handleModalClose}/>
         , document.body)}
     </div>
   );

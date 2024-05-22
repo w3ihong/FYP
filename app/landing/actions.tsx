@@ -22,7 +22,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/protected')
 }
 
 export async function signup(email: string, password: string) {
@@ -37,10 +37,14 @@ export async function signup(email: string, password: string) {
 
   const { error } = await supabase.auth.signUp(data)
 
+  console.log(error)
+
   if (error) {
     redirect('/error')
+  } else {
+    revalidatePath('/landing/register', 'page')
+    console.log('Sign up successful');
+    return true;
   }
-
-  revalidatePath('/', 'layout')
-  redirect('/landing')
+  
 }

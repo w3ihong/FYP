@@ -8,6 +8,7 @@ module.exports = {
     fontFamily: {
       sans: ["Inter", "sans-serif"],
       serif: ["Merriweather", "serif"],
+      mono: ["Roboto Mono", "monospace"],
     },
     extend: {
       colors: {
@@ -18,7 +19,18 @@ module.exports = {
         cred: "#E7310E",
         cgreen: "#27C124"
       },
+      textShadow: {
+        'custom': '2px 2px 4px rgba(0, 0, 0, 0.3)',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.text-shadow-custom': {
+          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+        },
+      }, ['responsive', 'hover']);
+    }
+  ],
 };

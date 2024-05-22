@@ -46,11 +46,11 @@ export default function Sidebar({ children }: SidebarProps) {
 
   return (
     <aside className="h-screen">
-      <nav className="h-full flex flex-col border-r shadow-sm" style={{ backgroundColor: '#133048' }}>
+      <nav className="h-full flex flex-col border-r shadow-sm bg-accent" >
         <div className="p-4 pb-2 flex justify-between items-center">
           <div className="flex items-center">
             <img
-              src="/EchoSphereLogo.png"
+              src="/ESLogo.png"
               className={`overflow-hidden transition-all ${expanded ? "w-8 h-8" : "w-0"}`}
               alt="Logo"
             />
