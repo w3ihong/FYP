@@ -1,6 +1,6 @@
 'use client';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { ChevronFirst, ChevronLast, BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
+import { ChevronFirst, ChevronLast, LogOut, User, CreditCard } from 'lucide-react';
 import Link from "next/link";
 
 
@@ -53,11 +53,7 @@ export default function Sidebar() {
       <nav className="h-full flex flex-col border-r shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
           <div className="flex items-center">
-            <img
-              src="/EchoSphereLogo.png"
-              className={`overflow-hidden transition-all ${expanded ? "w-8 h-8" : "w-0"}`}
-              alt="Logo"
-            />
+            {/* EchoSphere logo removed */}
             <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
               EchoSphere
             </span>
@@ -72,31 +68,17 @@ export default function Sidebar() {
 
         <SidebarContext.Provider value={{ expanded }}>
           <ul className="flex-1 px-3">
-            <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
             <hr className="border-t border-gray-200 my-2" />
-            <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" active link="/app/dashboard/page.tsx" />
-            <SidebarItem icon={<BarChart3 size={20} />} text="Analytics" alert link="/protected/analytics" />
-            <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar" />
-            <SidebarItem icon={<Brain size={20} />} text="Visualize" link="protected/Visualize" />
-            <SidebarItem icon={<Users size={20} />} text="Team" link="/protected/team" />
-            <div style={{ height: '450px' }} />
-            <SidebarItem icon={<Settings size={20} />} text="Settings" link="/protected/settings" />
+            <div style={{ height: '50px' }} />
+            <SidebarItem icon={<User size={20} />} text="Account" link="/protected/team" />
+            <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/protected/settings" />
+            <div style={{ height: '620px' }} />
             <SidebarItem icon={<LogOut size={20} />} text="Logout" link="/app/logout/page.tsx" />
           </ul>
         </SidebarContext.Provider>
 
         <div className="border-t flex p-3 items-center">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt="User Avatar"
-            className="w-10 h-10 rounded-md"
-          />
-          <div className={`flex items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}>
-            <div className="leading-4">
-              <h4 className="font-semibold text-white">John Doe</h4>
-              <span className="text-xs text-gray-300">johndoe@gmail.com</span>
-            </div>
-          </div>
+          {/* John Doe details removed */}
         </div>
       </nav>
     </aside>

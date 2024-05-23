@@ -1,9 +1,9 @@
-export default function create()
+export default function Visualize()
 {
     return (
        <main>
         <h4>
-            Create
+            Visualize page
         </h4>
        </main>
     )
