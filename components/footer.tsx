@@ -4,26 +4,23 @@ import logo from "@/public/ESLogoWithText.png";
 
 const Footer = () => {
   return (
-      <footer className="bg-accent text-gray-600 body-font py-12">
+      <footer className="bg-accent text-gray-600 body-font py-8">
       <div className="container px-5 mx-auto flex items-center justify-center md:flex-row md:flex-nowrap flex-wrap flex-col">
-          <div className="mx-auto text-center md:text-left mb-6">
-              <Image src={logo} alt="Logo" width={150} height={150} />
+          <div className="mx-auto text-center md:text-left mb-24">
+              <Image src={logo} alt="Logo" width={170} height={170} />
           </div>
           <div className="flex-grow flex flex-wrap md:pl-20 md:mt-0 mt-10 md:text-left text-center">
               <div className="lg:w-1/4 md:w-1/2 w-full px-4">
-                  <h2 className="title-font font-mono font-bold text-white tracking-widest text-sm mb-3">CATEGORIES</h2>
+                  <h2 className="title-font font-mono font-bold text-white tracking-widest text-sm mb-3">SUPPORT</h2>
                   <nav className="list-none mb-10">
                       <li>
-                          <a className="text-white hover:text-gray-800">First Link</a>
+                          <a className="text-white hover:text-gray-600">FAQ</a>
                       </li>
                       <li>
-                          <a className="text-white hover:text-gray-800">Second Link</a>
+                          <a className="text-white hover:text-gray-600">Privacy Policy</a>
                       </li>
                       <li>
-                          <a className="text-white hover:text-gray-800">Third Link</a>
-                      </li>
-                      <li>
-                          <a className="text-white hover:text-gray-800">Fourth Link</a>
+                          <a className="text-white hover:text-gray-600">Contact Us</a>
                       </li>
                   </nav>
               </div>
