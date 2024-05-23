@@ -18,10 +18,11 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/error')
+    redirect('/landing/login?message="Could not authenticate user')
   }
 
   revalidatePath('/', 'layout')
+  console.log('Log in successful');
   redirect('/protected')
 }
 
