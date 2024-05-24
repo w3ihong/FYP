@@ -15,7 +15,8 @@ export default function LoginPage() {
 
       {/* Navigation Bar */}
       <Navbar/>
-
+      
+      {/* Login Section */}
       <section id="login" className="flex flex-col md:flex-row">
 
         {/* Left Side: Graphics */}
