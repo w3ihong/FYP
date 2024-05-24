@@ -4,7 +4,7 @@ import Sidebar from '@/components/sidebar';
 export default function Analytics() {
     return (
         <div className="flex">
-            <Sidebar />
+            
             <main>
                 <h2>
                     Analytics

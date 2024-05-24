@@ -56,7 +56,7 @@ export default function Sidebar() {
           <div className="p-4 pb-2 flex items-center">
             <div className="flex items-center">
               <img
-                src="/EchoSphereLogo.png"
+                src="/ESlogo.png"
                 className={`transition-all ${imageSize} ml-2`}
                 alt="Logo"
               />
