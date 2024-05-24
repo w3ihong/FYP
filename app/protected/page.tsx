@@ -3,16 +3,6 @@ import Sidebar from '@/components/sidebar';
 import { createClient } from '@supabase/supabase-js';
 
 export default function Index() {
-  // const canInitSupabaseClient = () => {
-  //   try {
-  //     createClient();
-  //     return true;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // };
-
-  // const isSupabaseConnected = canInitSupabaseClient();
 
   return (
     <div>

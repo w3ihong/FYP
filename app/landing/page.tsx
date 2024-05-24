@@ -3,7 +3,6 @@ import Hero from "./hero";
 import Navbar from "./landing-navbar";
 import Pricing from "./pricing";
 import Features from "./features";
-import Sidebar from "@/components/sidebar";
 
 export default function LoginPage() {  
   return (
