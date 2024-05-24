@@ -1,89 +1,114 @@
-'use client';
+"use client";
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { ChevronFirst, ChevronLast, BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
+import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
 import Link from "next/link";
 
-
+// Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
 
+// Props for SidebarItem component
 interface SidebarItemProps {
   icon: ReactNode;
   text: string;
-  active?: boolean;
-  alert?: boolean;
-  link?: string;
+  link: string;
 }
 
-export function SidebarItem({ icon, text, active, alert, link }: SidebarItemProps) {
+// SidebarItem component
+export function SidebarItem({ icon, text, link }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
 
-  const item = (
-    <li
-      className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors ${
-        active
-          ? 'bg-gradient-to-tr from-purple-500 to-purple-500 text-indigo-800'
-          : 'hover:bg-purple-500 text-gray-699'
-      }`}
-    >
-      <span className="text-white">{icon}</span>
-      <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3 text-white' : 'w-0 text-white'}`}>
-        {text}
-      </span>
-      {alert && (
-        <div className={`absolute right-2 w-2 h-2 rounded-full bg-indigo-400 ${expanded ? 'top-2' : ''}`}></div>
-      )}
-      {active && <span className="ml-auto text-green-500"></span>}
-    </li>
-  );
-
-  return link ? (
+  return (
     <Link href={link}>
-      {item}
+      <li
+        className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-purple-500 text-gray-699`}
+      >
+        <span className="text-white">{icon}</span>
+        <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3 text-white' : 'w-0 text-white'}`}>
+          {text}
+        </span>
+      </li>
     </Link>
-  ) : (
-    <>{item}</>
   );
 }
 
+// Sidebar component
 export default function Sidebar() {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
+  const [activeLink, setActiveLink] = useState(""); // State to manage active link
+
+  // Function to handle click on sidebar item
+  const handleItemClick = (link: string) => {
+    setActiveLink(link);
+  };
+
+  // Adjust the size of the logo based on the expanded state
+  const imageSize = expanded ? "w-8 h-8" : "w-6 h-6";
 
   return (
-    <aside className={`h-screen fixed top-0 ${expanded ? 'w-64' : 'w-20'} transition-all`} style={{ backgroundColor: '#133048' }}>
-      <nav className="h-full flex flex-col border-r shadow-sm">
-        <div className="p-4 pb-2 flex justify-between items-center">
-          <div className="flex items-center">
-            <img
-              src="/EchoSphereLogo.png"
-              className={`overflow-hidden transition-all ${expanded ? "w-8 h-8" : "w-0"}`}
-              alt="Logo"
-            />
-            <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
-              EchoSphere
-            </span>
+    <aside
+      className={`fixed top-0 h-screen transition-all ${expanded ? 'w-64' : 'w-20'}`}
+      style={{ backgroundColor: '#133048' }}
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+    >
+      <nav className="h-full flex flex-col justify-between border-r shadow-sm">
+        <div>
+          <div className="p-4 pb-2 flex items-center">
+            <div className="flex items-center">
+              <img
+                src="/EchoSphereLogo.png"
+                className={`transition-all ${imageSize} ml-2`}
+                alt="Logo"
+              />
+              <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
+                EchoSphere
+              </span>
+            </div>
           </div>
-          <button
-            onClick={() => setExpanded(curr => !curr)}
-            className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
-          >
-            {expanded ? <ChevronFirst /> : <ChevronLast />}
-          </button>
-        </div>
 
-        <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3">
-            <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
-            <hr className="border-t border-gray-200 my-2" />
-            <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" active link="/app/dashboard/page.tsx" />
-            <SidebarItem icon={<BarChart3 size={20} />} text="Analytics" alert link="/protected/analytics" />
-            <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar" />
-            <SidebarItem icon={<Brain size={20} />} text="Visualize" link="protected/Visualize" />
-            <SidebarItem icon={<Users size={20} />} text="Team" link="/protected/team" />
-            <div style={{ height: '450px' }} />
-            <SidebarItem icon={<Settings size={20} />} text="Settings" link="/protected/settings" />
-            <SidebarItem icon={<LogOut size={20} />} text="Logout" link="/app/logout/page.tsx" />
-          </ul>
-        </SidebarContext.Provider>
+          <SidebarContext.Provider value={{ expanded }}>
+            <ul className="flex-1 px-3 overflow-y-auto">
+              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
+              <hr className="border-t border-gray-200 my-2" />
+              <SidebarItem
+                icon={<LayoutDashboard size={20} />}
+                text="Dashboard"
+                link="/protected/Dashboard"
+              />
+              <SidebarItem
+                icon={<BarChart3 size={20} />}
+                text="Analytics"
+                link="/protected/analytics"
+              />
+              <SidebarItem
+                icon={<Calendar size={20} />}
+                text="Calendar"
+                link="/protected/calendar"
+              />
+              <SidebarItem
+                icon={<Brain size={20} />}
+                text="Visualize"
+                link="/protected/Visualize"
+              />
+              <SidebarItem
+                icon={<Users size={20} />}
+                text="Team"
+                link="/protected/team"
+              />
+              <div style={{ height: '450px' }} />
+              <SidebarItem
+                icon={<Settings size={20} />}
+                text="Settings"
+                link="/protected/settings"
+              />
+              <SidebarItem
+                icon={<LogOut size={20} />}
+                text="Logout"
+                link="/landing/register"
+              />
+            </ul>
+          </SidebarContext.Provider>
+        </div>
 
         <div className="border-t flex p-3 items-center">
           <img
@@ -91,7 +116,7 @@ export default function Sidebar() {
             alt="User Avatar"
             className="w-10 h-10 rounded-md"
           />
-          <div className={`flex items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}>
+          <div className={`flex items-center overflow-hidden ${expanded ? "w-52 ml-3" : "w-0"}`}>
             <div className="leading-4">
               <h4 className="font-semibold text-white">John Doe</h4>
               <span className="text-xs text-gray-300">johndoe@gmail.com</span>
