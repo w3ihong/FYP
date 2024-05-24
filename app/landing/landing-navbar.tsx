@@ -15,9 +15,9 @@ const Navbar = () => {
 
         {/* Links to respective sections */}
         <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-          <a href="#features" className="mr-7 hover:text-gray-900">Our Features</a>
-          <a href="#pricing" className="mr-7 hover:text-gray-900">Pricing</a>
-          <a href="meet-the-team" className="mr-7 hover:text-gray-900">Meet The Team</a>
+          <a href="#features" className="mr-7 hover:text-secondary">Our Features</a>
+          <a href="#pricing" className="mr-7 hover:text-secondary">Pricing</a>
+          <a href="meet-the-team" className="mr-7 hover:text-secondary">Meet The Team</a>
         </nav>
 
         {/* Button */}
