@@ -76,7 +76,7 @@ export default function RegisterPage() {
 
         if (isEmailValid && isPasswordValid && isConfirmPasswordValid) {
             // commented out as theres a limit to the email signup in supabase
-            // const success =  await signup( email, password );
+            const success =  await signup( email, password );
             if (true) {
                 setShowModal(true);
             }

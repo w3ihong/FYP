@@ -14,7 +14,7 @@ export default function RegisterPage() {
         </div>
         {/* main */}
         <div className="flex flex-col items-center justify-center">
-            <h1 className="text-3xl font-bold text-black mt-10">Oops, something went wrong.</h1>
+            <h1 className="text-3xl font-bold text-black mt-10 pb-10">Oops, something went wrong.</h1>
             <p className="">Please contact the team @calista</p>
         </div>
     </div>
