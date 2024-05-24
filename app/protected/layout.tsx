@@ -24,7 +24,7 @@ export default async function ProtectedLayout({
     return (
         <div className='flex flex-row w-full min-h-screen'>
             <Sidebar/>
-            <div className="h-full w-">
+            <div className="h-full w-16">
             </div>
             <div className="flex-1 w-full flex flex-col gap-6 p-6">
                 {children}

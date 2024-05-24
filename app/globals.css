@@ -13,4 +13,8 @@
     .rectangle-generic {
         @apply rounded shadow-md;
     }
+
+    .outline {
+        @apply border-2 border-cgreen;
+    }
 }

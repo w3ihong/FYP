@@ -43,7 +43,8 @@ export default function Sidebar() {
       onMouseLeave={() => setExpanded(false)}
     >
       <nav className="h-screen flex flex-col justify-between border-r shadow-sm">
-        <div className='h-full '>
+        <div className='flex-col h-full '>
+
           <div className="flex items-center p-3 pb-2">
             <img
               src="/ESlogo.png"
@@ -55,38 +56,38 @@ export default function Sidebar() {
             </span>
           </div>
 
-          <div className='grow'>
-            <SidebarContext.Provider value={{ expanded }}>
-              <div className="flex flex-col px-3"> {/* Add flex-grow class */}
-                <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
-                <hr className="border-t border-gray-200 my-2" />
-                <SidebarItem
-                  icon={<LayoutDashboard size={20} />}
-                  text="Dashboard"
-                  link="/protected/Dashboard"
-                  />
-                <SidebarItem
-                  icon={<BarChart3 size={20} />}
-                  text="Analytics"
-                  link="/protected/analytics"
-                  />
-                <SidebarItem
-                  icon={<Calendar size={20} />}
-                  text="Calendar"
-                  link="/protected/calendar"
-                  />
-                <SidebarItem
-                  icon={<Brain size={20} />}
-                  text="Visualize"
-                  link="/protected/Visualize"
-                  />
-                <SidebarItem
-                  icon={<Users size={20} />}
-                  text="Team"
-                  link="/protected/team"
-                  />
-                {/* make this gor to fill , so log out and settings are at the bottom */}
-                <div className=" grow border-cgreen border-2"></div>
+          <SidebarContext.Provider value={{ expanded }}>
+            <div className=" flex flex-col px-3 h-full ">
+              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
+              <hr className="border-t border-gray-200 my-2" />
+              <SidebarItem
+                icon={<LayoutDashboard size={20} />}
+                text="Dashboard"
+                link="/protected/dashboard"
+                />
+              <SidebarItem
+                icon={<BarChart3 size={20} />}
+                text="Analytics"
+                link="/protected/analytics"
+                />
+              <SidebarItem
+                icon={<Calendar size={20} />}
+                text="Calendar"
+                link="/protected/calendar"
+                />
+              <SidebarItem
+                icon={<Brain size={20} />}
+                text="Visualize"
+                link="/protected/Visualize"
+                />
+              <SidebarItem
+                icon={<Users size={20} />}
+                text="Team"
+                link="/protected/team"
+                />
+              <div className=' grow '/>
+              <div className='pb-[63px]'>
+
                 <SidebarItem
                   icon={<Settings size={20} />}
                   text="Settings"
@@ -95,14 +96,15 @@ export default function Sidebar() {
                 <SidebarItem
                   icon={<LogOut size={20} />}
                   text="Logout"
-                  link="/landing/register"
+                  link="/landing"
                   />
               </div>
-            </SidebarContext.Provider>
-          </div>
+              
+            </div>
+          </SidebarContext.Provider>
         </div>
 
-        <div className="border-t flex p-3 items-center">
+        <div className="border-t flex p-3 items-center ">
           <img
             src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
             alt="User Avatar"
