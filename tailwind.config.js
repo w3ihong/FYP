@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
+    "./node_modules/flowbite-react/lib/**/*.js",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
@@ -9,6 +11,7 @@ module.exports = {
       sans: ["Inter", "sans-serif"],
       serif: ["Merriweather", "serif"],
       mono: ["Roboto Mono", "monospace"],
+      raleway: ["Raleway", "sans-serif"]
     },
     extend: {
       colors: {
@@ -31,6 +34,7 @@ module.exports = {
           textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
         },
       }, ['responsive', 'hover']);
-    }
+    },
+    require("flowbite/plugin")
   ],
 };
