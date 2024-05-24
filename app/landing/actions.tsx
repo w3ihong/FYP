@@ -18,10 +18,10 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/landing/login?message="Could not authenticate user')
+    redirect('/landing/login?message= Email or password is incorrect')
   }
 
-  revalidatePath('/', 'layout')
+  revalidatePath('/landing/login', 'page')
   console.log('Log in successful');
   redirect('/protected')
 }
@@ -29,8 +29,6 @@ export async function login(formData: FormData) {
 export async function signup(email: string, password: string) {
   const supabase = createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email,
     password

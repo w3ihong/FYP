@@ -1,65 +1,25 @@
 "use client"
 
 import Link from "next/link";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { FormEvent } from "react";
 import { login } from "../actions";
-import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [emailError, setEmailError] = useState<string>('');
-  const [passwordError, setPasswordError] = useState<string>('');
-  const router = useRouter();
-
-  function validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setEmailError('Invalid email address');
-      return false;
-    } else {
-      setEmailError('');
-      return true;
-    }
+export default function LoginPage({
+    searchParams,
+  }: {
+    searchParams: { message: string };
   }
+) {
 
-  function validatePassword(password: string): boolean {
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-      return false;
-    } else {
-      setPasswordError('');
-      return true;
-    }
-  }
-
-  function handleEmailChange(e: ChangeEvent<HTMLInputElement>): void {
-    const newEmail = e.target.value;
-    setEmail(newEmail);
-    validateEmail(newEmail);
-  }
-
-  function handlePasswordChange(e: ChangeEvent<HTMLInputElement>): void {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    validatePassword(newPassword);
-  }
 
   async function handleLogin(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
 
-    if (isEmailValid && isPasswordValid) {
-      const formData = new FormData(e.currentTarget);
-
-      try {
-        await login(formData);
-      } catch (error) {
-        console.error('Login failed', error);
-      }
-    } else {
-      console.log('Login validation failed');
+    const formData = new FormData(e.currentTarget);
+    try {
+      await login(formData);
+    } catch (error) {
+      console.error('Login failed', error);
     }
   }
 
@@ -98,13 +58,10 @@ export default function LoginPage() {
                 type="email"
                 name="email"
                 id="email"
-                value={email}
-                onChange={handleEmailChange}
-                className={`bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 ${emailError ? 'border-red-500' : ''}`}
+                className={`bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 `}
                 placeholder="name@company.com"
                 required
               />
-              {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
             </div>
 
             <div>
@@ -115,13 +72,16 @@ export default function LoginPage() {
                 type="password"
                 name="password"
                 id="password"
-                value={password}
-                onChange={handlePasswordChange}
                 placeholder="••••••••"
-                className={`bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 ${passwordError ? 'border-red-500' : ''}`}
+                className={`bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5`}
                 required
               />
-              {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
+            </div>
+
+            <div className=" h-4 w-full">
+              {searchParams.message && (
+                <p className="text-sm text-red-500">{searchParams.message}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
