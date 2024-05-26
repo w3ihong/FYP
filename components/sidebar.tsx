@@ -2,6 +2,7 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
 import Link from "next/link";
+import { logout } from '@/app/actions';
 
 // Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
@@ -20,7 +21,7 @@ export function SidebarItem({ icon, text, link }: SidebarItemProps) {
   return (
     <Link href={link}>
       <div
-        className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-purple-500 text-gray-699 `}
+        className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-SBaccent text-gray-699 `}
       >
         <span className="text-white">{icon}</span>
         <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3 text-white' : 'w-0 text-white'}`}>
@@ -32,12 +33,13 @@ export function SidebarItem({ icon, text, link }: SidebarItemProps) {
 }
 
 // Sidebar component
-export default function Sidebar() {
+export default function Sidebar({email, userType }: {email: string , userType: number}) {
   const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
+  // const { user } = useContext(UserContext);
 
   return (
     <aside
-      className={`fixed top-0 h-screen bg-accent transition-all ${expanded ? 'w-64' : 'w-16'}`}
+      className={`fixed top-0 h-screen bg-accent transition-all ${expanded ? 'w-60' : 'w-16'}`}
       
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
@@ -91,8 +93,9 @@ export default function Sidebar() {
                 <SidebarItem
                   icon={<Settings size={20} />}
                   text="Settings"
-                  link="/protected/settings"
+                  link="/settings"
                   />
+                
                 <SidebarItem
                   icon={<LogOut size={20} />}
                   text="Logout"
@@ -112,8 +115,7 @@ export default function Sidebar() {
             />
           <div className={`flex items-center overflow-hidden ${expanded ? "w-52 ml-3" : "w-0"}`}>
             <div className="leading-4">
-              <h4 className="font-semibold text-white">John Doe</h4>
-              <span className="text-xs text-gray-300">johndoe@gmail.com</span>
+              <span className="text-xs text-gray-300 overflow-clip">{email}</span>
             </div>
           </div>
         </div>

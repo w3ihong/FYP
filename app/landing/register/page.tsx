@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { signup } from "../actions";
+import { signup } from "../../actions";
 import Modal from "@/components/modalSuccess";
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';

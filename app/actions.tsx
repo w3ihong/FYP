@@ -47,3 +47,11 @@ export async function signup(email: string, password: string) {
   }
   
 }
+
+export async function logout() {
+  const supabase = createClient()
+  await supabase.auth.signOut()
+
+  revalidatePath('/protected', 'page')
+  redirect('/landing/login')
+}

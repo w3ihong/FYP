@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent } from "react";
-import { login } from "../actions";
+import { login } from "../../actions";
 
 export default function LoginPage({
     searchParams,
