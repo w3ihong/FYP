@@ -1,7 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
 
+}
+
+@layer components {
+    .rectangle-generic {
+        @apply rounded shadow-md;
+    }
+
+    .outline {
+        @apply border-2 border-cgreen;
+    }
 }

@@ -1,10 +1,11 @@
 // to do this sprint
-- login
-- register 
-- sidebar
+- ill put everything togetehr on weds
+- pull on thurs morning, 
+- start on settings pages, calista will distribute the work
 
 
-For code samples/testing , use the test branch
+For code samples/testing , create your own local branch
+The test branch is for reference
 Work should be done on the master branch, any confirmed code will be subseqently pulled into the main branch(deployed)
 
 - any reuseable components goes under components 

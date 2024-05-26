@@ -1,6 +1,8 @@
 
 import "./globals.css";
+import Footer from "@/components/footer";
 
+//needs to be updated
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -17,11 +19,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-background text-accent font-sans">
+    <html lang="en" className="bg-background text-accent font-sans scroll-smooth">
       <body className="">
-        <main className="min-h-screen flex flex-col items-center">
+        <main className="min-h-screen w-full">
           {children}
         </main>
+        <Footer/>
       </body>
     </html>
   );

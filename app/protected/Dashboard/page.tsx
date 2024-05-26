@@ -1,9 +1,9 @@
-export default function calendar()
+export default function Dashboard()
 {
     return (
        <main>
         <h3>
-            Calendar
+            Dashboard Page
         </h3>
        </main>
     )
