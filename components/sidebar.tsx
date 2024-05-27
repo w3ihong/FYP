@@ -3,6 +3,8 @@ import React, { ReactNode, createContext, useContext, useState } from 'react';
 import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
 import Link from "next/link";
 import { logout } from '@/app/actions';
+import Image from 'next/image';
+import logo from "@/public/ESLogo.png";
 
 // Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
@@ -48,11 +50,8 @@ export default function Sidebar({email, userType }: {email: string , userType: n
         <div className='flex-col h-full '>
 
           <div className="flex items-center p-3 pb-2">
-            <img
-              src="/ESlogo.png"
-              className=' w-9 h-9'
-              alt="Logo"
-            />
+            <Image src={logo} className="w-9 h-9" alt="Logo" />
+            
             <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
               EchoSphere
             </span>
