@@ -14,11 +14,11 @@ export default async function ProtectedLayout({
       data: { user },
     } = await supabase.auth.getUser();
     
-
-    if (!user) {
-      console.log('User not found');
-      return redirect("../../landing/login");
-    }
+    //comment out to aid with development
+    // if (!user) {
+    //   console.log('User not found');
+    //   return redirect("../../landing/login");
+    // }
     
     const userObj = JSON.parse(JSON.stringify(user));
     console.log(userObj.email);

@@ -14,11 +14,12 @@ export default async function ProtectedLayout({
       data: { user },
     } = await supabase.auth.getUser();
     
+    // comment out to aid with development
+    // if (!user) {
+    //   console.log('User not found');
+    //   return redirect("../../landing/login");
+    // }
 
-    if (!user) {
-      console.log('User not found');
-      return redirect("../../landing/login");
-    }
     return (
         <div className='flex flex-row w-full min-h-screen'>
             <Sidebar/>
