@@ -104,7 +104,8 @@ CREATE TABLE public.platform_metrics (
 ) TABLESPACE pg_default;
 
 CREATE TABLE public.post_metrics (
-    post_id bigint PRIMARY KEY,
+    post_metric_id SERIAL PRIMARY KEY,
+    post_id bigint,
     platform_account bigint,
     post_type character varying(20),
     post_likes integer,
