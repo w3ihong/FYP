@@ -1,7 +1,15 @@
-// to do this sprint
-- ill put everything togetehr on weds
-- pull on thurs morning, 
-- start on settings pages, calista will distribute the work
+// backlog
+
+- settings (backend)
+- forgot password (backend)
+- connect social media account (backend)
+- settings (backend)
+- fix email link to redirect to website instead of loal host (backend)
+- dashboard ui and backend
+- logout (backend)
+
+
+
 
 
 For code samples/testing , create your own local branch
