@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Modal from '@/components/Modal';
 import ModalSocial from '@/components/ModalSocial';
+import { User } from 'lucide-react';
 
 export default function Index() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -15,6 +16,8 @@ export default function Index() {
       return false;
     }
   };
+
+  
 
   const isSupabaseConnected = canInitSupabaseClient();
 
