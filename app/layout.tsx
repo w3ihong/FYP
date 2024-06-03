@@ -2,13 +2,7 @@
 import "./globals.css";
 import Footer from "@/components/footer";
 
-//needs to be updated
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
-
 export const metadata = {
-  metadataBase: new URL(defaultUrl),
   title: "EchoSphere",
   description: "Your consumer intelligence partner",
 };

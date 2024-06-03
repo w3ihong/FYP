@@ -26,7 +26,7 @@ const ChangeSubscription = ({ currentPlan, currentPlanCost, newPlanCost, onCance
       <p className="mb-4">You agree that your EchoSphere membership will continue and that we will charge the updated monthly fee until you cancel. You may cancel at any time to avoid future charges.</p>
       <div className="text-right">
         <button onClick={onCancel} className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2">Cancel</button>
-        <button onClick={handleConfirm} className="bg-cyan-950 text-white px-4 py-2 rounded">Confirm</button>
+        <button onClick={handleConfirm} className="bg-cyan-950 text-white px-4 py-2 rounded">Confirm</button> {/*suppose to prompt the sucessSub*/}
       </div>
       <SuccessSubscription isOpen={isSuccessModalOpen} onRequestClose={() => setIsSuccessModalOpen(false)} />
     </div>
