@@ -73,7 +73,7 @@ export default function Sidebar() {
             <ul className="flex-1 px-3 overflow-y-auto">
               <hr className="border-t border-gray-200 my-2" />
               <SidebarItem icon={<User size={20} />} text="Account" active link="/protected/settings" />
-              <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/protected/settings" />
+              <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/landing/billing" />
             </ul>
           </SidebarContext.Provider>
         </div>
