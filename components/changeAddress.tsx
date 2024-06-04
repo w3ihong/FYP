@@ -16,7 +16,7 @@ interface ChangeAddressProps {
 const ChangeAddress: React.FC<ChangeAddressProps> = ({ billingDetails, onBillingDetailsChange, onCancel }) => {
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg w-full lg:w-4/5">
-      <h2 className="text-2xl font-semibold mb-4 text-accent text-base">Change Billing Address</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-accent ">Change Billing Address</h2>
       <form>
         <div className="mb-4">
           <label htmlFor="billingAddress" className="block text-sm font-medium text-gray-700">
