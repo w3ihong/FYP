@@ -17,8 +17,6 @@ create table
     constraint users_user_type_fkey foreign key (user_type) references user_types (type_name)
   ) tablespace pg_default;
   
--- change to inlude cc info
-
 create table
   public.billing (
     user_id uuid not null,
@@ -27,6 +25,10 @@ create table
     street character varying(255) null,
     unit character varying(50) null,
     postalcode character varying(20) null,
+    credit_card_no bigint null,
+    credit_card_cvv smallint null,
+    credit_card_expiry date null,
+    full_name text null,
     constraint billing_pkey primary key (user_id),
     constraint billing_user_id_fkey1 foreign key (user_id) references users (user_id) on update cascade
   ) tablespace pg_default;
