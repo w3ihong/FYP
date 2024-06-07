@@ -1,18 +1,23 @@
 'use client';
+"use client";
+
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { LogOut, User, CreditCard, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LogOut, User, CreditCard } from 'lucide-react';
 import Link from "next/link";
 
+// Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
 
+// Props for SidebarItem component
 interface SidebarItemProps {
   icon: ReactNode;
   text: string;
   active?: boolean;
   alert?: boolean;
-  link?: string;
+  link: string;
 }
 
+// SidebarItem component
 export function SidebarItem({ icon, text, active, alert, link }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
 
@@ -35,51 +40,48 @@ export function SidebarItem({ icon, text, active, alert, link }: SidebarItemProp
     </li>
   );
 
-  return link ? (
+  return (
     <Link href={link}>
       {item}
     </Link>
-  ) : (
-    <>{item}</>
   );
 }
 
+// Sidebar component
 export default function Sidebar() {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
 
   return (
     <aside
-      className={`fixed top-0 h-screen transition-all ${expanded ? 'w-64' : 'w-20'}`}
-      style={{ backgroundColor: '#133048' }}
+      className={`fixed top-0 left-0 h-screen bg-accent transition-all duration-300 ease-in-out ${expanded ? 'w-60' : 'w-16'}`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
+      style={{ zIndex: 1000 }}
     >
-      <nav className="h-full flex flex-col justify-between border-r shadow-sm">
-        <div>
-          <div className="p-4 pb-2 flex items-center">
-            <div className="flex items-center">
-              <Link href="/landing">
-                <button className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100">
-                  <ArrowLeft className="text-gray-800" />
-                </button>
-              </Link>
-              <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
-                {/* EchoSphere */}
+      <nav className="h-full flex flex-col justify-between shadow-sm">
+        <div className="flex-col h-full">
+          <Link href="/protected">
+            <div className="flex items-center p-3 pb-2 cursor-pointer mb-4 ml-1 mt-2">
+              <span className="text-white"><ArrowLeft size={24} /></span>
+              <span className={`ml-3 text-white font-semibold transition-opacity duration-300 ease-in-out ${expanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
+                Settings
               </span>
             </div>
-          </div>
+          </Link>
 
           <SidebarContext.Provider value={{ expanded }}>
             <ul className="flex-1 px-3 overflow-y-auto">
               <hr className="border-t border-gray-200 my-2" />
-              <SidebarItem icon={<User size={20} />} text="Account" active link="/protected/settings" />
-              <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/protected/settings" />
+              <SidebarItem icon={<User size={20} />} text="Account" active link="/settings/account" />
+              <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
             </ul>
           </SidebarContext.Provider>
         </div>
 
         <div className="p-3">
-          <SidebarItem icon={<LogOut size={20} />} text="Logout" link="/landing/register" />
+          <SidebarContext.Provider value={{ expanded }}>
+            <SidebarItem icon={<LogOut size={20} />} text="Log out" link="/landing" />
+          </SidebarContext.Provider>
         </div>
       </nav>
     </aside>
