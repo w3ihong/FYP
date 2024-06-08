@@ -122,6 +122,15 @@ export default function Settings() {
     }
   };
 
+  const generateOTP = (length = 6) => {
+    let otp = '';
+    for (let i = 0; i < length; i++) {
+      otp += Math.floor(Math.random() * 10).toString();
+    }
+    return otp;
+  };
+  
+
   const handleDisableAccount = () => {
     // Add logic to disable the account here
     console.log('Account disabled');
