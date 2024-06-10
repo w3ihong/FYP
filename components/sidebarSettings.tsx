@@ -21,12 +21,13 @@ export function SidebarItem({ icon, text, link }: SidebarItemProps) {
   return (
     <Link href={link}>
       <div
-        className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors duration-300 ease-in-out hover:bg-SBaccent text-gray-699`}
+        className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-SBaccent text-gray-699 `}
       >
         <span className="text-white">{icon}</span>
         <span
-          className={`ml-3 text-white transition-opacity duration-300 ease-in-out ${expanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}
-          style={{ whiteSpace: 'nowrap' }}
+          className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+            expanded ? 'w-auto ml-3 opacity-100 text-white' : 'w-0 opacity-0'
+          }`}
         >
           {text}
         </span>
@@ -41,7 +42,7 @@ export default function SettingsSidebar() {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-accent transition-all duration-300 ease-in-out ${expanded ? 'w-60' : 'w-16'}`}
+      className={`fixed top-0 h-screen bg-accent transition-all ${expanded ? 'w-60' : 'w-16'}`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       style={{ zIndex: 1000 }}
@@ -51,7 +52,11 @@ export default function SettingsSidebar() {
           <Link href="/protected">
             <div className="flex items-center p-3 pb-2 cursor-pointer mb-4 ml-1 mt-2">
               <span className="text-white"><ArrowLeft size={24} /></span>
-              <span className={`ml-3 text-white font-semibold transition-opacity duration-300 ease-in-out ${expanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
+              <span
+                className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+                  expanded ? 'w-auto ml-3 opacity-100 text-white' : 'w-0 opacity-0'
+                }`}
+              >
                 Settings
               </span>
             </div>
@@ -61,6 +66,8 @@ export default function SettingsSidebar() {
             <div className="flex flex-col px-3 h-full">
               <SidebarItem icon={<User size={20} />} text="Account" link="/settings/account" />
               <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
+              <div className=' grow '/>
+          
             </div>
           </SidebarContext.Provider>
         </div>
