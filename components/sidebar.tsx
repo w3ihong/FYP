@@ -45,6 +45,7 @@ export default function Sidebar({email, userType }: {email: string , userType: n
       
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
+      style={{ zIndex: 1000 }}
     >
       <nav className="h-screen flex flex-col justify-between border-r shadow-sm">
         <div className='flex-col h-full '>
