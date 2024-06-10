@@ -7,6 +7,7 @@
 - fix email link to redirect to website instead of loal host (backend)
 - dashboard ui and backend
 - logout (backend)
+- combine change password and change credit card into same page
 
 
 

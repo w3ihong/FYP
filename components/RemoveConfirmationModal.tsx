@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ModalSuccess from './ModalSuccess';
+import ModalSuccess from './modalSuccess';
 import ModalBackdrop from './modalBackdrop';
 
 const RemoveConfirmationModal = ({ isOpen, onConfirm, onClose }) => {

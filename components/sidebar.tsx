@@ -79,7 +79,7 @@ export default function Sidebar({email, userType }: {email: string , userType: n
               <SidebarItem
                 icon={<Brain size={20} />}
                 text="Visualize"
-                link="/protected/Visualize"
+                link="/protected/visualize"
                 />
               <SidebarItem
                 icon={<Users size={20} />}
