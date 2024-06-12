@@ -17,8 +17,6 @@ export default function Index() {
     }
   };
 
-  
-
   const isSupabaseConnected = canInitSupabaseClient();
 
   return (
@@ -80,11 +78,26 @@ export default function Index() {
               </a>
             </p>
           </footer>
+
+          <script type="text/javascript">
+            {(function(d, t) {
+              var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+              v.onload = function() {
+                window.voiceflow.chat.load({
+                  verify: { projectID: '661bab099f0a7cb3f08a6340' },
+                  url: 'https://general-runtime.voiceflow.com',
+                  versionID: 'production'
+                });
+              }
+              v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
+              v.type = "text/javascript"; 
+              s.parentNode.insertBefore(v, s);
+            })(document, 'script')}
+          </script>
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
       <ModalSocial isOpen={isAccountModalOpen} onClose={() => setAccountModalOpen(false)} />
-
     </div>
   );
 }

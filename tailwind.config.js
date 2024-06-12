@@ -11,7 +11,8 @@ module.exports = {
       sans: ["Inter", "sans-serif"],
       serif: ["Merriweather", "serif"],
       mono: ["Roboto Mono", "monospace"],
-      raleway: ["Raleway", "sans-serif"]
+      raleway: ["Raleway", "sans-serif"],
+      roboto: ["Roboto", "sans-serif"]
     },
     extend: {
       colors: {

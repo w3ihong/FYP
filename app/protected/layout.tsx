@@ -15,6 +15,7 @@ export default async function ProtectedLayout({
     } = await supabase.auth.getUser();
     
     
+    
     //comment out to aid with development
     // if (!user) {
     //   console.log('User not found');
@@ -22,6 +23,8 @@ export default async function ProtectedLayout({
     // }
     
     const userObj = JSON.parse(JSON.stringify(user));
+
+    
     
     
     return (
@@ -33,5 +36,9 @@ export default async function ProtectedLayout({
                 {children}
             </div>
         </div>
+
+        
     );
+
+
 }

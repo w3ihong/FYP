@@ -1,3 +1,5 @@
+"use client";
+
 'use client';
 "use client";
 
@@ -12,43 +14,32 @@ const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
 interface SidebarItemProps {
   icon: ReactNode;
   text: string;
-  active?: boolean;
-  alert?: boolean;
   link: string;
 }
 
 // SidebarItem component
-export function SidebarItem({ icon, text, active, alert, link }: SidebarItemProps) {
+export function SidebarItem({ icon, text, link }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
-
-  const item = (
-    <li
-      className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors ${
-        active
-          ? 'bg-gradient-to-tr from-purple-500 to-purple-500 text-indigo-800'
-          : 'hover:bg-purple-500 text-gray-699'
-      }`}
-    >
-      <span className="text-white">{icon}</span>
-      <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3 text-white' : 'w-0 text-white'}`}>
-        {text}
-      </span>
-      {alert && (
-        <div className={`absolute right-2 w-2 h-2 rounded-full bg-indigo-400 ${expanded ? 'top-2' : ''}`}></div>
-      )}
-      {active && <span className="ml-auto text-green-500"></span>}
-    </li>
-  );
 
   return (
     <Link href={link}>
-      {item}
+      <div
+        className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors duration-300 ease-in-out hover:bg-SBaccent text-gray-699`}
+      >
+        <span className="text-white">{icon}</span>
+        <span
+          className={`ml-3 text-white transition-opacity duration-300 ease-in-out ${expanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}
+          style={{ whiteSpace: 'nowrap' }}
+        >
+          {text}
+        </span>
+      </div>
     </Link>
   );
 }
 
-// Sidebar component
-export default function Sidebar() {
+// SettingsSidebar component
+export default function SettingsSidebar() {
   const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
 
   return (
@@ -70,11 +61,10 @@ export default function Sidebar() {
           </Link>
 
           <SidebarContext.Provider value={{ expanded }}>
-            <ul className="flex-1 px-3 overflow-y-auto">
-              <hr className="border-t border-gray-200 my-2" />
-              <SidebarItem icon={<User size={20} />} text="Account" active link="/settings/account" />
+            <div className="flex flex-col px-3 h-full">
+              <SidebarItem icon={<User size={20} />} text="Account" link="/settings/account" />
               <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
-            </ul>
+            </div>
           </SidebarContext.Provider>
         </div>
 
