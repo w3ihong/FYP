@@ -1,6 +1,6 @@
 "use client";
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
+import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain, Mail} from 'lucide-react';
 import Link from "next/link";
 import { logout } from '@/app/actions';
 import Image from 'next/image';
@@ -94,6 +94,12 @@ export default function Sidebar({email, userType }: {email: string , userType: n
                   icon={<Settings size={20} />}
                   text="Settings"
                   link="/settings"
+                  />
+
+                <SidebarItem
+                  icon={<Mail size={20} />}
+                  text="Inivtations"
+                  link="/invitations"
                   />
                 
                 <SidebarItem
