@@ -320,7 +320,7 @@ export default function Settings() {
               </select>
             </div>
             <div className="flex justify-center space-x-4">
-              <button className="bg-cred font-roboto text-white px-4 py-2 rounded-md w-52" onClick={handleDeleteAccount}>Disable Account</button>
+              <button className="bg-cred font-roboto text-white px-4 py-2 rounded-md w-52" onClick={handleDeleteAccount}>Delete Account</button>
               <button className="bg-gray-400 font-roboto text-white px-4 py-2 rounded-md w-52" onClick={toggleDeleteAccountModal}>Cancel</button>
             </div>
           </div>
