@@ -13,6 +13,8 @@ export default async function ProtectedLayout({
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
+    
     
     // comment out to aid with development
     // if (!user) {

@@ -70,7 +70,7 @@ export default function Sidebar({email, userType }: {email: string , userType: n
               <SidebarItem
                 icon={<BarChart3 size={20} />}
                 text="Analytics"
-                link="/protected/analytics"
+                link="/settings/ChangePassword"
                 />
               <SidebarItem
                 icon={<Calendar size={20} />}

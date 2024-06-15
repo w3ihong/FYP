@@ -1,5 +1,8 @@
 "use client";
 
+'use client';
+"use client";
+
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 import { ArrowLeft, LogOut, User, CreditCard } from 'lucide-react';
 import Link from "next/link";

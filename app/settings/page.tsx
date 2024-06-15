@@ -1,13 +1,23 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EnvelopeIcon } from '@heroicons/react/24/outline'; 
 import ModalBackdrop from '@/components/modalBackdrop';
+import { deleteUser, disableUser, getEmail, sendOTP, updateEmail, updatePassword, verifyOTP } from '../actions';
+import { redirect } from 'next/dist/server/api-utils';
+import router from 'next/router';
+import { login } from '../actions';
+
+
 
 // Mock user data
 const user = {
-  email: 'johndoe10@gmail.com',
+  
+  email: '',
 };
+
+
+
 
 export default function Settings() {
   const [email, setEmail] = useState(user.email);
@@ -21,6 +31,20 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState(Array(6).fill(''));
+
+  useEffect(() => {
+    async function fetchEmail() {
+      const fetchedEmail = await getEmail();
+      setEmail(fetchedEmail);
+      if (fetchedEmail !== email) {
+        setModalEmail(fetchedEmail);
+      }
+    }
+    fetchEmail();
+  }, []);
+  
+  
+  
 
   const toggleEmailModal = () => {
     setIsEmailModalOpen(!isEmailModalOpen);
@@ -47,33 +71,126 @@ export default function Settings() {
     setIsDeleteAccountModalOpen(!isDeleteAccountModalOpen);
   };
 
-  const saveEmail = () => {
-    setEmail(modalEmail); 
-    setIsEmailModalOpen(false);
+  const saveEmail = async () => {
+    try {
+      await updateEmail(email, modalEmail);  // Call the updateEmail function
+      setEmail(modalEmail); 
+      setIsEmailModalOpen(false);
+      router.push('/settings?message=Email updated successfully');  // Redirect on success
+    } catch (error) {
+      console.error('Error updating email:', error);
+      router.push('/settings/change-email?message=Error updating email');  // Redirect on error
+    }
   };
 
-  const changePassword = () => {
-    // Add password change logic here
-    console.log('Password changed');
-    setIsPasswordModalOpen(false);
+  const changePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      console.error('New passwords do not match');
+      return;
+    }
+    try {
+      await updatePassword(currentPassword , newPassword);
+      console.log('Password changed');
+      setIsPasswordModalOpen(false);
+    } catch (error) {
+      console.error('Error changing password:', error.message);
+    }
   };
 
-  const enable2FA = () => {
-    // Add 2FA enabling logic here
-    console.log('2FA enabled with OTP:', otp.join(''));
-    setIs2FAModalOpen(false);
+
+  const enable2FA = async () => {
+    try {
+      // Assuming you have the email available in the component state
+      const userEmail = email;
+      if (!userEmail) {
+        console.error('Email not found.');
+        return;
+      }
+  
+      // Call the sendOTP function with the user's email
+      const otp = await sendOTP(userEmail);
+      if (otp) {
+        console.log('2FA enabled with OTP:', otp);
+        setIs2FAModalOpen(true);
+        // Optionally, show an input field to the user to enter the OTP for verification
+      } else {
+        console.error('Failed to enable 2FA.');
+        // Handle the failure case appropriately
+      }
+    } catch (error) {
+      console.error('Error enabling 2FA:', error.message);
+      // Handle the error appropriately
+    }
   };
 
-  const handleDisableAccount = () => {
-    // Add logic to disable the account here
-    console.log('Account disabled');
-    setIsDisableAccountModalOpen(false);
+  const handleVerifyOTP = async () => {
+    const enteredOtp = otp.join('');
+    const userEmail = email;
+
+    if (!userEmail) {
+      console.error('Email not found.');
+      return;
+    }
+
+    try {
+      const isValidOtp = await verifyOTP(userEmail, enteredOtp);
+      if (isValidOtp) {
+        console.log('OTP verified successfully');
+        router.push('/protected');
+        setIs2FAModalOpen(false);
+      } else {
+        console.error('Invalid OTP');
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error.message);
+    }
   };
 
-  const handleDeleteAccount = () => {
-    // Add logic to delete the account here
-    console.log('Account deleted');
-    setIsDeleteAccountModalOpen(false);
+
+ 
+  
+
+  const handleDisableAccount = async () => {
+    try {
+      // Call the disableUser function with the user's email
+      const isDisabled = await disableUser();
+      
+      if (isDisabled) {
+        console.log('Account disabled successfully');
+        // Optionally, you can redirect the user or show a success message
+        
+        
+        
+      } else {
+        console.log('Failed to disable account');
+        // Handle the failure case
+      }
+      
+      setIsDisableAccountModalOpen(false); // Close the modal
+      
+    } catch (error) {
+      console.error('Error disabling account:', error.message);
+      // Handle the error appropriately
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const isDeleted = await deleteUser();
+  
+      if (isDeleted) {
+        console.log('Account deleted successfully');
+        router.push('/goodbye'); // Redirect the user to a goodbye page or home page
+      } else {
+        console.error('Failed to delete account');
+        // Optionally, handle the failure case (e.g., show an error message)
+      }
+  
+      setIsDeleteAccountModalOpen(false); // Close the modal
+    } catch (error) {
+      console.error('Error deleting account:', error.message);
+      // Optionally, handle the error appropriately (e.g., show an error message)
+    }
   };
 
   return (
@@ -236,34 +353,43 @@ export default function Settings() {
         </ModalBackdrop>
       )}
 
-    {is2FAModalOpen && (
-      <ModalBackdrop onClick={toggle2FAModal}>
-        <div className="bg-white p-8 rounded-md shadow-lg w-[40rem] h-[20rem] relative" onClick={(e) => e.stopPropagation()}>
-          <button className="absolute top-2 left-2 text-gray-500" onClick={toggle2FAModal}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <h2 className="text-lg font-semibold mb-4">Enable 2-Factor Authentication</h2>
-            <div className="flex justify-center mb-4">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <input 
-                  key={index}
-                  type="text" 
-                  maxLength={1}
-                  pattern="[0-9]*"
-                  className="text-sm text-gray-900 font-inter border border-gray-300 rounded-md p-2 w-12 h-12 mx-1 text-center"
-                />
-              ))}
-            </div>
-            <div className="flex justify-end mt-4">
-              <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={enable2FA}>Enable 2FA</button>
-            </div>
-          </div>
+{is2FAModalOpen && (
+  <ModalBackdrop onClick={toggle2FAModal}>
+    <div className="bg-white p-8 rounded-md shadow-lg w-[40rem] h-[20rem] relative" onClick={(e) => e.stopPropagation()}>
+      <button className="absolute top-2 left-2 text-gray-500" onClick={toggle2FAModal}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <h2 className="text-lg font-semibold mb-4">Enable 2-Factor Authentication</h2>
+        <div className="flex justify-center mb-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <input 
+              key={index}
+              type="text" 
+              maxLength={1}
+              pattern="[0-9]*"
+              className="text-sm text-gray-900 font-inter border border-gray-300 rounded-md p-2 w-12 h-12 mx-1 text-center"
+              value={otp[index] || ''}
+              onChange={(e) => {
+                const newOtp = [...otp];
+                newOtp[index] = e.target.value;
+                setOtp(newOtp);
+              }}
+            />
+          ))}
         </div>
-      </ModalBackdrop>
-      )}
+        <div className="flex justify-end mt-4">
+          <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={enable2FA}>Enable 2FA</button>
+          <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={handleVerifyOTP}>Confirm</button>
+        </div>
+      </div>
+    </div>
+  </ModalBackdrop>
+)}
+
+      
 
     {/* Disable Account Modal */}
     {isDisableAccountModalOpen && (
@@ -330,4 +456,3 @@ export default function Settings() {
       </div>
   );
 }
-
