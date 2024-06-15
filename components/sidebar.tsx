@@ -1,6 +1,6 @@
 "use client";
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
+import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain, Mail} from 'lucide-react';
 import Link from "next/link";
 import { logout } from '@/app/actions';
 import Image from 'next/image';
@@ -60,17 +60,17 @@ export default function Sidebar({email, userType }: {email: string , userType: n
 
           <SidebarContext.Provider value={{ expanded }}>
             <div className=" flex flex-col px-3 h-full ">
-              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
+              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/create" />
               <hr className="border-t border-gray-200 my-2" />
               <SidebarItem
                 icon={<LayoutDashboard size={20} />}
                 text="Dashboard"
-                link="/protected/dashboard"
+                link="/protected"
                 />
               <SidebarItem
                 icon={<BarChart3 size={20} />}
                 text="Analytics"
-                link="/protected/analytics"
+                link="/settings/ChangePassword"
                 />
               <SidebarItem
                 icon={<Calendar size={20} />}
@@ -94,6 +94,12 @@ export default function Sidebar({email, userType }: {email: string , userType: n
                   icon={<Settings size={20} />}
                   text="Settings"
                   link="/settings"
+                  />
+
+                <SidebarItem
+                  icon={<Mail size={20} />}
+                  text="Invitations"
+                  link="/invitations"
                   />
                 
                 <SidebarItem
