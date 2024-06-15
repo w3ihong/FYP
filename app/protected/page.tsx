@@ -1,46 +1,49 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import ModalContainer from '@/components/modalContainer';
-import ModalRemoveConfirmation from '@/components/modalRemoveConfirmation'; // Adjust the path as per your project structure
+import React, { useState } from "react";
+import ModalContainer from "@/components/modalContainer";
+import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 
 export default function Index() {
   const [isDraftModalOpen, setDraftModalOpen] = useState(false);
   const [isAccountModalOpen, setAccountModalOpen] = useState(false);
   const [deleteDraftIndex, setDeleteDraftIndex] = useState<number | null>(null);
   const [disconnectAccountIndex, setDisconnectAccountIndex] = useState<number | null>(null);
+  const [isConnectSocialModalOpen, setConnectSocialModalOpen] = useState(false);
 
+  // dummy accounts and values to check UI, can delete after implementing backend.
   const drafts = [
-    { id: 1, name: 'John Doe', caption: 'hello', lastEdited: '21 October 2023'},
-    { id: 2, name: 'Draft 2' },
-    { id: 3, name: 'Draft 3' },
-    { id: 4, name: 'Draft 4' },
-    { id: 5, name: 'Draft 4' },
+    { id: 1, name: "John Doe", caption: "hello", lastEdited: "21 October 2023" },
+    { id: 2, name: "Draft 2" },
+    { id: 3, name: "Draft 3" },
+    { id: 4, name: "Draft 4" },
+    { id: 5, name: "Draft 4" },
     // Add more drafts as needed
   ];
 
   const accounts = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Account 2' },
-    { id: 3, name: 'Account 3' },
-    { id: 4, name: 'Account 4' },
-    { id: 5, name: 'Account 4' },
-    { id: 6, name: 'Account 4' },
-    { id: 7, name: 'Account 4' },
-    { id: 8, name: 'Account 4' },
-    { id: 9, name: 'Account 4' },
-    { id: 10, name: 'Account 4' },
-    { id: 11, name: 'Account 4' },
-    { id: 12, name: 'Account 4' },
-    { id: 13, name: 'Account 4' },
-    { id: 14, name: 'Account 4' },
-    { id: 15, name: 'Account 4' },
+    { id: 1, name: "John Doe" },
+    { id: 2, name: "Account 2" },
+    { id: 3, name: "Account 3" },
+    { id: 4, name: "Account 4" },
+    { id: 5, name: "Account 4" },
+    { id: 6, name: "Account 4" },
+    { id: 7, name: "Account 4" },
+    { id: 8, name: "Account 4" },
+    { id: 9, name: "Account 4" },
+    { id: 10, name: "Account 4" },
+    { id: 11, name: "Account 4" },
+    { id: 12, name: "Account 4" },
+    { id: 13, name: "Account 4" },
+    { id: 14, name: "Account 4" },
+    { id: 15, name: "Account 4" },
     // Add more accounts as needed
   ];
 
+  // Logic for backend should go here, but can be changeable, it depends what you're comfortable with, Ebrahim
   const handleDeleteDraft = () => {
     if (deleteDraftIndex !== null) {
-      console.log('Deleting draft:', deleteDraftIndex + 1);
+      console.log("Deleting draft:", deleteDraftIndex + 1);
       setDeleteDraftIndex(null); // Reset delete state after action
       setDraftModalOpen(false); // Close the draft modal
     }
@@ -48,9 +51,9 @@ export default function Index() {
 
   const handleDisconnectAccount = () => {
     if (disconnectAccountIndex !== null) {
-      console.log('Disconnecting account:', disconnectAccountIndex + 1);
-      setDisconnectAccountIndex(null); // Reset disconnect state after action
-      setAccountModalOpen(false); // Close the account modal
+      console.log("Disconnecting account:", disconnectAccountIndex + 1);
+      setDisconnectAccountIndex(null);
+      setAccountModalOpen(false);
     }
   };
 
@@ -138,7 +141,7 @@ export default function Index() {
               <div className="flex space-x-2">
                 <button
                   className="bg-gray-400 text-white px-6 py-1 rounded-lg hover:bg-gray-500"
-                  onClick={() => console.log('Edit draft', index + 1)}
+                  onClick={() => console.log("Edit draft", index + 1)}
                 >
                   Edit
                 </button>
@@ -165,6 +168,7 @@ export default function Index() {
           isOpen={deleteDraftIndex !== null}
           onClose={() => setDeleteDraftIndex(null)}
           message="Are you sure you want to delete this draft?"
+          onConfirm={handleDeleteDraft}
         />
       </ModalContainer>
 
@@ -202,7 +206,10 @@ export default function Index() {
 
         {/* Buttons */}
         <div className="flex justify-center mt-6">
-          <button className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-900">
+          <button
+            className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-900"
+            onClick={() => setConnectSocialModalOpen(true)}
+          >
             Connect To More Social Media Accounts
           </button>
         </div>
@@ -213,7 +220,24 @@ export default function Index() {
         isOpen={disconnectAccountIndex !== null}
         onClose={() => setDisconnectAccountIndex(null)}
         message="Are you sure you want to disconnect this social media account?"
+        onConfirm={handleDisconnectAccount}
       />
+
+      {/* Modal for Connect Social Media Account */}
+      <ModalContainer isOpen={isConnectSocialModalOpen} onClose={() => setConnectSocialModalOpen(false)}>
+        <div className="flex flex-col items-center justify-center h-full space-y-4">
+          <h2 className="text-2xl font-bold mb-2">Connect To More Social Media Accounts</h2>
+          <button className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
+            <img src="/Instagram.png" alt="Instagram" className="w-6 h-6 mr-2" /> Instagram
+          </button>
+          <button className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
+            <img src="Twitter.png" alt="Twitter" className="w-6 h-6 mr-2" /> X
+          </button>
+          <button className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
+            <img src="Facebook.png" alt="Facebook" className="w-6 h-6 mr-2" /> Facebook
+          </button>
+        </div>
+      </ModalContainer>
     </div>
   );
 }
