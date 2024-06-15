@@ -1,8 +1,7 @@
 "use client";
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain, Mail} from 'lucide-react';
+import { Users, FileText, ShieldAlert, LogOut, Settings } from 'lucide-react';
 import Link from "next/link";
-import { logout } from '@/app/actions';
 import Image from 'next/image';
 import logo from "@/public/ESLogo.png";
 
@@ -34,10 +33,9 @@ export function SidebarItem({ icon, text, link }: SidebarItemProps) {
   );
 }
 
-// Sidebar component
-export default function Sidebar({email, userType }: {email: string , userType: number}) {
+// AdminSidebar component
+export default function AdminSidebar({email, userType }: {email: string , userType: number}) {
   const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
-  // const { user } = useContext(UserContext);
 
   return (
     <aside
@@ -45,7 +43,6 @@ export default function Sidebar({email, userType }: {email: string , userType: n
       
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      style={{ zIndex: 1000 }}
     >
       <nav className="h-screen flex flex-col justify-between border-r shadow-sm">
         <div className='flex-col h-full '>
@@ -60,33 +57,9 @@ export default function Sidebar({email, userType }: {email: string , userType: n
 
           <SidebarContext.Provider value={{ expanded }}>
             <div className=" flex flex-col px-3 h-full ">
-              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/create" />
-              <hr className="border-t border-gray-200 my-2" />
-              <SidebarItem
-                icon={<LayoutDashboard size={20} />}
-                text="Dashboard"
-                link="/protected"
-                />
-              <SidebarItem
-                icon={<BarChart3 size={20} />}
-                text="Analytics"
-                link="/settings/ChangePassword"
-                />
-              <SidebarItem
-                icon={<Calendar size={20} />}
-                text="Calendar"
-                link="/protected/calendar"
-                />
-              <SidebarItem
-                icon={<Brain size={20} />}
-                text="Visualize"
-                link="/protected/Visualize"
-                />
-              <SidebarItem
-                icon={<Users size={20} />}
-                text="Team"
-                link="/protected/team"
-                />
+              <SidebarItem icon={<Users size={20} />} text="Users" link="/admin" />
+              <SidebarItem icon={<FileText size={20} />} text="Reports" link="/admin/reports" />
+              <SidebarItem icon={<ShieldAlert size={20} />} text="Suspend" link="/admin/suspend" />
               <div className=' grow '/>
               <div className='pb-[63px]'>
 
@@ -94,19 +67,13 @@ export default function Sidebar({email, userType }: {email: string , userType: n
                   icon={<Settings size={20} />}
                   text="Settings"
                   link="/settings"
-                  />
-
-                <SidebarItem
-                  icon={<Mail size={20} />}
-                  text="Invitations"
-                  link="/invitations"
-                  />
+                />
                 
                 <SidebarItem
                   icon={<LogOut size={20} />}
                   text="Logout"
                   link="/landing"
-                  />
+                />
               </div>
               
             </div>
