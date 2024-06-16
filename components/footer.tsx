@@ -22,6 +22,9 @@ const Footer = () => {
                         <li>
                             <a className="text-white hover:text-secondary">Contact Us</a>
                         </li>
+                        <li>
+                            <a className="text-white hover:text-secondary">Report</a>
+                        </li>
                     </nav>
                 </div>
             </div>

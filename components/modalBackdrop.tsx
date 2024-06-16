@@ -1,4 +1,9 @@
+import React from 'react';
 
+interface ModalBackdropProps {
+  children: React.ReactNode;
+  onClick: () => void;
+}
 
 export default function ModalBackdrop({ children, onClick }: { children: any, onClick: any }) {
     return (
