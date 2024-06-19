@@ -28,6 +28,15 @@ export async function login(formData: FormData) {
   // Authenticate the user with email and password
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword(data);
 
+  console.log(authData?.user?.id);
+
+  const value = authData?.user?.id;
+
+  await insertUserData(value);
+  
+  
+
+
   if (authError) {
     redirect('/landing/login?message=Email or password is incorrect');
     return;
@@ -47,11 +56,14 @@ export async function login(formData: FormData) {
     return;
   }
 
- // if (foundUser.disabled) {
-//    console.log('User account is disabled');
+  
+
+  if (foundUser.disabled) {
+    console.log('User account is disabled');
+    await enableUser();
  //   redirect('/landing/login?message=Your account is disabled');
  //   return;
- // }
+  }
 
   if (foundUser['FA']) {
     console.log('2FA is enabled for this account');
@@ -78,10 +90,37 @@ export async function login(formData: FormData) {
   
 }
 
+// Function to insert user data into the users table
+async function insertUserData(userId: string) {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('users')
+    .insert([
+      {
+        user_id: userId,
+        suspended: false,
+        user_type: 'basic',
+        disabled : 'false' ,
+        FA : false
+      },
+    ]);
+
+  if (error) {
+    // console.error('Error inserting user data:', error.message);
+    return false;
+  }
+
+  console.log('User data inserted successfully');
+  return true;
+}
+
 
 
 export async function signup(email: string, password: string) {
   const supabase = createClient()
+
+  const check = supabase.auth.getUser();
 
   const data = {
     email,
@@ -91,6 +130,8 @@ export async function signup(email: string, password: string) {
 
 
   const { error } = await supabase.auth.signUp(data)
+
+  
 
   console.log(error)
   
@@ -193,42 +234,43 @@ export async function updateEmail(currentEmail: string, newEmail: string) {
 
 export async function deleteUser() {
   const supabase = createAdminClient();
-  try {
-    // Get the current user
-    const { data: { user }, error: getUserError } = await supabase.auth.getUser();
-    if (getUserError) {
-      throw getUserError;
-    }
 
-    if (!user) {
-      console.error('No user logged in.');
-      return false;
-    }
-
-    // Delete user data from your database
-    const { error: deleteUserDataError } = await supabase
-      .from('users')
-      .delete()
-      .eq('user_id', user.id); // Assuming 'id' is the primary key of your user table
-
-    if (deleteUserDataError) {
-      throw deleteUserDataError;
-    }
-
-    // Delete the user from the Supabase authentication system
-    const { error: deleteAuthUserError } = await supabase.auth.admin.deleteUser(user.id);
-
-    if (deleteAuthUserError) {
-      throw deleteAuthUserError;
-    }
-
-    console.log('User deleted successfully');
-    return true;
-  } catch (error) {
-    console.error('Error deleting user:', error.message);
+  // Get the current user
+  const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+  if (getUserError) {
+    console.error('Error getting user:', getUserError.message);
     return false;
   }
+
+  if (!user) {
+    console.error('No user logged in.');
+    return false;
+  }
+
+  // Delete user data from your database
+  const { error: deleteUserDataError } = await supabase
+    .from('users')
+    .delete()
+    .eq('user_id', user.id); // Assuming 'id' is the primary key of your user table
+
+  if (deleteUserDataError) {
+    console.error('Error deleting user data:', deleteUserDataError.message);
+    return false;
+  }
+
+  // Delete the user from the Supabase authentication system
+  const { error: deleteAuthUserError } = await supabase.auth.admin.deleteUser(user.id);
+
+  if (deleteAuthUserError) {
+    console.error('Error deleting auth user:', deleteAuthUserError.message);
+    return false;
+  }
+
+  console.log('User deleted successfully');
+  redirect('/landing');
+  return true;
 }
+
 
 // Function to generate a random OTP
 function generateOTP() {
@@ -455,7 +497,7 @@ export async function disableUser() {
   console.log('User disabled successfully:', foundUser.user_id);
 
   // Sign out the user after disabling the account
- // const { error: signOutError } = await supabase.auth.signOut();
+  const { error: signOutError } = await supabase.auth.signOut();
 
 
  // if (signOutError) {
@@ -464,7 +506,7 @@ export async function disableUser() {
  // }
 
 //  console.log('User signed out successfully');
- // redirect('/landing');
+  redirect('/landing');
   return true;
 }
 
