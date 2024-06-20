@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { EnvelopeIcon } from '@heroicons/react/24/outline'; 
 import ModalBackdrop from '@/components/modalBackdrop';
-import { deleteUser, disableUser, getEmail, sendOTP, updateEmail, updatePassword, verifyOTP } from '../actions';
+import { checkOTP, checkUserStatus, deleteUser, disableUser, getEmail, sendOTP, updateEmail, updatePassword, verifyOTP } from '../actions';
+import { enableUser } from '../actions';
 import { redirect } from 'next/dist/server/api-utils';
 import router from 'next/router';
 import { login } from '../actions';
+import ModalSuccess from '@/components/modalSuccess';
 
 
 
@@ -31,6 +33,11 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState(Array(6).fill(''));
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isAccountDisabled, setIsAccountDisabled] = useState(false); // State to track account status
+
+
 
   useEffect(() => {
     async function fetchEmail() {
@@ -42,8 +49,41 @@ export default function Settings() {
     }
     fetchEmail();
   }, []);
+
+  
+
+  const handleToggleAccountStatus = async () => {
+    if (isAccountDisabled) {
+      // If account is disabled, enable it
+      try {
+        await enableUser();
+        setIsSuccessModalOpen(true);
+        setSuccessMessage('Account has been enabled successfully.');
+        setIsAccountDisabled(true); // Update account status
+      } catch (error) {
+        console.error('Error enabling account:', error.message);
+        // Handle error
+      }
+    } else {
+      // If account is enabled, disable it
+      try {
+        await disableUser();
+        setIsSuccessModalOpen(true);
+        setSuccessMessage('Account has been disabled successfully.');
+        setIsAccountDisabled(true); // Update account status
+      } catch (error) {
+        console.error('Error disabling account:', error.message);
+        // Handle error
+      }
+    }
+    setIsDisableAccountModalOpen(false); // Close the modal
+  };
   
   
+  const showSuccessModal = (message) => {
+    setSuccessMessage(message);
+    setIsSuccessModalOpen(true);
+  };
   
 
   const toggleEmailModal = () => {
@@ -76,7 +116,8 @@ export default function Settings() {
       await updateEmail(email, modalEmail);  // Call the updateEmail function
       setEmail(modalEmail); 
       setIsEmailModalOpen(false);
-      router.push('/settings?message=Email updated successfully');  // Redirect on success
+      showSuccessModal('An email has been sent to your new email ');
+     // router.push('/settings?message=Email updated successfully');  // Redirect on success
     } catch (error) {
       console.error('Error updating email:', error);
       router.push('/settings/change-email?message=Error updating email');  // Redirect on error
@@ -92,6 +133,7 @@ export default function Settings() {
       await updatePassword(currentPassword , newPassword);
       console.log('Password changed');
       setIsPasswordModalOpen(false);
+      showSuccessModal('Password has been changed succesfully');
     } catch (error) {
       console.error('Error changing password:', error.message);
     }
@@ -112,6 +154,7 @@ export default function Settings() {
       if (otp) {
         console.log('2FA enabled with OTP:', otp);
         setIs2FAModalOpen(true);
+        
         // Optionally, show an input field to the user to enter the OTP for verification
       } else {
         console.error('Failed to enable 2FA.');
@@ -133,11 +176,11 @@ export default function Settings() {
     }
 
     try {
-      const isValidOtp = await verifyOTP(userEmail, enteredOtp);
+      const isValidOtp = await checkOTP(userEmail, enteredOtp);
       if (isValidOtp) {
         console.log('OTP verified successfully');
-        router.push('/protected');
         setIs2FAModalOpen(false);
+        showSuccessModal('2FA enabled');
       } else {
         console.error('Invalid OTP');
       }
@@ -145,6 +188,8 @@ export default function Settings() {
       console.error('Error verifying OTP:', error.message);
     }
   };
+
+
 
 
  
@@ -158,7 +203,8 @@ export default function Settings() {
       if (isDisabled) {
         console.log('Account disabled successfully');
         // Optionally, you can redirect the user or show a success message
-        
+
+       
         
         
       } else {
@@ -167,6 +213,8 @@ export default function Settings() {
       }
       
       setIsDisableAccountModalOpen(false); // Close the modal
+      showSuccessModal('Disabled account succesfully');
+      
       
     } catch (error) {
       console.error('Error disabling account:', error.message);
@@ -187,6 +235,7 @@ export default function Settings() {
       }
   
       setIsDeleteAccountModalOpen(false); // Close the modal
+      showSuccessModal('Deleted Account');
     } catch (error) {
       console.error('Error deleting account:', error.message);
       // Optionally, handle the error appropriately (e.g., show an error message)
@@ -381,7 +430,7 @@ export default function Settings() {
           ))}
         </div>
         <div className="flex justify-end mt-4">
-          <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={enable2FA}>Enable 2FA</button>
+          <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={enable2FA}>Send OTP</button>
           <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={handleVerifyOTP}>Confirm</button>
         </div>
       </div>
@@ -393,34 +442,41 @@ export default function Settings() {
 
     {/* Disable Account Modal */}
     {isDisableAccountModalOpen && (
-      <ModalBackdrop onClick={toggleDisableAccountModal}>
-        <div className="bg-white p-8 rounded-md shadow-lg w-[40rem] h-[25rem] relative flex flex-col justify-center" onClick={(e) => e.stopPropagation()}>
-          <button className="absolute top-2 left-2 text-gray-500" onClick={toggleDisableAccountModal}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <h2 className="text-xl text-accent font-bold mb-0 text-center">Are you sure you want to disable your account?</h2>
-
-          <p className="text-sm text-gray-600 mb-4 text-center">
-            You can come back anytime by logging in with your credentials.
-          </p>
-
-          <div className="mb-4 text-center">
-            <p className="text-sm font-semibold mb-2">Reason for disabling your account:</p>
-            <select className="text-sm text-gray-900 font-inter border border-gray-300 rounded-md p-2 w-[30rem] mb-4">
-              <option value="personal">Personal reasons</option>
-              <option value="security">Security concerns</option>
-              <option value="no-longer-needed">No longer needed</option>
-            </select>
-          </div>
-          <div className="flex justify-center space-x-4">
-            <button className="bg-accent font-roboto text-white px-4 py-2 rounded-md w-44" onClick={handleDisableAccount}>Disable Account</button>
-            <button className="bg-gray-400 font-roboto text-white px-4 py-2 rounded-md w-52" onClick={toggleDisableAccountModal}>Cancel</button>
-          </div>
+  <ModalBackdrop onClick={toggleDisableAccountModal}>
+    <div className="bg-white p-8 rounded-md shadow-lg w-[40rem] h-[25rem] relative flex flex-col justify-center" onClick={(e) => e.stopPropagation()}>
+      <button className="absolute top-2 left-2 text-gray-500" onClick={toggleDisableAccountModal}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <h2 className="text-xl text-accent font-bold mb-0 text-center">
+        {isAccountDisabled ? 'Enable Your Account' : 'Disable Your Account'}
+      </h2>
+      <p className="text-sm text-gray-600 mb-4 text-center">
+        {isAccountDisabled
+          ? 'You can enable your account anytime by clicking the button below.'
+          : 'You can come back anytime by logging in with your credentials.'}
+      </p>
+      {!isAccountDisabled && (
+        <div className="mb-4 text-center">
+          <p className="text-sm font-semibold mb-2">Reason for disabling your account:</p>
+          <select className="text-sm text-gray-900 font-inter border border-gray-300 rounded-md p-2 w-[30rem] mb-4">
+            <option value="personal">Personal reasons</option>
+            <option value="security">Security concerns</option>
+            <option value="no-longer-needed">No longer needed</option>
+          </select>
         </div>
-      </ModalBackdrop>
-    )}
+      )}
+      <div className="flex justify-center space-x-4">
+        <button className={isAccountDisabled ? "bg-accent font-roboto text-white px-4 py-2 rounded-md w-44" : "bg-cred font-roboto text-white px-4 py-2 rounded-md w-44"} onClick={handleToggleAccountStatus}>
+          {isAccountDisabled ? 'Enable Account' : 'Disable Account'}
+        </button>
+        <button className="bg-gray-400 font-roboto text-white px-4 py-2 rounded-md w-52" onClick={toggleDisableAccountModal}>Cancel</button>
+      </div>
+    </div>
+  </ModalBackdrop>
+)}
+
 
       {/* Delete Account Modal */}
       {isDeleteAccountModalOpen && (
@@ -446,12 +502,17 @@ export default function Settings() {
               </select>
             </div>
             <div className="flex justify-center space-x-4">
-              <button className="bg-cred font-roboto text-white px-4 py-2 rounded-md w-52" onClick={handleDeleteAccount}>Delete Account</button>
+              <button className="bg-cred font-roboto text-white px-4 py-2 rounded-md w-52" onClick={handleDeleteAccount}>Disable Account</button>
               <button className="bg-gray-400 font-roboto text-white px-4 py-2 rounded-md w-52" onClick={toggleDeleteAccountModal}>Cancel</button>
             </div>
           </div>
         </ModalBackdrop>
         )}
+
+        {/* Success Modal */}
+      {isSuccessModalOpen && (
+        <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} />
+      )}
 
       </div>
   );
