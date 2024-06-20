@@ -25,7 +25,7 @@ const Billing = () => {
   const [billingDetailsState, setBillingDetailsState] = useState({
     full_name: '',
     planType: '',
-    billingCycle: '',
+    billingCycle: '12 march',
     planCost: '',
     credit_card_no: '',
     credit_card_expiry: '',

@@ -1,37 +1,77 @@
-// Import necessary components and functions
-'use client'
-// Import necessary components and functions
-import { signIn } from 'next-auth/react';
+import React, { useEffect } from 'react';
 
-// Example Next.js functional component
-export default function SignIn(): JSX.Element {
+declare global {
+  interface Window {
+    fbAsyncInit: () => void;
+    FB: any;
+  }
+}
 
-    // Handle Facebook sign-in
-    const handleSignIn = async () => {
-        try {
-            // Call signIn with 'facebook' provider
-            const result = await signIn('facebook', {
-                callbackUrl: `${window.location.origin}/dashboard`, // Replace with your desired callback URL
-                redirect: false, // Whether to redirect after login, set to true if needed
-            });
+const FacebookLogin: React.FC = () => {
+  useEffect(() => {
+    // Initialize Facebook SDK
+    window.fbAsyncInit = function() {
+      window.FB.init({
+        appId      : '2153953224988805', // Replace with your app ID
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v20.0' // Replace with your API version
+      });
 
-            // Optionally handle the result
-            if (result?.error) {
-                console.error("Failed to sign in with Facebook", result.error);
-                // Handle error (e.g., show error message)
-            } else if (result?.url) {
-                // Redirect manually after successful login
-                window.location.href = result.url; // Redirect to the URL returned by signIn
-            }
-        } catch (error) {
-            console.error("Error during sign in:", error);
-            // Handle any other error (e.g., show error message)
-        }
+      window.FB.getLoginStatus(function(response: any) {
+        statusChangeCallback(response);
+      });
     };
 
-    return (
-        <button onClick={handleSignIn}>
-            Sign in with Facebook
-        </button>
-    );
-}
+    // Load the SDK script
+    (function(d, s, id){
+      const element = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      const js = d.createElement(s) as HTMLScriptElement;
+      js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      js.async = true;
+      js.defer = true;
+      js.crossOrigin = "anonymous";
+      element.parentNode!.insertBefore(js, element);
+    }(document, 'script', 'facebook-jssdk'));
+  }, []);
+
+  function statusChangeCallback(response: any) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+      testAPI();
+    } else {
+      document.getElementById('status')!.innerHTML = 'Please log into this webpage.';
+    }
+  }
+
+  function checkLoginState() {
+    window.FB.getLoginStatus(function(response: any) {
+      statusChangeCallback(response);
+    });
+  }
+
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    window.FB.api('/me', function(response: any) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status')!.innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+  }
+
+  return (
+    <div>
+      <div
+        className="fb-login-button"
+        data-scope="public_profile,email"
+        data-onlogin="checkLoginState();"
+      ></div>
+      <div id="status"></div>
+    </div>
+  );
+};
+
+export default FacebookLogin;
