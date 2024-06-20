@@ -2,9 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { sendOTP, verifyOTP } from '@/app/actions';
 import { getEmail } from '@/app/actions';
-
-
-
+import { redirect } from 'next/navigation';
 
 const TwoFactorAuth: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
@@ -55,20 +53,13 @@ const TwoFactorAuth: React.FC = () => {
     console.log('Entered OTP:', otpCode);
 
     // Verify OTP
-    const isVerified = await verifyOTP(email ,  otpCode);
-    
+    const verificationResult = await verifyOTP(email, otpCode);
 
-    if (isVerified) {
+    if (verificationResult == true) {
       console.log('OTP Verified Successfully');
-      // Redirect or perform further actions upon successful verification
-      
-      
-      
-      
-
-      
+      // Redirect to protected page if OTP is correct
     } else {
-      console.log('OTP Verification Failed');
+      console.log('OTP Verification Failed:', verificationResult);
       // Handle OTP verification failure (e.g., show error message)
     }
   };
@@ -105,3 +96,4 @@ const TwoFactorAuth: React.FC = () => {
 };
 
 export default TwoFactorAuth;
+
