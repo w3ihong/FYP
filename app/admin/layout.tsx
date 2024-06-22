@@ -14,6 +14,7 @@ export default async function AdminLayout({
   } = await supabase.auth.getUser();
 
 
+
   const userObj = JSON.parse(JSON.stringify(user));
   console.log(userObj.email);
 

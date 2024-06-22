@@ -1,11 +1,8 @@
-"use client";
-
 'use client';
-"use client";
-
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 import { ArrowLeft, LogOut, User, CreditCard } from 'lucide-react';
 import Link from "next/link";
+import { logout } from '@/app/actions';
 
 // Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
@@ -15,16 +12,18 @@ interface SidebarItemProps {
   icon: ReactNode;
   text: string;
   link: string;
+  onClick?: () => void; // onClick prop added
 }
 
 // SidebarItem component
-export function SidebarItem({ icon, text, link }: SidebarItemProps) {
+export function SidebarItem({ icon, text, link, onClick }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
 
   return (
     <Link href={link}>
       <div
         className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-SBaccent text-gray-699 `}
+        onClick={onClick} // onClick handler
       >
         <span className="text-white">{icon}</span>
         <span
@@ -42,6 +41,11 @@ export function SidebarItem({ icon, text, link }: SidebarItemProps) {
 // SettingsSidebar component
 export default function SettingsSidebar() {
   const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
+
+  // Logout function
+  const handleLogout = () => {
+    logout(); // Call logout function
+  };
 
   return (
     <aside
@@ -67,17 +71,16 @@ export default function SettingsSidebar() {
 
           <SidebarContext.Provider value={{ expanded }}>
             <div className="flex flex-col px-3 h-full">
-              <SidebarItem icon={<User size={20} />} text="Account" link="/settings/account" />
+              <SidebarItem icon={<User size={20} />} text="Account" link="/settings" />
               <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
               <div className=' grow '/>
-          
             </div>
           </SidebarContext.Provider>
         </div>
 
         <div className="p-3">
           <SidebarContext.Provider value={{ expanded }}>
-            <SidebarItem icon={<LogOut size={20} />} text="Log out" link="/landing" />
+            <SidebarItem icon={<LogOut size={20} />} text="Log out" link="/landing" onClick={handleLogout} />
           </SidebarContext.Provider>
         </div>
       </nav>

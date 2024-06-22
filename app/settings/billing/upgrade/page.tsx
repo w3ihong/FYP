@@ -1,13 +1,20 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link';
-import ChangeSubscription from '@/components/changesubmodal'; 
+import ChangeSubscription from '@/components/changesubmodal';
+
+const CheckmarkIcon = () => (
+  <svg className="h-5 w-5 text-cyan-950 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+  </svg>
+);
 
 const Upgrade = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const currentPlan = 'Premium Plan';
   const currentPlanDetails = ['SMMT Functionalities', 'Posting Recommendations', 'Sentiment & Competition Analysis'];
+  const newPlan = 'Business Plan';
   const newPlanDetails = ['Everything Premium member has', 'Includes 2 additional members', 'Network Visualization', 'Custom Workflow'];
   const currentPlanCost = '$39/month';
   const newPlanCost = '$99/month';
@@ -32,9 +39,9 @@ const Upgrade = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-yellow-100">
+    <div className="flex flex-col min-h-screen bg-yellow-150">
       <main className="flex-grow container mx-auto px-5 py-24">
-        <section className="text-gray-600 ">
+        <section className="text-gray-600">
           <div className="container mx-auto flex flex-col items-center">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full lg:w-3/4 mx-auto relative">
               {/* Back Button */}
@@ -50,12 +57,16 @@ const Upgrade = () => {
               <h2 className="bg-gray-100 rounded px-2 py-2 text-3xl font-semibold mb-4 text-center">Upgrade Your Plan</h2>
               <div className="border p-6 rounded-lg mb-6">
                 <h3 className="text-sm font-grey-100 mb-2">Current Plan:</h3>
-                <div className="flex justify-between items-start">
-                  <div className='flex-1 mr-4'>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-60 ">
                     <p className="text-2xl font-semibold">{currentPlan}</p>
-                    <ul className="list-disc ml-4">
+                    
+                    <ul className="ml-4">
                       {currentPlanDetails.map((detail, index) => (
-                        <li key={index} className="mb-1">{detail}</li>
+                        <li key={index} className="mb-1 flex items-center">
+                          <CheckmarkIcon />
+                          <span>{detail}</span>
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -63,12 +74,16 @@ const Upgrade = () => {
                 </div>
               </div>
               <div className="border p-6 rounded-lg mb-6">
-                <h3 className="text-2xl font-semibold mb-2">Business Plan</h3>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <ul className="list-disc ml-4">
+                <h3 className="text-sm font-grey-100 mb-2">New Plan:</h3>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-60">
+                    <p className="text-2xl font-semibold">{newPlan}</p>
+                    <ul className="ml-4">
                       {newPlanDetails.map((detail, index) => (
-                        <li key={index} className="mb-1">{detail}</li>
+                        <li key={index} className="mb-1 flex items-center">
+                          <CheckmarkIcon />
+                          <span>{detail}</span>
+                        </li>
                       ))}
                     </ul>
                   </div>

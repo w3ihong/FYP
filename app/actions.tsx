@@ -1,16 +1,16 @@
 'use server'
 
+
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
 import { idText } from 'typescript';
-import { Router } from 'lucide-react';
+import { Router, Users } from 'lucide-react';
 import TwoFactorAuth from './landing/TwoFactorAuth/page';
 
 const otpStore = new Map();
-const router = Router;
 
 
 export async function login(formData: FormData) {
@@ -28,6 +28,15 @@ export async function login(formData: FormData) {
   // Authenticate the user with email and password
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword(data);
 
+  console.log(authData?.user?.id);
+
+  const value = authData?.user?.id;
+
+  await insertUserData(value);
+  
+  
+
+
   if (authError) {
     redirect('/landing/login?message=Email or password is incorrect');
     return;
@@ -43,57 +52,75 @@ export async function login(formData: FormData) {
 
   if (findError) {
     console.error('Error checking user status:', findError.message);
-    redirect('/landing/login?message=An error occurred while checking user status');
+   // redirect('/landing/login?message=An error occurred while checking user status');
     return;
   }
-
-  if (foundUser.disabled) {
-    console.log('User account is disabled');
-    redirect('/landing/login?message=Your account is disabled');
-    return;
-  }
-
-  if (foundUser['FA']) {
-    
-    console.log('2FA is enabled for this account');
-
-    // Generate OTP
-    const otp = generateOTP();
-
-    // Save the OTP in a store (this example uses a hypothetical otpStore)
-    otpStore.set(data.email, otp);
-
-    // Send OTP via email
-    await sendOTPEmail(data.email, otp);
-
-    redirect(`/landing/TwoFactorAuth?email=${encodeURIComponent(data.email) }`)
 
   
 
-    
-
-    
-
-    
-
-   // redirect('/landing/login?message=Please check your email for 2FA code');
-    return;
-
-    
-   // + encodeURIComponent(data.email)
+  if (foundUser.disabled) {
+    console.log('User account is disabled');
+    await enableUser();
+ //   redirect('/landing/login?message=Your account is disabled');
+ //   return;
   }
+
+  if (foundUser['FA']) {
+    console.log('2FA is enabled for this account');
+    console.log(otpStore);
+    const isVerify = await verifyOTP(data.email , otpStore);
+
+    if (isVerify) {
+      redirect('/protected'); // Redirect to protected page if OTP is verified
+      return;
+    } else {
+      redirect(`/landing/TwoFactorAuth?email=${encodeURIComponent(data.email)}`);
+      return;
+    }
+  }
+
+  
 
   // Proceed with the login if the user is not disabled and 2FA is not enabled
   revalidatePath('/landing/login', 'page');
   console.log('Log in successful');
   
   redirect('/protected');
+
+  
+}
+
+// Function to insert user data into the users table
+async function insertUserData(userId: string) {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('users')
+    .insert([
+      {
+        user_id: userId,
+        suspended: false,
+        user_type: 'basic',
+        disabled : 'false' ,
+        FA : false
+      },
+    ]);
+
+  if (error) {
+    // console.error('Error inserting user data:', error.message);
+    return false;
+  }
+
+  console.log('User data inserted successfully');
+  return true;
 }
 
 
 
 export async function signup(email: string, password: string) {
   const supabase = createClient()
+
+  const check = supabase.auth.getUser();
 
   const data = {
     email,
@@ -103,6 +130,8 @@ export async function signup(email: string, password: string) {
 
 
   const { error } = await supabase.auth.signUp(data)
+
+  
 
   console.log(error)
   
@@ -119,6 +148,9 @@ export async function signup(email: string, password: string) {
 
 export async function logout() {
   const supabase = createClient()
+
+ 
+
   await supabase.auth.signOut()
 
   revalidatePath('/protected', 'page')
@@ -126,6 +158,182 @@ export async function logout() {
 }
 
 
+export async function billingDetails() {
+  const supabase = createClient();
+  const userResponse = await supabase.auth.getUser(); 
+  
+  if (!userResponse) {
+    console.error('User not authenticated');
+    return null;
+  }
+  
+  const userId = userResponse.data.user.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('billing')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching billing details:', error.message);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching billing details:', error.message);
+    return null;
+  }
+}
+
+export async function updateCardDetails(cardDetails: any): Promise<void> {
+  const supabase = createClient();
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const { data, error } = await supabase
+      .from('billing')
+      .update({
+        full_name: cardDetails.full_name,
+        credit_card_no: cardDetails.credit_card_no,
+        credit_card_expiry: cardDetails.credit_card_expiry,
+        credit_card_cvv: cardDetails.credit_card_cvv,
+        state: cardDetails.state,
+        city: cardDetails.city,
+        street: cardDetails.street,
+        unit: cardDetails.unit,
+        postalcode: cardDetails.postalcode,
+      })
+      .eq('user_id', userId); // Use the actual user ID
+
+    if (error) {
+      throw error;
+    }
+
+    // Handle success
+    console.log('Card details updated successfully:', data);
+  } catch (error) {
+    throw new Error(`Error updating card details: ${error.message}`);
+  }
+}
+
+export async function planType() {
+  const supabase = createClient();
+
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    // Get the user_type for the current user
+    const { data: userData, error: userTypeError } = await supabase
+      .from('users')
+      .select('user_type')
+      .eq('user_id', userId)
+      .single();
+
+    if (userTypeError) {
+      throw userTypeError;
+    }
+
+    const userType = userData?.user_type;
+
+    if (!userType) {
+      throw new Error('User type not found');
+    }
+
+    return userType;
+  } catch (error) {
+    console.error('Error fetching plan type:', error.message);
+    return null;
+  }
+}
+
+export async function upgradeSubscription(plan_type: string): Promise<void> {
+  const supabase = createClient();
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ user_type: plan_type }) 
+      .eq('user_id', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    // Handle success
+    console.log('User type updated successfully:', data);
+  } catch (error) {
+    throw new Error(`Error updating user type: ${error.message}`);
+  }
+}
+
+export async function downgradeSubscription(plan_type: string): Promise<void> {
+  const supabase = createClient();
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ user_type: plan_type }) 
+      .eq('user_id', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    // Handle success
+    console.log('User type updated successfully:', data);
+  } catch (error) {
+    throw new Error(`Error updating user type: ${error.message}`);
+  }
+}
 export async function getEmail() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -202,42 +410,43 @@ export async function updateEmail(currentEmail: string, newEmail: string) {
 
 export async function deleteUser() {
   const supabase = createAdminClient();
-  try {
-    // Get the current user
-    const { data: { user }, error: getUserError } = await supabase.auth.getUser();
-    if (getUserError) {
-      throw getUserError;
-    }
 
-    if (!user) {
-      console.error('No user logged in.');
-      return false;
-    }
-
-    // Delete user data from your database
-    const { error: deleteUserDataError } = await supabase
-      .from('users')
-      .delete()
-      .eq('user_id', user.id); // Assuming 'id' is the primary key of your user table
-
-    if (deleteUserDataError) {
-      throw deleteUserDataError;
-    }
-
-    // Delete the user from the Supabase authentication system
-    const { error: deleteAuthUserError } = await supabase.auth.admin.deleteUser(user.id);
-
-    if (deleteAuthUserError) {
-      throw deleteAuthUserError;
-    }
-
-    console.log('User deleted successfully');
-    return true;
-  } catch (error) {
-    console.error('Error deleting user:', error.message);
+  // Get the current user
+  const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+  if (getUserError) {
+    console.error('Error getting user:', getUserError.message);
     return false;
   }
+
+  if (!user) {
+    console.error('No user logged in.');
+    return false;
+  }
+
+  // Delete user data from your database
+  const { error: deleteUserDataError } = await supabase
+    .from('users')
+    .delete()
+    .eq('user_id', user.id); // Assuming 'id' is the primary key of your user table
+
+  if (deleteUserDataError) {
+    console.error('Error deleting user data:', deleteUserDataError.message);
+    return false;
+  }
+
+  // Delete the user from the Supabase authentication system
+  const { error: deleteAuthUserError } = await supabase.auth.admin.deleteUser(user.id);
+
+  if (deleteAuthUserError) {
+    console.error('Error deleting auth user:', deleteAuthUserError.message);
+    return false;
+  }
+
+  console.log('User deleted successfully');
+  redirect('/landing');
+  return true;
 }
+
 
 // Function to generate a random OTP
 function generateOTP() {
@@ -290,132 +499,292 @@ export async function sendOTP(email: string) {
   }
 }
 
-export async function verifyOTP(data: { email: string; otp: string }) {
+export async function verifyOTP(email, inputOtp) {
   const supabase = createClient();
-  const email = data.email;
-  const otp = data.otp;
 
-  // Retrieve the saved OTP from the store
-  const savedOTP = otpStore.get(email);
+  // Get the currently authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-  if (savedOTP === otp) {
-    // OTP is correct, remove it from the store
-    otpStore.delete(email);
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    throw userError;
+  }
+
+  if (!user) {
+    console.error('No authenticated user found');
+    return false;
+  }
+
+  // Log the ID of the authenticated user
+  console.log('Authenticated user ID:', user.id);
+
+  const userId = user.id;
+
+  const storedOtp = otpStore.get(email); // Retrieve stored OTP for the email
+
+  // Handle empty input OTP
+  if (!inputOtp) {
+    console.error('Empty input OTP');
+    return false;
+  }
+
+  if (storedOtp && storedOtp === inputOtp) {
+    otpStore.delete(email); // OTP is valid, remove it from the store
     console.log('OTP verified successfully for', email);
 
-    // Get the currently authenticated user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError) {
-      console.error('Error fetching authenticated user:', userError.message);
-      redirect(`/landing/TwoFactorAuth?email=${encodeURIComponent(email)}&message=An error occurred`);
-      return;
-    }
-
-    if (!user) {
-      console.error('No authenticated user found');
-      redirect(`/landing/TwoFactorAuth?email=${encodeURIComponent(email)}&message=No authenticated user found`);
-      return;
-    }
-
-    // Log the ID of the authenticated user
-    console.log('Authenticated user ID:', user.id);
-
-    // Update the user to set FA to true
+    // Update the user to set 2FAenabled to true
     const { error: updateError } = await supabase
       .from('users')
-      .update({ FA: true })
-      .eq('user_id', user.id);
+      .update({ FA: true }) // Assuming you have a field 'FA' to track 2FA status
+      .eq('user_id', userId);
 
     if (updateError) {
       console.error('Error updating user 2FA status:', updateError.message);
-      redirect(`/landing/TwoFactorAuth?email=${encodeURIComponent(email)}&message=An error occurred`);
-      return;
+      throw updateError;
     }
 
     console.log('2FA enabled successfully for', email);
+
+    
+    // Redirect to protected page
     redirect('/protected');
+
+    return true;
   } else {
-    // OTP is incorrect, redirect back to the OTP page with an error message
-    console.log('Incorrect OTP');
-    redirect(`/landing/TwoFactorAuth?email=${encodeURIComponent(email)}&message=Incorrect OTP`);
+    console.error('Invalid OTP for', email);
+    return false;
   }
 }
+
+
+
+
+export async function checkOTP(email, inputOtp) {
+  const supabase = createClient();
+
+  // Get the currently authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    throw userError;
+  }
+
+  if (!user) {
+    console.error('No authenticated user found');
+    return false;
+  }
+
+  // Log the ID of the authenticated user
+  console.log('Authenticated user ID:', user.id);
+
+  const userId = user.id;
+
+  const storedOtp = otpStore.get(email); // Retrieve stored OTP for the email
+
+  // Handle empty input OTP
+  if (!inputOtp) {
+    console.error('Empty input OTP');
+    return false;
+  }
+
+  if (storedOtp && storedOtp === inputOtp) {
+    otpStore.delete(email); // OTP is valid, remove it from the store
+    console.log('OTP verified successfully for', email);
+
+    // Update the user to set 2FAenabled to true
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ FA: true }) // Assuming you have a field 'FA' to track 2FA status
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.error('Error updating user 2FA status:', updateError.message);
+      throw updateError;
+    }
+
+    console.log('2FA enabled successfully for', email);
+
+    
+    
+    
+
+    return true;
+  } else {
+    console.error('Invalid OTP for', email);
+    return false;
+  }
+}
+
+
+
+
+
 
 
 
 export async function disableUser() {
   const supabase = createClient();
 
-  try {
-    // Get the currently authenticated user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+  // Get the currently authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (userError) {
-      console.error('Error fetching authenticated user:', userError.message);
-      throw userError;
-    }
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    throw userError;
+  }
 
-    if (!user) {
-      console.error('No authenticated user found');
-      return false;
-    }
-
-    // Log the ID of the authenticated user
-    console.log('Authenticated user ID:', user.id);
-
-    // Find the user by ID in your users table
-    const { data: foundUser, error: findError } = await supabase
-      .from('users')
-      .select('user_id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (findError) {
-      console.error('Error finding user by ID:', findError.message);
-      throw findError;
-    }
-
-    if (!foundUser) {
-      console.error('User not found for ID:', user.id);
-      return false;
-    }
-
-    // Disable the user account
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ disabled: true }) // Assuming you have a field 'disabled' to track account status
-      .eq('user_id', foundUser.user_id); // Using user_id to identify the user
-
-    if (updateError) {
-      console.error('Error updating user status:', updateError.message);
-      throw updateError;
-    }
-
-    console.log('User disabled successfully:', foundUser.user_id);
-
-
-    
-  
-    // Sign out the user after disabling the account
-    const { error: signOutError } = await supabase.auth.signOut();
-    
-
-    
-
-    if (signOutError) {
-      console.error('Error signing out user:', signOutError.message);
-      throw signOutError;
-    }
-
-    
-    console.log('User signed out successfully');
-    return true;
-  } catch (error) {
-    console.error('Error disabling user:', error.message);
+  if (!user) {
+    console.error('No authenticated user found');
     return false;
   }
+
+  // Log the ID of the authenticated user
+  console.log('Authenticated user ID:', user.id);
+
+  // Find the user by ID in your users table
+  const { data: foundUser, error: findError } = await supabase
+    .from('users')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (findError) {
+    console.error('Error finding user by ID:', findError.message);
+    throw findError;
+  }
+
+  if (!foundUser) {
+    console.error('User not found for ID:', user.id);
+    return false;
+  }
+
+  // Disable the user account
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ disabled: true }) // Assuming you have a field 'disabled' to track account status
+    .eq('user_id', foundUser.user_id); // Using user_id to identify the user
+
+  if (updateError) {
+    console.error('Error updating user status:', updateError.message);
+    throw updateError;
+  }
+
+  console.log('User disabled successfully:', foundUser.user_id);
+
+  // Sign out the user after disabling the account
+  const { error: signOutError } = await supabase.auth.signOut();
+
+
+ // if (signOutError) {
+ //   console.error('Error signing out user:', signOutError.message);
+ //   throw signOutError;
+ // }
+
+//  console.log('User signed out successfully');
+  redirect('/landing');
+  return true;
 }
+
+
+
+
+export async function enableUser() {
+  const supabase = createClient();
+
+  // Get the currently authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    throw userError;
+  }
+
+  if (!user) {
+    console.error('No authenticated user found');
+    return false;
+  }
+
+  // Log the ID of the authenticated user
+  console.log('Authenticated user ID:', user.id);
+
+  // Find the user by ID in your users table
+  const { data: foundUser, error: findError } = await supabase
+    .from('users')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (findError) {
+    console.error('Error finding user by ID:', findError.message);
+    throw findError;
+  }
+
+  if (!foundUser) {
+    console.error('User not found for ID:', user.id);
+    return false;
+  }
+
+  // Disable the user account
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ disabled: false }) // Assuming you have a field 'disabled' to track account status
+    .eq('user_id', foundUser.user_id); // Using user_id to identify the user
+
+  if (updateError) {
+    console.error('Error updating user status:', updateError.message);
+    throw updateError;
+  }
+
+  console.log('User has been enabled successfully:', foundUser.user_id);
+
+  
+  return true;
+}
+
+export async function checkUserStatus() {
+  const supabase = createClient();
+
+  // Get the currently authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    throw userError;
+  }
+
+  if (!user) {
+    console.error('No authenticated user found');
+    return null; // Return null if no user is authenticated
+  }
+
+  // Log the ID of the authenticated user
+  console.log('Authenticated user ID:', user.id);
+
+  // Find the user by ID in your users table and fetch their disabled status
+  const { data: foundUser, error: findError } = await supabase
+    .from('users')
+    .select('disabled')
+    .eq('user_id', user.id)
+    .single();
+
+  if (findError) {
+    console.error('Error finding user by ID:', findError.message);
+    throw findError;
+  }
+
+  if (!foundUser) {
+    console.error('User not found for ID:', user.id);
+    return null; // Return null if user is not found
+  }
+
+  // Log the disabled status of the user
+  console.log('User status (disabled):', foundUser.disabled);
+
+  return true;
+}
+
+
 
 
 
