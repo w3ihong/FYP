@@ -514,6 +514,8 @@ export default function Settings() {
         <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} />
       )}
 
+      
       </div>
+      
   );
 }
