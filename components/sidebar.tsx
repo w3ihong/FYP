@@ -76,7 +76,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
                 icon={<BarChart3 size={20} />}
                 text="Analytics"
                 link="/protected/analytics"
-              />
+                />
               <SidebarItem
                 icon={<Calendar size={20} />}
                 text="Calendar"

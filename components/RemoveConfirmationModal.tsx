@@ -89,3 +89,4 @@ const ModalRemove = ({ isOpen, onClose }) => {
 };
 
 export default ModalRemove;
+
