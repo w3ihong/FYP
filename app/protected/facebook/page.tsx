@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-
+"use client"
 declare global {
   interface Window {
     fbAsyncInit: () => void;
