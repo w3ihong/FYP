@@ -65,12 +65,12 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
 
           <SidebarContext.Provider value={{ expanded }}>
             <div className=" flex flex-col px-3 h-full ">
-              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/reports/create" />
+              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/post/create" />
               <hr className="border-t border-gray-200 my-2" />
               <SidebarItem
                 icon={<LayoutDashboard size={20} />}
                 text="Dashboard"
-                link="/protected/dashboard"
+                link="/protected"
               />
               <SidebarItem
                 icon={<BarChart3 size={20} />}
