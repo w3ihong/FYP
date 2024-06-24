@@ -6,9 +6,6 @@ import { redirect } from 'next/navigation'
 
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
-import { idText } from 'typescript';
-import { Router, Users } from 'lucide-react';
-import TwoFactorAuth from './landing/TwoFactorAuth/page';
 
 const otpStore = new Map();
 
@@ -148,8 +145,6 @@ export async function signup(email: string, password: string) {
 
 export async function logout() {
   const supabase = createClient()
-
- 
 
   await supabase.auth.signOut()
 
@@ -555,8 +550,6 @@ export async function verifyOTP(email, inputOtp) {
     return false;
   }
 }
-
-
 
 
 export async function checkOTP(email, inputOtp) {
