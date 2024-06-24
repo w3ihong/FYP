@@ -1,4 +1,5 @@
 import React from 'react';
+import { signIn } from 'next-auth/react';
 
 const ConnectSocialMedia = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -15,7 +16,10 @@ const ConnectSocialMedia = ({ isOpen, onClose }) => {
           <button className="w-full px-4 py-2 bg-blue-900 text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-700">
             <img src="Twitter.png" alt="Twitter" className="w-6 h-6 mr-2" /> Twitter
           </button>
-          <button className="w-full px-4 py-2 bg-blue-900 text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-700">
+          <button
+            onClick={() => signIn('facebook')}
+            className="w-full px-4 py-2 bg-blue-900 text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-700"
+          >
             <img src="Facebook.jpeg" alt="Facebook" className="w-6 h-6 mr-2" /> Facebook
           </button>
         </div>

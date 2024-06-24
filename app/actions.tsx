@@ -6,9 +6,6 @@ import { redirect } from 'next/navigation'
 
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
-import { idText } from 'typescript';
-import { Router, Users } from 'lucide-react';
-import TwoFactorAuth from './landing/TwoFactorAuth/page';
 
 const otpStore = new Map();
 
@@ -149,8 +146,6 @@ export async function signup(email: string, password: string) {
 export async function logout() {
   const supabase = createClient()
 
- 
-
   await supabase.auth.signOut()
 
   revalidatePath('/protected', 'page')
@@ -158,6 +153,182 @@ export async function logout() {
 }
 
 
+export async function billingDetails() {
+  const supabase = createClient();
+  const userResponse = await supabase.auth.getUser(); 
+  
+  if (!userResponse) {
+    console.error('User not authenticated');
+    return null;
+  }
+  
+  const userId = userResponse.data.user.id;
+
+  try {
+    const { data, error } = await supabase
+      .from('billing')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching billing details:', error.message);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching billing details:', error.message);
+    return null;
+  }
+}
+
+export async function updateCardDetails(cardDetails: any): Promise<void> {
+  const supabase = createClient();
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const { data, error } = await supabase
+      .from('billing')
+      .update({
+        full_name: cardDetails.full_name,
+        credit_card_no: cardDetails.credit_card_no,
+        credit_card_expiry: cardDetails.credit_card_expiry,
+        credit_card_cvv: cardDetails.credit_card_cvv,
+        state: cardDetails.state,
+        city: cardDetails.city,
+        street: cardDetails.street,
+        unit: cardDetails.unit,
+        postalcode: cardDetails.postalcode,
+      })
+      .eq('user_id', userId); // Use the actual user ID
+
+    if (error) {
+      throw error;
+    }
+
+    // Handle success
+    console.log('Card details updated successfully:', data);
+  } catch (error) {
+    throw new Error(`Error updating card details: ${error.message}`);
+  }
+}
+
+export async function planType() {
+  const supabase = createClient();
+
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    // Get the user_type for the current user
+    const { data: userData, error: userTypeError } = await supabase
+      .from('users')
+      .select('user_type')
+      .eq('user_id', userId)
+      .single();
+
+    if (userTypeError) {
+      throw userTypeError;
+    }
+
+    const userType = userData?.user_type;
+
+    if (!userType) {
+      throw new Error('User type not found');
+    }
+
+    return userType;
+  } catch (error) {
+    console.error('Error fetching plan type:', error.message);
+    return null;
+  }
+}
+
+export async function upgradeSubscription(plan_type: string): Promise<void> {
+  const supabase = createClient();
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ user_type: plan_type }) 
+      .eq('user_id', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    // Handle success
+    console.log('User type updated successfully:', data);
+  } catch (error) {
+    throw new Error(`Error updating user type: ${error.message}`);
+  }
+}
+
+export async function downgradeSubscription(plan_type: string): Promise<void> {
+  const supabase = createClient();
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ user_type: plan_type }) 
+      .eq('user_id', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    // Handle success
+    console.log('User type updated successfully:', data);
+  } catch (error) {
+    throw new Error(`Error updating user type: ${error.message}`);
+  }
+}
 export async function getEmail() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -379,8 +550,6 @@ export async function verifyOTP(email, inputOtp) {
     return false;
   }
 }
-
-
 
 
 export async function checkOTP(email, inputOtp) {
