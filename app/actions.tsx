@@ -28,7 +28,7 @@ export async function login(formData: FormData) {
   // Authenticate the user with email and password
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword(data);
 
-  console.log(authData?.user?.id);
+  //console.log(authData?.user?.id);
 
   const value = authData?.user?.id;
 
