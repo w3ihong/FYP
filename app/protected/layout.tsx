@@ -13,15 +13,23 @@ export default async function ProtectedLayout({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    
 
-    if (!user) {
-      console.log('User not found');
-      return redirect("../../landing/login");
-    }
+    
+    
+    
+    
+    //comment out to aid with development
+     if (!user) {
+       console.log('User not found');
+
+       return redirect("../../landing/login");
+     }
     
     const userObj = JSON.parse(JSON.stringify(user));
-    console.log(userObj.email);
+
+    
+    
+    
     return (
         <div className='flex flex-row w-full min-h-screen'>
             <Sidebar email={userObj.email} userType= {0}/>
@@ -31,5 +39,9 @@ export default async function ProtectedLayout({
                 {children}
             </div>
         </div>
+
+        
     );
+
+
 }

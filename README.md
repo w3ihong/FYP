@@ -1,7 +1,17 @@
-// to do this sprint
-- ill put everything togetehr on weds
-- pull on thurs morning, 
-- start on settings pages, calista will distribute the work
+// backlog
+
+- forgot password (backend)
+- change email error leads to nothing
+- no error messages for password requirements or if passwords dont match when changing passwords
+
+# Payment #
+- payment details when there is no payment method provided
+- visa and master selection doesnt work 
+
+- connect social media account (backend)
+- fix email link during sign up to redirect to website instead of loal host (backend)
+
+
 
 
 For code samples/testing , create your own local branch

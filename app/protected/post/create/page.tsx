@@ -1,10 +1,10 @@
-export default function create()
+export default function team()
 {
     return (
        <main>
-        <h4>
+        <h5>
             Create
-        </h4>
+        </h5>
        </main>
     )
 }
