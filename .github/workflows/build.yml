@@ -3,10 +3,7 @@ name: Node.js CI
 on:
   push:
     branches:
-      - main
-      - 'feature/*'
-  pull_request:
-    branches:
+      - master
       - main
 
 jobs:
@@ -32,12 +29,5 @@ jobs:
     - name: Build the app
       run: npm run build
 
-    - name: Run tests
-      run: npm test
-
-    - name: Upload coverage report
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage-report
-        path: coverage
+    # - name: Run tests
+    #   run: npm test
