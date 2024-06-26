@@ -7,6 +7,7 @@ interface ChangeSubscriptionProps {
   currentPlanCost: string;
   newPlanCost: string;
   onCancel: () => void;
+  onConfirm: () => void;
 }
 
 const ChangeSubscription: React.FC<ChangeSubscriptionProps> = ({ currentPlan, currentPlanCost, newPlanCost, onCancel }) => {

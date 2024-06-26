@@ -9,7 +9,7 @@ export default function AdminSuspend() {
   const [suspensionReason, setSuspensionReason] = useState('');
 
   // Function to open the view modal
-  const handleOpenViewModal = (suspensionId, suspensionReason) => {
+  const handleOpenViewModal = (suspensionId : any, suspensionReason: any) => {
     setSuspensionId(suspensionId);
     setSuspensionReason(suspensionReason);
     setIsViewModalOpen(true);

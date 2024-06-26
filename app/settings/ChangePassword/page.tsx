@@ -69,7 +69,6 @@ function ChangePassword() {
 const styles = {
   container: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
@@ -86,7 +85,6 @@ const styles = {
   },
   form: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     width: '100%',
   },
