@@ -206,7 +206,7 @@ export default function RegisterPage() {
 
         {/* Modal */}
         {showModal && createPortal(
-        <Modal message="Sign up successful! Please check your email to continue." onClose={handleModalClose} />,
+        <Modal message="Sign up successful! Please check your email to continue." onClose={handleModalClose} isOpen={""}/>,
         document.body
       )}
 

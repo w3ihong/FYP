@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
-import FacebookSDK from './facebook/FacebookSDK';
+import FacebookSDK from './facebook/facebookSDK';
 
 declare global {
   interface Window {
@@ -25,7 +25,7 @@ export default function Index() {
     if (window.FB) {
       window.FB.login((response: any) => {
         if (response.authResponse) {
-          console.log('Welcome!  Fetching your information.... ');
+          console.log('Welcome! Fetching your information.... ');
           window.testAPI();
         } else {
           console.log('User cancelled login or did not fully authorize.');
@@ -36,7 +36,7 @@ export default function Index() {
     }
   };
 
-  const handleLoginSuccess = (response) => {
+  const handleLoginSuccess = (response: any) => {
     setUserName(response.name);
   };
 

@@ -16,7 +16,6 @@ const CheckmarkIcon = () => (
 
 // to match with the plan type/user_type    
 const planCosts = {
-  business: '$99/month',
   premium: '$39/month',
   basic: 'Free'
 };
@@ -25,7 +24,7 @@ const Billing = () => {
   const [billingDetailsState, setBillingDetailsState] = useState({
     full_name: '',
     planType: '',
-    billingCycle: '12 march',
+    billingCycle: '12 march', // set to the 1st day of the coming month
     planCost: '',
     credit_card_no: '',
     credit_card_expiry: '',
@@ -82,7 +81,7 @@ const Billing = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setBillingDetailsState({
       ...billingDetailsState,

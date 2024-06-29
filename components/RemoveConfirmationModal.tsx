@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ModalBackdrop from './modalBackdrop';
 import ModalSuccess from './modalSuccess';
+import ModalBackdrop from './modalBackdrop';
 
 const RemoveConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
   if (!isOpen) return null;
@@ -81,11 +81,12 @@ const ModalRemove = ({ isOpen, onClose }) => {
       />
       <ModalSuccess 
         isOpen={isSuccessModalOpen} 
-        message="Account removed successfully!" 
+        message="Draft removed successfully!" 
         onClose={closeModals} 
       />
     </div>
   );
 };
 
-export default ModalRemove; 
+export default ModalRemove;
+

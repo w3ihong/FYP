@@ -3,7 +3,7 @@ export default function team()
     return (
        <main>
         <h5>
-            Reports
+            Create
         </h5>
        </main>
     )

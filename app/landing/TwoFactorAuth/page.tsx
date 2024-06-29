@@ -13,7 +13,7 @@ const TwoFactorAuth: React.FC = () => {
     async function fetchEmail() {
       try {
         const fetchedEmail = await getEmail(); // Assuming getEmail is a function to fetch email
-        setEmail(fetchedEmail);
+        setEmail(fetchedEmail!);
       } catch (error) {
         console.error('Error fetching email:', error);
       }

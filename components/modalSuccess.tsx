@@ -1,7 +1,7 @@
 import { Backpack } from "lucide-react";
 import ModalBackdrop from "./modalBackdrop";
 
-export default function ModalSuccess({message = "Success", onClose}: {message: string, onClose: any}) {
+export default function ModalSuccess({message = "Success", onClose , isOpen}: {message: string, onClose: any, isOpen :any}) {
 
     return (
         <ModalBackdrop onClick={onClose}>

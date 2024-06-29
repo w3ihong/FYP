@@ -12,6 +12,7 @@ create table
     user_id uuid not null,
     suspended boolean null default false,
     user_type character varying null,
+    disabled boolean not null default false,
     constraint account_pkey primary key (user_id),
     constraint account_user_id_fkey foreign key (user_id) references auth.users (id),
     constraint users_user_type_fkey foreign key (user_type) references user_types (type_name)

@@ -5,6 +5,7 @@ interface ModalRemoveConfirmationProps {
   children?: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  onConfirm: () => void;
   message: string;
 }
 
