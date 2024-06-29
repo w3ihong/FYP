@@ -5,8 +5,8 @@ import Link from 'next/link';
 
 const Navbar = () => {
   return (
-    <header className="text-white bg-accent body-font font-bold font-mono sticky top-0 z-10">
-      <div className="w-full mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+    <header className="text-white bg-accent body-font font-bold font-raleway sticky top-0 z-10">
+      <div className="w-full mx-auto flex flex-wrap p-4 flex-col md:flex-row items-center">
 
         {/* Logo */}
         <a href="#">
@@ -15,9 +15,10 @@ const Navbar = () => {
 
         {/* Links to respective sections */}
         <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-          <a href="#features" className="mr-7 hover:text-secondary">Our Features</a>
-          <a href="#pricing" className="mr-7 hover:text-secondary">Pricing</a>
-          <a href="meet-the-team" className="mr-7 hover:text-secondary">Meet The Team</a>
+          <a href="#features" className="mr-10 hover:text-secondary">Our Features</a>
+          <a href="#testimonials" className="mr-10 hover:text-secondary">Testimonials</a>
+          <a href="#pricing" className="mr-10 hover:text-secondary">Pricing</a>
+          <a href="#freetrial" className="mr-10 hover:text-secondary">Free Trial</a>
         </nav>
 
         {/* Button */}
