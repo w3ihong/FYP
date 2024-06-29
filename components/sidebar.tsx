@@ -14,7 +14,7 @@ interface SidebarItemProps {
   icon: ReactNode;
   text: string;
   link: string;
-  onClick?: () => void; // onClick prop added
+  onClick?: () => void;
 }
 
 // SidebarItem component
@@ -70,7 +70,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
               <SidebarItem
                 icon={<LayoutDashboard size={20} />}
                 text="Dashboard"
-                link="/protected/dashboard"
+                link="/protected"
               />
               <SidebarItem
                 icon={<BarChart3 size={20} />}
