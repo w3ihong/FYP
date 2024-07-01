@@ -5,6 +5,7 @@ import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
+import { setAccessToken } from "../auth/socials/actions"; 
 
 declare global {
   interface Window {

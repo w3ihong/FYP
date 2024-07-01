@@ -16,5 +16,5 @@ const responseType = 'token';
 
 export const instagramOAuth = () => {
   const authUrl = `https://www.facebook.com/dialog/oauth?client_id=${clientId}&display=${display}&extras=${extras}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
-  window.open(authUrl, '_blank');
+  window.location.href = authUrl;
 };
