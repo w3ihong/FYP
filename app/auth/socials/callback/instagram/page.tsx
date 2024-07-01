@@ -28,10 +28,10 @@ export default function InstagramConnectRedirect() {
 
           // Store the user's access token
           if (longLiveToken == null ) {
-            // await setAccessToken(accessToken, 'Instagram')
-            const data = await getLongLivedToken(accessToken)
-            console.log(JSON.stringify(data))
-            console.log(data)
+            await setAccessToken(accessToken, 'Instagram')
+            // const data = await getLongLivedToken(accessToken)
+            // console.log(JSON.stringify(data))
+            // console.log(data)
           }
           
           await setAccessToken(longLiveToken, 'Instagram');
