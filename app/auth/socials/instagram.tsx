@@ -1,4 +1,4 @@
-const clientId = '2153953224988805';
+const clientId = '2153953224988805'; // also app id
 const display = 'page';
 const extras = '{"setup":{"channel":"IG_API_ONBOARDING"}}';
 
@@ -6,10 +6,10 @@ const extras = '{"setup":{"channel":"IG_API_ONBOARDING"}}';
 const redirectUri = 'http://localhost:3000/auth/socials/callback/instagram'
 
 // master branch Url
-// const redirectUri = 'https://fyp-git-master-weih0ngs-projects.vercel.app/auth/socials/callback/instagram'; // Replace with your redirect URI
+// const redirectUri = 'https://fyp-git-master-weih0ngs-projects.vercel.app/auth/socials/callback/instagram' // Replace with your redirect URI
 
 // production url
-// const redirectUri = ""
+// const redirectUri = 'https://fyp-flame.vercel.app/auth/socials/callback/instagram'
 
 const scope = 'instagram_basic,instagram_content_publish,instagram_manage_comments,instagram_manage_insights,pages_show_list,pages_read_engagement'; // Replace with the required scopes
 const responseType = 'token';

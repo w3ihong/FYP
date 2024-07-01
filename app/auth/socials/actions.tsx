@@ -82,8 +82,9 @@ export async function getLongLivedToken(accessToken: string) {
         fb_exchange_token=${accessToken}`
     
     try {
-        const data = await axios.get(lltURL)
-        return data
+        const response = await axios.get(lltURL)
+        
+        return response.data
     } catch (error) {
         console.error('There has been a problem with your axios operation:', error);
         throw error;

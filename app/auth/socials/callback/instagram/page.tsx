@@ -28,13 +28,18 @@ export default function InstagramConnectRedirect() {
 
           // Store the user's access token
           if (longLiveToken == null ) {
-            await setAccessToken(accessToken, 'Instagram')
-            // const data = await getLongLivedToken(accessToken)
-            // console.log(JSON.stringify(data))
-            // console.log(data)
+            // await setAccessToken(accessToken, 'Instagram')
+            const data = await getLongLivedToken(accessToken)
+            console.log(data)
+            
+            await setAccessToken(data.access_token, "Instagram")
+
+          } else {
+
+            await setAccessToken(longLiveToken, 'Instagram');
           }
           
-          await setAccessToken(longLiveToken, 'Instagram');
+          
 
           // Redirect to another page or handle the token further
           router.push('/protected');
@@ -47,4 +52,3 @@ export default function InstagramConnectRedirect() {
 
   return <div>Connecting ...</div>;
 }
-
