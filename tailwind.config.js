@@ -18,9 +18,8 @@ module.exports = {
       colors: {
         background: "#FAF0CA",  // the background color of the page
         primary: "#F8F8FF",     // off -white the card background
-        secondary: "#F7DF8B",   // the yellowish background also sued for card
-        homepage: "#F3EAAE", // trying a new homepage colour
-        accent: "#133048",      // the dark blue color ,side bar and text
+        secondary: "#F7DF8B",   // the yellowish background also used for card
+        accent: "#133048",      // the dark blue color, side bar and text
         cred: "#E7310E",
         cgreen: "#27C124",
         SBaccent: "#494FEB"       // hover over sidebar icons
