@@ -1,7 +1,7 @@
 'use client'
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { setAccessToken } from '../../actions';
+import { addInstagramAccount } from '../../actions';
 import { getLongLivedToken } from '../../actions';
 
 export default async function InstagramConnectRedirect() {
@@ -16,7 +16,7 @@ export default async function InstagramConnectRedirect() {
         const accessToken = params.get('access_token');
         const accessExpirationTime = params.get('data_access_expiration_time');
         const expiresIn = params.get('expires_in');
-        const longLiveToken = params.get('long-lived-token');
+        const longLiveToken = params.get('long_lived_token');
 
         if (accessToken) {
 
@@ -26,15 +26,13 @@ export default async function InstagramConnectRedirect() {
             const data = await getLongLivedToken(accessToken)
             console.log(data)
             
-            await setAccessToken(data.access_token, "Instagram")
+            await addInstagramAccount(data.access_token)
 
           } else {
 
-            await setAccessToken(longLiveToken, 'Instagram');
+            await addInstagramAccount(longLiveToken);
           }
           
-          
-
           // Redirect to another page or handle the token further
           router.push('/protected');
         } else {
