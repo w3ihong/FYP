@@ -1,31 +1,42 @@
 "use client";
-
 import React, { useState, useEffect } from 'react';
 import ModalContainer from '@/components/modalContainer';
 import { disableUsers, fetchUsers, enableUsers } from '../actions'; // Adjust the import path accordingly
+import { insertSuspensionData } from '@/app/actions';
 
 export default function AdminHome() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<{ user_id: string, name: string, disabled: boolean } | null>(null); // Added disabled
+  const [selectedUser, setSelectedUser] = useState<{ user_id: string, name: string, suspended: boolean } | null>(null);
   const [reason, setReason] = useState('');
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]); // Adjust type as per your actual user structure
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  // Fetch users on component mount
   useEffect(() => {
     const loadUsers = async () => {
-      const usersData = await fetchUsers();
-      console.log('Fetched users:', usersData); // Debugging line
-      setUsers(usersData);
-      setLoading(false);
+      try {
+        const usersData = await fetchUsers();
+        console.log('Fetched users:', usersData); // Debugging line
+  
+        const formattedUsers = usersData.map((user) => ({
+          ...user,
+          suspended: user.suspended ? user.suspended : false, // Default to false if not provided
+        }));
+  
+        setUsers(formattedUsers);
+        localStorage.setItem('users', JSON.stringify(formattedUsers));
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading users:', error);
+        setLoading(false);
+      }
     };
+  
     loadUsers();
   }, []);
-
-  const handleOpenModal = (user: { user_id: string, name: string, disabled: boolean }) => {
-    console.log('Opening modal for user:', user); // Debugging line
-    setSelectedUser({ user_id: user.user_id, name: user.name, disabled: user.disabled }); // Update the state correctly
+  
+  const handleOpenModal = (user: any) => {
+    setSelectedUser({ user_id: user.user_id, name: user.name, suspended: user.suspended });
     setIsModalOpen(true);
   };
 
@@ -39,21 +50,28 @@ export default function AdminHome() {
     if (selectedUser) {
       console.log(`User: ${selectedUser.name}, ID: ${selectedUser.user_id}, Reason: ${reason}`); // Debugging line
       let result;
-      if (selectedUser.disabled) {
-        result = await enableUsers(selectedUser.user_id); // Call enableUsers if the user is disabled
+      if (selectedUser.suspended) {
+        result = await enableUsers(selectedUser.user_id); // Call enableUsers if the user is suspended
       } else {
-        result = await disableUsers(selectedUser.user_id); // Call disableUsers if the user is not disabled
+        result = await disableUsers(selectedUser.user_id); // Call disableUsers if the user is not suspended
       }
-
+  
       if (result.success) {
-        alert(`User ${selectedUser.name} has been ${selectedUser.disabled ? 'unsuspended' : 'suspended'}.`);
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.user_id === selectedUser.user_id ? { ...user, disabled: !selectedUser.disabled } : user
-          )
-        );
+        alert(`User ${selectedUser.name} has been ${selectedUser.suspended ? 'unsuspended' : 'suspended'}.`);
+        
+        // Re-fetch the latest users data
+        const usersData = await fetchUsers();
+        const formattedUsers = usersData.map((user) => ({
+          ...user,
+          suspended: user.suspended ? user.suspended : false, // Default to false if not provided
+        }));
+        setUsers(formattedUsers);
+        localStorage.setItem('users', JSON.stringify(formattedUsers));
+  
+        // Insert suspension data with the reason
+        await insertSuspensionData(selectedUser.user_id, reason);
       } else {
-        alert(`Failed to ${selectedUser.disabled ? 'unsuspend' : 'suspend'} user: ${result.error.message}`);
+        alert(`Failed to ${selectedUser.suspended ? 'unsuspend' : 'suspend'} user: ${result.error.message}`);
       }
     } else {
       alert('No user selected');
@@ -92,15 +110,12 @@ export default function AdminHome() {
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
-                <div>{user.name} , {user.user_id}</div>
+                <div>{user.name}, {user.user_id}, {user.suspended ? 'Suspended' : 'Active'}</div>
                 <button
-                  className={`text-white px-8 py-1 rounded-lg ${user.disabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}
-                  onClick={() => { 
-                    console.log('Button clicked for user:', user.name); // Debugging line
-                    handleOpenModal(user); 
-                  }}
+                  className={`text-white px-8 py-1 rounded-lg ${user.suspended ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}
+                  onClick={() => handleOpenModal(user)}
                 >
-                  {user.disabled ? 'Unsuspend' : 'Suspend'}
+                  {user.suspended ? 'Unsuspend' : 'Suspend'}
                 </button>
               </div>
             ))
@@ -110,8 +125,8 @@ export default function AdminHome() {
         </div>
       </div>
       <ModalContainer isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2 className="text-2xl font-raleway font-bold mb-2 mt-20">{selectedUser?.disabled ? 'Unsuspend' : 'Suspend'} User</h2>
-        <label className="block text-lg mb-2">Reason for {selectedUser?.disabled ? 'Unsuspending' : 'Suspending'}:</label>
+        <h2 className="text-2xl font-raleway font-bold mb-2 mt-20">{selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
+        <label className="block text-lg mb-2">Reason for {selectedUser?.suspended ? 'Unsuspending' : 'Suspending'}:</label>
         <textarea
           className="w-full h-60 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 mb-6 resize-none"
           value={reason}

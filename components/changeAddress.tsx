@@ -1,18 +1,24 @@
+import { billingDetails } from '@/app/actions';
 import React from 'react';
 
 interface ChangeAddressProps {
   billingDetails: {
+    full_name: string;
     planType: string;
     billingCycle: string;
     planCost: string;
-    cardNumber: string;
-    expiryDate: string;
-    billingAddress: string;
+    credit_card_no: string;
+    credit_card_expiry: string;
+    state: string;
+    city : string;
+    street: string;
+    unit: string;
+    postalcode : string;
   };
   onBillingDetailsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCancel: () => void;
 }
-
+const billingAddr : string  = '${billingDetails.street}, ${billingDetails.city}, ${billingDetails.state}, ${billingDetails.postalcode'
 const ChangeAddress: React.FC<ChangeAddressProps> = ({ billingDetails, onBillingDetailsChange, onCancel }) => {
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg w-full lg:w-4/5">
@@ -26,7 +32,7 @@ const ChangeAddress: React.FC<ChangeAddressProps> = ({ billingDetails, onBilling
             type="text"
             id="billingAddress"
             name="billingAddress"
-            value={billingDetails.billingAddress}
+            value={billingAddr}
             onChange={onBillingDetailsChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />

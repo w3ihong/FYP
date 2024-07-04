@@ -511,7 +511,7 @@ export default function Settings() {
 
         {/* Success Modal */}
       {isSuccessModalOpen && (
-        <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} />
+        <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} isOpen={""} />
       )}
 
       

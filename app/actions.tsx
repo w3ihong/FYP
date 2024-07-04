@@ -29,8 +29,7 @@ export async function login(formData: FormData) {
 
   const value = authData?.user?.id;
 
-  await insertUserData(value);
-  
+  await insertUserData(value!);
   
 
 
@@ -52,8 +51,6 @@ export async function login(formData: FormData) {
    // redirect('/landing/login?message=An error occurred while checking user status');
     return;
   }
-
-  
 
   if (foundUser.disabled) {
     console.log('User account is disabled');
@@ -109,6 +106,7 @@ async function insertUserData(userId: string) {
         disabled : 'false' ,
         FA : false ,
         
+       
       },
     ]);
 
@@ -133,14 +131,9 @@ export async function signup(email: string, password: string) {
     password
   }
 
-
-
   const { error } = await supabase.auth.signUp(data)
 
-  
-
   console.log(error)
-  
 
   if (error) {
     redirect('/error')
@@ -171,7 +164,7 @@ export async function billingDetails() {
     return null;
   }
   
-  const userId = userResponse.data.user.id;
+  const userId = userResponse.data.user!.id;
 
   try {
     const { data, error } = await supabase
@@ -186,7 +179,7 @@ export async function billingDetails() {
     }
 
     return data;
-  } catch (error) {
+  } catch (error : any) {
     console.error('Error fetching billing details:', error.message);
     return null;
   }
@@ -229,7 +222,7 @@ export async function updateCardDetails(cardDetails: any): Promise<void> {
 
     // Handle success
     console.log('Card details updated successfully:', data);
-  } catch (error) {
+  } catch (error : any) {
     throw new Error(`Error updating card details: ${error.message}`);
   }
 }
@@ -269,7 +262,7 @@ export async function planType() {
     }
 
     return userType;
-  } catch (error) {
+  } catch (error : any) {
     console.error('Error fetching plan type:', error.message);
     return null;
   }
@@ -302,7 +295,7 @@ export async function upgradeSubscription(plan_type: string): Promise<void> {
 
     // Handle success
     console.log('User type updated successfully:', data);
-  } catch (error) {
+  } catch (error : any) {
     throw new Error(`Error updating user type: ${error.message}`);
   }
 }
@@ -334,7 +327,7 @@ export async function downgradeSubscription(plan_type: string): Promise<void> {
 
     // Handle success
     console.log('User type updated successfully:', data);
-  } catch (error) {
+  } catch (error : any) {
     throw new Error(`Error updating user type: ${error.message}`);
   }
 }
@@ -359,7 +352,7 @@ export async function updatePassword(oldPassword: string, newPassword: string) {
 
   // Re-authenticate user with the old password
   const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: user.data.user.email,
+    email: String(user.data.user.email),
     password: oldPassword,
   });
 
@@ -458,7 +451,7 @@ function generateOTP() {
 }
 
 // Function to send OTP via email
-async function sendOTPEmail(email, otp) {
+async function sendOTPEmail(email: string, otp : string) {
   // Configure Nodemailer with your email service provider
   let transporter = nodemailer.createTransport({
     service: 'gmail', // Use your email service provider
@@ -497,13 +490,13 @@ export async function sendOTP(email: string) {
     // Optionally, you can save the OTP in the database or in-memory store for later verification
 
     return otp; // Return the OTP for further processing if needed
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending OTP:', error.message);
     return null; // Handle the error appropriately
   }
 }
 
-export async function verifyOTP(email, inputOtp) {
+export async function verifyOTP(email : string, inputOtp : any) {
   const supabase = createClient();
 
   // Get the currently authenticated user
@@ -561,7 +554,7 @@ export async function verifyOTP(email, inputOtp) {
 }
 
 
-export async function checkOTP(email, inputOtp) {
+export async function checkOTP(email : string, inputOtp : string) {
   const supabase = createClient();
 
   // Get the currently authenticated user
@@ -617,12 +610,6 @@ export async function checkOTP(email, inputOtp) {
     return false;
   }
 }
-
-
-
-
-
-
 
 
 export async function disableUser() {
@@ -791,7 +778,7 @@ export async function fetchUsers() {
   try {
     const { data, error } = await supabase
       .from('users') // Replace 'users' with your actual table name
-      .select('user_id  , name , disabled');
+      .select('user_id  , name , suspended');
       
 
     if (error) {
@@ -804,6 +791,50 @@ export async function fetchUsers() {
     console.error('Error fetching users:', error);
     return [];
   }
+}
+
+export async function fetchReports()
+{
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('reports_on_user') // Replace 'users' with your actual table name
+      .select('reason , reporter_id , reportee_id ');
+      
+
+    if (error) {
+      throw error;
+    }
+
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+
+}
+
+export async function fetchSuspension()
+{
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('suspension') // Replace 'users' with your actual table name
+      .select('reason , user_id ');
+      
+
+    if (error) {
+      throw error;
+    }
+
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+
 }
 
 export async function disableUsers(userId: string) {
@@ -857,6 +888,29 @@ export async function enableUsers(userId: string) {
 }
 
 
+
+export async function insertSuspensionData(userId: string, reason: string) {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('suspension')
+    .insert([
+      {
+        user_id: userId,
+        reason: reason,
+        
+        
+      },
+    ]);
+
+  if (error) {
+    console.error('Error inserting user data:', error.message);
+    return false;
+  }
+
+  console.log('User data inserted successfully');
+  return true;
+}
 
 
 

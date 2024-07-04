@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import modalSucess from './ModalSuccess';
 import ModalBackdrop from './modalBackdrop';
-import ModalSuccess from './ModalSuccess';
+import ModalSuccess from './modalSuccess';
 
 const RemoveConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
   if (!isOpen) return null;
@@ -89,4 +88,4 @@ const ModalRemove = ({ isOpen, onClose }) => {
   );
 };
 
-export default ModalRemove;
+export default ModalRemove; 
