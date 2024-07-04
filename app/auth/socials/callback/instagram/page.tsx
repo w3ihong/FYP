@@ -18,6 +18,8 @@ export default async function InstagramConnectRedirect() {
         const expiresIn = params.get('expires_in');
         const longLiveToken = params.get('long_lived_token');
 
+        console.log("long lived token : "+longLiveToken)
+
         if (accessToken) {
 
           // Store the user's access token

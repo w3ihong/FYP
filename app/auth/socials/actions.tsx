@@ -1,6 +1,7 @@
 'use server'
 import { createClient } from '@/utils/supabase/server';
 import axios from 'axios';
+import { profile } from 'console';
 
 export async function addInstagramAccount(accessToken:string) {
     const supabase = createClient();  
@@ -24,13 +25,11 @@ export async function addInstagramAccount(accessToken:string) {
     if (data.length === 0) {
         console.log ("no existing accounts")
 
-        const pageData = await getPageDetails(accessToken);
-        console.log(pageData)
-        console.log("page ID :" + pageData.data[0].id)
-        const IGAccdata = await getConnectedIGAcc(pageData.data[0].id,accessToken)
-        console.log(IGAccdata)
-        //get 
-        await insertNewAcc(IGAccdata.instagram_business_account.id,accessToken, "Instagram", user.id, "self")
+        const detailsData = await getAssociatedDetails(accessToken);
+        console.log(detailsData)
+        const IGAccDetails = await getIGAccDetails(detailsData.data[0].instagram_business_account.id, accessToken)
+        console.log(IGAccDetails)
+        await insertNewAcc(IGAccDetails.id,accessToken, "Instagram", user.id, IGAccDetails.username, IGAccDetails.profile_picture_url)
     } else {
         console.log("matching acc found")
         await updateToken(accessToken, "Instagram", user.id)
@@ -56,7 +55,7 @@ export async function updateToken(accessToken :string , platform :string , userI
     }
 }
      
-export async function insertNewAcc(accountID: number ,accessToken: string , platform : string , userID :any , accountName :string) {
+export async function insertNewAcc(accountID: number ,accessToken: string , platform : string , userID :any , accountName :string , profilePicURL :string) {
     const supabase = createClient()
 
 
@@ -64,7 +63,7 @@ export async function insertNewAcc(accountID: number ,accessToken: string , plat
     const { data, error } = await supabase
         .from('platform_account')
         .insert([
-            { platform_account_id: accountID, user_id: userID,  platform: platform, access_token :accessToken, client_name: accountName},
+            { platform_account_id: accountID, user_id: userID,  platform: platform, access_token :accessToken, client_name: accountName , profile_picture_url: profilePicURL},
         ])
         .select()
 
@@ -78,8 +77,8 @@ export async function insertNewAcc(accountID: number ,accessToken: string , plat
 
 }
 
-export async function getPageDetails(accessToken:string ) {
-    const endpoint = `https://graph.facebook.com/v20.0/me/accounts?access_token=${accessToken}`
+export async function getAssociatedDetails(accessToken:string ) {
+    const endpoint = `https://graph.facebook.com/v20.0/me/accounts?fields=id%2Cname%2Caccess_token%2Cinstagram_business_account&access_token=${accessToken}`
 
     const response = await axios.get(endpoint)
     return response.data
@@ -108,9 +107,9 @@ export async function getLongLivedPageToken(app_scoped_user_id: string, longLive
 
 export async function getConnectedIGAcc(pageID:number, accessToken:string) {
     const endpoint = `https://graph.facebook.com/v20.0/${pageID}?fields=instagram_business_account&access_token=${accessToken}`
+    
     const response = await axios.get(endpoint)
-    console.log(response)
-    if (response.status == 200) {
+    if (response.status == 200) {       
         return response.data
     } else {
         console.log("error processing request")
@@ -118,24 +117,34 @@ export async function getConnectedIGAcc(pageID:number, accessToken:string) {
 }
 
 export async function getIGAccDetails(accID :number, accessToken:string) {
-    const fields = ''
-    const endpoint = `https://graph.facebook.com/v20.0/${accID}
-        ?fields=${fields}
-        &access_token=${accessToken}`
+    const fields = "id,profile_picture_url,name,username"
+    const endpoint  = `https://graph.facebook.com/v20.0/${accID}?fields=id,profile_picture_url,name,username&access_token=${accessToken}`
+    console.log(endpoint)
+    const response = await axios.get(endpoint)
+    console.log(response)
+
+    return response.data
 }
 
-export async function getIGMediaObj(accountID :number , accessToken:string) {
+export async function getIGMediaObj(accID :number , accessToken:string) {
     const supabase = createClient()
-    const endpoint = `https://graph.facebook.com/v20.0/${accountID}/media?access_token=${accessToken}`
-    const resposne = await axios.get(endpoint)
+    const endpoint = `https://graph.facebook.com/v20.0/${accID}/media?access_token=${accessToken}`
+    const response = await axios.get(endpoint)
 
-    const ids = resposne.data.map(item => item.id);
+    const ids = response.data.map(item => item.id);
+    console.log(ids)
+    for (const id of ids) {
+        //get media metadata 
+        const data = await getIGMediaData(id)
 
-  for (const id of ids) {
-    const { error } = await supabase
-      .from('') // Replace with your table name
-      .insert({ id });
+        //add to posts table
 
-  }
+    }
+}
+
+export async function getIGMediaData(mediaID :number){
 
 }
+
+
+
