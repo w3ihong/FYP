@@ -14,7 +14,7 @@ interface SidebarItemProps {
   icon: ReactNode;
   text: string;
   link: string;
-  onClick?: () => void; // onClick prop added
+  onClick?: () => void;
 }
 
 // SidebarItem component

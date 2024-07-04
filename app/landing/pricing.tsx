@@ -1,159 +1,102 @@
-"use server";
+"use server"
 
 import React from 'react';
 
 const Pricing = () => {
   return (
-    <section id="pricing" className="body-font overflow-hidden ">
-
-      {/* Text */}
-      <div className="container border-blue-400 px-5 py-24 mx-auto">
-        <div className="flex flex-col text-center w-full mb-10">
-          <h1 className="sm:text-4xl text-3xl font-bold font-raleway title-font mb-2 text-accent">Pricing</h1>
-          <p className="lg:w-2/3 mx-auto font-sans font-medium leading-relaxed text-base text-accent">Manage all your social medias in one place.</p>
+    <section id="pricing">
+      <div className="max-w-screen-xl px-4 py-8 mx-auto lg:py-28 lg:px-6">
+        <div className="max-w-screen-md mx-auto mb-8 text-center lg:mb-12">
+          <h2 className="mb-4 text-3xl font-raleway font-bold tracking-tight text-accent">
+            Designed for individuals like you
+          </h2>
+          <p className="mb-5 font-light text-gray-600 sm:text-xl">
+            Here at EchoSphere, we analyze your data to produce maximum results.
+          </p>
         </div>
 
-        {/* Pricing Boxes */}
-        <div className="flex flex-wrap -m-4 justify-center">
-          
-          {/* First Box */}
-          <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-            <div className="h-full p-6 rounded-xl border-2 border-accent flex flex-col relative overflow-hidden bg-primary shadow-lg">
-              <h2 className="text-sm tracking-widest title-font mb-1 font-mono font-medium">BASIC</h2>
-              <h1 className="text-5xl text-accent pb-4 mb-4 border-b border-accent leading-none">Free</h1>
-              <p className="flex items-center mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Cross-platform Posting
+        <div className="flex flex-col lg:flex-row justify-center lg:space-x-6 sm:gap-6 xl:gap-10">
+          {/* Pricing Card - Free */}
+          <div className="flex flex-col p-6 mx-auto mb-8 text-center text-gray-900 bg-white border border-gray-100 rounded-lg shadow h-[490px] lg:w-1/2 w-full">
+            <div>
+              <h3 className="mt-2 mb-2 text-2xl font-raleway font-semibold">Free</h3>
+              <p className="font-light text-gray-500 sm:text-lg">
+                Best option for personal use
               </p>
-              <p className="flex items-center mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
+              <div className="flex items-baseline justify-center my-8 mb-10">
+                <span className="mr-2 text-5xl font-extrabold">$0</span>
+                <span className="text-gray-500">/month</span>
+              </div>
+            </div>
+            <div className="flex-grow">
+              {/* List */}
+              <ul role="list" className="mb-8 space-y-4 text-left">
+                <li className="flex items-center space-x-3">
+                  {/* Icon */}
+                  <svg className="flex-shrink-0 w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                   </svg>
-                </span>Analysis Dashboard
-              </p>
-              <p className="flex items-center mb-6">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Mixtape chillwave tumeric
-              </p>
-              <button className="flex items-center mt-auto text-white bg-accent border-0 py-2 px-4 w-full focus:outline-none hover:bg-blue-900 rounded">Learn More
-                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
-              </button>
-              
+                  <span>Small-scale Metrics</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <a href="#" className="text-white bg-accent hover:bg-SBaccent font-raleway font-medium rounded-lg border-2 border-gray-700 text-sm px-20 py-2.5 mb-10 text-center">Get started</a>
             </div>
           </div>
-
-          {/* Second Box */}
-          <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-            <div className="h-full p-6 rounded-xl border-2 border-yellow-300 flex flex-col relative overflow-hidden bg-primary shadow-lg">
-              <span className="bg-yellow-300 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl">POPULAR</span>
-              <h2 className="text-sm tracking-widest title-font mb-1 font-mono font-medium">PREMIUM</h2>
-              <h1 className="text-5xl text-accent-900 leading-none flex items-center pb-4 mb-4 border-b border-accent">
-                <span>$38</span>
-                <span className="text-lg ml-1 font-normal text-accent-500">/mo</span>
-              </h1>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Vexillologist pitchfork
+          {/* Pricing Card - Premium */}
+          <div className="flex flex-col p-6 mx-auto text-center text-gray-900 bg-white border border-gray-100 rounded-lg shadow h-[490px] lg:w-1/2 w-full">
+            <div>
+              <h3 className="mb-2 mt-2 text-2xl font-raleway font-semibold">Premium</h3>
+              <p className="font-light text-gray-500 sm:text-lg">
+                Relevant for social media managers, small businesses
               </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Tumeric plaid portland
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Hexagon neutra unicorn
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-6">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Mixtape chillwave tumeric
-              </p>
-
-              <button className="flex items-center mt-auto text-white bg-yellow-300 border-0 py-2 px-4 w-full focus:outline-none hover:bg-yellow-500 rounded">Learn More
-                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
-              </button>
-
+              <div className="flex items-baseline justify-center my-8 mb-10">
+                <span className="mr-2 text-5xl font-extrabold">$99</span>
+                <span className="text-gray-500">/month</span>
+              </div>
             </div>
-          </div>
-
-          {/* Third Box */}
-          <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-            <div className="h-full p-6 rounded-xl border-2 border-accent flex flex-col relative overflow-hidden bg-primary shadow-lg">
-              <h2 className="text-sm tracking-widest title-font mb-1 font-mono font-medium">BUSINESS</h2>
-              <h1 className="text-5xl text-accent-900 leading-none flex items-center pb-4 mb-4 border-b border-accent">
-                <span>$56</span>
-                <span className="text-lg ml-1 font-normal text-accent-500">/mo</span>
-              </h1>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
+            <div className="flex-grow">
+              {/* List */}
+              <ul role="list" className="mb-8 space-y-4 text-left">
+                <li className="flex items-center space-x-3">
+                  {/* Icon */}
+                  <svg className="flex-shrink-0 w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                   </svg>
-                </span>Vexillologist pitchfork
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
+                  <span>In-depth Visual Insights</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  {/* Icon */}
+                  <svg className="flex-shrink-0 w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                   </svg>
-                </span>Tumeric plaid portland
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
+                  <span>Competitive Analysis</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  {/* Icon */}
+                  <svg className="flex-shrink-0 w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                   </svg>
-                </span>Hexagon neutra unicorn
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-6">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
+                  <span>Sentiment Analysis</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  {/* Icon */}
+                  <svg className="flex-shrink-0 w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                   </svg>
-                </span>Mixtape chillwave tumeric
-              </p>
-
-              <button className="flex items-center mt-auto text-white bg-accent border-0 py-2 px-4 w-full focus:outline-none hover:bg-blue-900 rounded">Learn More
-                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
-              </button>
+                  <span>Trend Indicator</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <a href="#" className="text-white bg-accent hover:bg-SBaccent font-raleway font-medium rounded-lg border-2 border-gray-700 text-sm px-20 py-2.5 mb-10 text-center">Get started</a>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default Pricing;

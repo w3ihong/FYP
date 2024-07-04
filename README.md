@@ -9,7 +9,7 @@
 - visa and master selection doesnt work 
 
 - connect social media account (backend)
-- fix email link during sign up to redirect to website instead of loal host (backend)
+- fix email link during sign up to redirect to website instead of local host (backend)
 
 
 
