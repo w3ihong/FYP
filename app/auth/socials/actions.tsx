@@ -1,7 +1,6 @@
 'use server'
 import { createClient } from '@/utils/supabase/server';
 import axios from 'axios';
-import { profile } from 'console';
 
 export async function addInstagramAccount(accessToken:string) {
     const supabase = createClient();  
@@ -26,13 +25,14 @@ export async function addInstagramAccount(accessToken:string) {
         console.log ("no existing accounts")
 
         const detailsData = await getAssociatedDetails(accessToken);
-        console.log(detailsData)
         const IGAccDetails = await getIGAccDetails(detailsData.data[0].instagram_business_account.id, accessToken)
-        console.log(IGAccDetails)
         await insertNewAcc(IGAccDetails.id,accessToken, "Instagram", user.id, IGAccDetails.username, IGAccDetails.profile_picture_url)
+        await loadIGMediaObj(IGAccDetails.id, accessToken)
+        return 
     } else {
         console.log("matching acc found")
         await updateToken(accessToken, "Instagram", user.id)
+        return 
     }
 
 };
@@ -58,7 +58,6 @@ export async function updateToken(accessToken :string , platform :string , userI
 export async function insertNewAcc(accountID: number ,accessToken: string , platform : string , userID :any , accountName :string , profilePicURL :string) {
     const supabase = createClient()
 
-
     //get platform acc id
     const { data, error } = await supabase
         .from('platform_account')
@@ -66,8 +65,6 @@ export async function insertNewAcc(accountID: number ,accessToken: string , plat
             { platform_account_id: accountID, user_id: userID,  platform: platform, access_token :accessToken, client_name: accountName , profile_picture_url: profilePicURL},
         ])
         .select()
-
-    console.log(JSON.stringify(data))
 
     if (error) {
         console.error('Error updating platform account:', error);
@@ -79,7 +76,6 @@ export async function insertNewAcc(accountID: number ,accessToken: string , plat
 
 export async function getAssociatedDetails(accessToken:string ) {
     const endpoint = `https://graph.facebook.com/v20.0/me/accounts?fields=id%2Cname%2Caccess_token%2Cinstagram_business_account&access_token=${accessToken}`
-
     const response = await axios.get(endpoint)
     return response.data
 }
@@ -119,32 +115,54 @@ export async function getConnectedIGAcc(pageID:number, accessToken:string) {
 export async function getIGAccDetails(accID :number, accessToken:string) {
     const fields = "id,profile_picture_url,name,username"
     const endpoint  = `https://graph.facebook.com/v20.0/${accID}?fields=id,profile_picture_url,name,username&access_token=${accessToken}`
-    console.log(endpoint)
+    
     const response = await axios.get(endpoint)
-    console.log(response)
 
     return response.data
 }
 
-export async function getIGMediaObj(accID :number , accessToken:string) {
+export async function loadIGMediaObj(accID :number , accessToken:string) {
     const supabase = createClient()
     const endpoint = `https://graph.facebook.com/v20.0/${accID}/media?access_token=${accessToken}`
     const response = await axios.get(endpoint)
 
-    const ids = response.data.map(item => item.id);
+    const ids = response.data.data.map(item => item.id);
+    console.log(response.data)
     console.log(ids)
     for (const id of ids) {
         //get media metadata 
-        const data = await getIGMediaData(id)
+        const data = await getIGMediaData(id, accessToken)
 
         //add to posts table
+        const { data: postData, error: postError } = await supabase
+            .from('posts')
+            .insert([
+                { platform_account: accID, id: data.id, post_type: data.media_type, media_url: data.media_url, permalink: data.permalink, caption: data.caption, created_at: data.timestamp}
+            ])
+            .select()
 
+        if (postError) {
+            console.error('Error inserting post:', postError);
+        } else {
+            console.log('Inserted post:', postData);
+        }
     }
 }
 
-export async function getIGMediaData(mediaID :number){
+export async function getIGMediaData(mediaID :number, accessToken:string){
+    const fields = `id,media_type,media_url,thumbnail_url,permalink,caption,timestamp`
+    const endpoint = `https://graph.facebook.com/v20.0/${mediaID}?fields=${fields}&access_token=${accessToken}`
+    const response = await axios.get(endpoint)
 
+    if (response.status == 200) {
+        return response.data
+    } else {
+        console.log("error processing request")
+    }
+    
 }
 
+// impressions, shares, comments, plays, likes, saved, peak_concurrent_viewers, replies, video_views, total_interactions, navigation, follows, profile_visits, profile_activity, reach,
+// ig_reels_video_view_total_time, ig_reels_avg_watch_time, clips_replays_count, ig_reels_aggregated_all_plays_count, views, reposts, quotes
 
 
