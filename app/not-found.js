@@ -14,8 +14,8 @@ export default function RegisterPage() {
         </div>
         {/* main */}
         <div className="flex flex-col items-center justify-center">
-            <h1 className="text-3xl  text-black mt-10 pb-10">404, something went wrong.</h1>
-            <p className="">Please contact the team </p>
+            <h1 className="text-2xl  text-accent mt-10 pb-10">404 | something went wrong.</h1>
+            <p>Please contact the team</p>
         </div>
     </div>
 
