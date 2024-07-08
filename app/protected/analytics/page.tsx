@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import LineGraph from '@/components/lineGraph';
 import BarGraph from '@/components/barChart';
 import PieChart from '@/components/pieChart';
-import TotalStatsCard from '@/components/totalStatsCard'; // Import TotalStatsCard
+import TotalStatsCard from '@/components/totalStatsCard';
 import { createClient } from '@/utils/supabase/client';
 
 const Dashboard = () => {
@@ -37,7 +37,7 @@ const Dashboard = () => {
         const { data: platformMetricsData, error: platformError } = await supabase
           .from('platform_metrics')
           .select('*')
-          .single(); // Assuming there's only one row for total metrics
+          .single();
 
         if (platformError) {
           console.error('Supabase error fetching platform metrics:', platformError);
@@ -66,7 +66,6 @@ const Dashboard = () => {
     return <div>Error: {error}</div>;
   }
 
-  // Assuming platformMetrics is structured like { platform_account_views, platform_followers, ... }
   const { platform_account_views, platform_followers, platform_likes, platform_comments, platform_saves, platform_shares } = platformMetrics || {};
 
   return (
