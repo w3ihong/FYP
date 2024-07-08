@@ -4,7 +4,7 @@ import React from 'react';
 
 const Pricing = () => {
   return (
-    <section id="pricing" className="bg-homepage">
+    <section id="pricing">
       <div className="max-w-screen-xl px-4 py-8 mx-auto lg:py-28 lg:px-6">
         <div className="max-w-screen-md mx-auto mb-8 text-center lg:mb-12">
           <h2 className="mb-4 text-3xl font-raleway font-bold tracking-tight text-accent">

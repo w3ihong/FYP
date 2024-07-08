@@ -4,7 +4,7 @@ import React from 'react'
 
 const Features = () => {
   return (
-    <section id="features" className="bg-homepage">
+    <section id="features">
       <div className="max-w-screen-xl px-4 py-52 mx-auto space-y-14">
         {/* Row */}
         <div className="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">

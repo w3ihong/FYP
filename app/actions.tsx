@@ -37,7 +37,7 @@ export async function login(formData: FormData) {
   // Check if the user account is disabled
   const { data: foundUser, error: findError } = await supabase
     .from('users')
-    .select('disabled, FA, profile_complete')
+    .select('disabled, FA, profile_complete , suspended')
     .eq('user_id', userId)
     .single();
 
@@ -72,6 +72,17 @@ export async function login(formData: FormData) {
       return;
     }
   }
+
+  if (foundUser.suspended) {
+    console.log('User account has been suspended');
+    await enableUser();
+    redirect('/landing/login?message=Your account has been suspended ');
+ //   return;
+  }
+  
+
+  
+
   // Proceed with the login if the user is not disabled and 2FA is not enabled
   revalidatePath('/landing/login', 'page');
   console.log('Log in successful');
@@ -89,8 +100,10 @@ async function insertUserData(userId: string) {
         user_id: userId,
         suspended: false,
         user_type: 'basic',
-        disabled : false ,
-        FA : false
+        disabled : 'false' ,
+        FA : false ,
+        
+       
       },
     ]);
 
@@ -900,7 +913,146 @@ export async function updateUserCategory(profileData: any) {
   }
 
   return true;
+}export async function fetchUsers() {
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('users') // Replace 'users' with your actual table name
+      .select('user_id  , name , suspended');
+      
+
+    if (error) {
+      throw error;
+    }
+
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
 }
+
+export async function fetchReports()
+{
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('reports_on_user') // Replace 'users' with your actual table name
+      .select('reason , reporter_id , reportee_id ');
+      
+
+    if (error) {
+      throw error;
+    }
+
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+
+}
+
+export async function fetchSuspension()
+{
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('suspension') // Replace 'users' with your actual table name
+      .select('reason , user_id ');
+      
+
+    if (error) {
+      throw error;
+    }
+
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+
+}
+
+export async function disableUsers(userId: string) {
+  const supabase = createClient();
+  const user = supabase.auth.getUser();
+
+  try {
+    // Log the userId to debug
+    console.log('Suspending user with ID:', userId);
+
+    // Update the user's status in the database based on the user ID
+    let { error } = await supabase
+      .from('users') // Replace 'users' with your actual table name
+      .update({ suspended: true }) // Replace with your actual fields
+      .eq('user_id', userId); // Pass the userId correctly here
+
+    if (error) {
+      throw error;
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Error suspending user:', error);
+    return { success: false, error };
+  }
+}
+
+
+
+export async function enableUsers(userId: string) {
+  const supabase = createClient();
+  const user = supabase.auth.getUser();
+
+  try {
+    // Log the userId to debug
+    console.log('Unsuspending user with ID:', userId);
+
+    // Update the user's status in the database based on the user ID
+    let { error } = await supabase
+      .from('users') // Replace 'users' with your actual table name
+      .update({ suspended: false }) // Replace with your actual fields
+      .eq('user_id', userId); // Pass the userId correctly here
+
+    if (error) {
+      throw error;
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Error disabling user:', error);
+    return { success: false, error };
+  }
+}
+
+
+
+export async function insertSuspensionData(userId: string, reason: string) {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('suspension')
+    .insert([
+      {
+        user_id: userId,
+        reason: reason,
+        
+        
+      },
+    ]);
+
+  if (error) {
+    console.error('Error inserting user data:', error.message);
+    return false;
+  }
+
+  console.log('User data inserted successfully');
+  return true;
+}
+
+
 
 
 

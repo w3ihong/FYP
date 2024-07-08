@@ -12,6 +12,7 @@
     "@types/chart.js": "^2.9.41",
     "@types/react-big-calendar": "^1.8.9",
     "autoprefixer": "10.4.17",
+    "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "dom": "^0.0.3",
     "flowbite": "^2.3.0",

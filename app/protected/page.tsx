@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
+import { instagramOAuth } from "../auth/socials/instagram";
 
 declare global {
   interface Window {
@@ -245,12 +246,12 @@ export default function Index() {
       <ModalContainer isOpen={isConnectSocialModalOpen} onClose={() => setConnectSocialModalOpen(false)}>
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold mb-2">Connect To More Social Media Accounts</h2>
-          <button className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
+          <button
+            onClick={instagramOAuth} 
+            className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
             <img src="/Instagram.png" alt="Instagram" className="w-6 h-6 mr-2" /> Instagram
           </button>
-          <button className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
-            <img src="/Twitter.png" alt="Twitter" className="w-6 h-6 mr-2" /> X
-          </button>
+          
           <button
             onClick={handleFBLogin}
             className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900"
