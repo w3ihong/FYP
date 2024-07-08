@@ -73,6 +73,7 @@ export default function SettingsSidebar() {
             <div className="flex flex-col px-3 h-full">
               <SidebarItem icon={<User size={20} />} text="Account" link="/settings" />
               <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
+              <SidebarItem icon={<User size={20}/>} text="Profile" link="/settings/profile"/>
               <div className=' grow '/>
             </div>
           </SidebarContext.Provider>

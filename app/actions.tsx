@@ -14,55 +14,55 @@ export async function login(formData: FormData) {
   const supabase = createClient();
 
   // Type-casting here for convenience
-  // In practice, you should validate your inputs
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   };
 
-  console.log(data.email);
-
   // Authenticate the user with email and password
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword(data);
-
-  //console.log(authData?.user?.id);
-
-  const value = authData?.user?.id;
-
-  await insertUserData(value!);
-  
-
 
   if (authError) {
     redirect('/landing/login?message=Email or password is incorrect');
     return;
   }
 
-  // If authentication is successful, check if the user account is disabled
+  // Get the authenticated user
   const user = authData.user;
+  const userId = user.id;
+
+  // Insert user data if necessary
+  await insertUserData(userId);
+
+  // Check if the user account is disabled
   const { data: foundUser, error: findError } = await supabase
     .from('users')
-    .select('disabled, FA')
-    .eq('user_id', user.id)
+    .select('disabled, FA, profile_complete')
+    .eq('user_id', userId)
     .single();
 
   if (findError) {
     console.error('Error checking user status:', findError.message);
-   // redirect('/landing/login?message=An error occurred while checking user status');
+    redirect('/landing/login?message=An error occurred while checking user status');
     return;
   }
 
   if (foundUser.disabled) {
     console.log('User account is disabled');
-    await enableUser();
- //   redirect('/landing/login?message=Your account is disabled');
- //   return;
+    redirect('/landing/login?message=Your account is disabled');
+    return;
   }
 
-  if (foundUser['FA']) {
-    console.log('2FA is enabled for this account');
-    console.log(otpStore);
-    const isVerify = await verifyOTP(data.email , otpStore);
+  // Check if profile and category are complete
+  if (!foundUser.profile_complete) {
+    redirect('/landing/register/userProfile');
+    return;
+  }
+
+  // Handle 2FA
+  if (foundUser.FA) {
+    const otpStore = ''; // Replace with actual OTP store logic
+    const isVerify = await verifyOTP(data.email, otpStore);
 
     if (isVerify) {
       redirect('/protected'); // Redirect to protected page if OTP is verified
@@ -72,16 +72,10 @@ export async function login(formData: FormData) {
       return;
     }
   }
-
-  
-
   // Proceed with the login if the user is not disabled and 2FA is not enabled
   revalidatePath('/landing/login', 'page');
   console.log('Log in successful');
-  
   redirect('/protected');
-
-  
 }
 
 // Function to insert user data into the users table
@@ -134,6 +128,7 @@ export async function signup(email: string, password: string) {
   }
   
 }
+
 
 export async function logout() {
   const supabase = createClient()
@@ -763,7 +758,149 @@ export async function checkUserStatus() {
   return true;
 }
 
+//for existing user in the profile settings
+export async function getUserProfile() {
+  const supabase = createClient();
 
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return null;
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return null;
+  }
+
+  const { data: profileData, error: profileError } = await supabase
+    .from('users')
+    .select('first_name,last_name,DOB,country,main_category,gender')
+    .eq('user_id', userId)
+    .single();
+
+  if (profileError) {
+    console.error('Error fetching user profile:', profileError.message);
+    return null;
+  }
+  if (profileData) {
+    profileData.main_category = JSON.parse(profileData.main_category || '[]');
+  }
+
+  return profileData;
+}
+
+// Function to update user profile data
+export async function updateUserProfile(profileData: any) {
+  const supabase = createClient();
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return false;
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return false;
+  }
+
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({
+      first_name: profileData.firstName,
+      last_name: profileData.lastName,
+      DOB: profileData.dateOfBirth,
+      country: profileData.country,
+      gender: profileData.gender,
+      profile_complete: true  // Mark profile as complete
+    })
+    .eq('user_id', userId);
+
+  if (updateError) {
+    console.error('Error updating user profile:', updateError.message);
+    return false;
+  }
+
+  return true;
+}
+
+//get user's category for main and sub
+export async function getUserCategory() {
+  const supabase = createClient();
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return null;
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return null;
+  }
+
+  const { data: profileData, error: profileError } = await supabase
+    .from('users')
+    .select('main_category, sub_category')
+    .eq('user_id', userId)
+    .single();
+
+  if (profileError) {
+    console.error('Error fetching user profile:', profileError.message);
+    return null;
+  }
+
+  // Parse the JSON fields if necessary
+  if (profileData) {
+    profileData.main_category = JSON.parse(profileData.main_category || '[]');
+    profileData.sub_category = JSON.parse(profileData.sub_category || '{}');
+  }
+
+  return profileData;
+}
+
+export async function updateUserCategory(profileData: any) {
+  const supabase = createClient();
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return false;
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return false;
+  }
+
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({
+      main_category: JSON.stringify(profileData.mainCategories),
+      sub_category: JSON.stringify(profileData.subCategories)
+    })
+    .eq('user_id', userId);
+
+  if (updateError) {
+    console.error('Error updating user profile:', updateError.message);
+    return false;
+  }
+
+  return true;
+}
 
 
 
