@@ -1,52 +1,36 @@
-"use client";
 
-import React from 'react';
+'use client';
+
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ChartData,
-  ChartOptions,
-} from 'chart.js';
+import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface LineGraphProps {
-  data: ChartData<'line'>;
+  data: any[];
+  metric: string;
+  color: string;
+  label: string;
   title: string;
 }
 
-const LineGraph: React.FC<LineGraphProps> = ({ data, title }) => {
-  const options: ChartOptions<'line'> = {
-    responsive: true,
-    scales: {
-      x: {
-        type: 'category',
+const LineGraph: React.FC<LineGraphProps> = ({ data, metric, color, label, title }) => {
+  const chartData = {
+    labels: data.map((d: any) => d.date_retrieved),
+    datasets: [
+      {
+        label: label,
+        data: data.map((d: any) => d[metric]),
+        borderColor: color,
+        borderWidth: 2,
       },
-      y: {
-        beginAtZero: true,
-      },
-    },
+    ],
   };
 
   return (
-    <div className="col-span-1 bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-2">{title}</h2>
-      <Line data={data} options={options} />
+    <div className="bg-white p-4 rounded-lg shadow h-70">
+      <h2 className="text-xl font-bold mb-4">{title}</h2>
+      <Line data={chartData} />
     </div>
   );
 };

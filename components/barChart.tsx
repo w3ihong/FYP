@@ -1,52 +1,42 @@
-"use client";
 
-import React from 'react';
+'use client';
+
 import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ChartData,
-  ChartOptions,
-} from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-interface BarChartProps {
-  data: ChartData<'bar'>;
+interface BarGraphProps {
+  data: any[];
+  metrics: string[];
+  colors: string[];
+  label: string;
   title: string;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, title }) => {
-  const options: ChartOptions<'bar'> = {
-    responsive: true,
-    scales: {
-      x: {
-        type: 'category',
-      },
-      y: {
-        beginAtZero: true,
-      },
-    },
+const formatLabel = (label: string) => {
+  return label
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const BarGraph: React.FC<BarGraphProps> = ({ data, metrics, colors, label, title }) => {
+  const chartData = {
+    labels: data.map((d: any) => d.date_retrieved),
+    datasets: metrics.map((metric, index) => ({
+      label: formatLabel(metric),
+      data: data.map((d: any) => d[metric]),
+      backgroundColor: colors[index],
+    })),
   };
 
   return (
-    <div className="col-span-1 bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-2">{title}</h2>
-      <Bar data={data} options={options} />
+    <div className="bg-white p-4 rounded-lg shadow h-50">
+      <h2 className="text-xl font-bold mb-4">{title}</h2>
+      <Bar data={chartData} />
     </div>
   );
 };
 
-export default BarChart;
+export default BarGraph;
