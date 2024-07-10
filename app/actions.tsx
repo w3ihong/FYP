@@ -778,7 +778,7 @@ export async function fetchUsers() {
   try {
     const { data, error } = await supabase
       .from('users') // Replace 'users' with your actual table name
-      .select('user_id  , name , suspended');
+      .select('user_id  , first_name , suspended');
       
 
     if (error) {

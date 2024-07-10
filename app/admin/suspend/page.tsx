@@ -89,7 +89,7 @@ export default function AdminSuspend() {
         setUsers(updatedUsers);
         localStorage.setItem('users', JSON.stringify(updatedUsers));
 
-        alert(`User ${selectedUser.name} has been ${selectedUser.suspended ? 'unsuspended' : 'suspended'}.`);
+        alert(`User ${selectedUser.first_name} has been ${selectedUser.suspended ? 'unsuspended' : 'suspended'}.`);
       } else {
         alert(`Failed to ${selectedUser.suspended ? 'unsuspend' : 'suspend'} user.`);
       }
@@ -107,7 +107,7 @@ export default function AdminSuspend() {
   }
 
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.user_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -138,7 +138,7 @@ export default function AdminSuspend() {
 
               return (
                 <div key={index} className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
-                  <div>{user.name} , {user.user_id}</div>
+                  <div>{user.first_name} , {user.user_id}</div>
                   <div>
                     <button 
                       className="bg-gray-400 text-roboto text-white px-10 py-1 mr-2 rounded-lg hover:bg-gray-500"
