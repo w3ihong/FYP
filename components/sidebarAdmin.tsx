@@ -81,11 +81,6 @@ export default function AdminSidebar({email, userType }: {email: string , userTy
         </div>
 
         <div className="border-t flex p-3 items-center ">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt="User Avatar"
-            className="w-10 h-10 rounded-md"
-            />
           <div className={`flex items-center overflow-hidden ${expanded ? "w-52 ml-3" : "w-0"}`}>
             <div className="leading-4">
               <span className="text-xs text-gray-300 overflow-clip">{email}</span>
