@@ -85,7 +85,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
               <SidebarItem
                 icon={<Brain size={20} />}
                 text="Visualize"
-                link="/protected/visualize"
+                link="/protected/Visualize"
                 />
               <SidebarItem
                 icon={<Users size={20} />}

@@ -1,10 +1,13 @@
 import { spawn } from 'child_process';
-import path from 'path';
 
-export async function GET(request: Request) {
+export async function GET(request) {
     return new Promise((resolve, reject) => {
-        const scriptPath = path.resolve(__dirname, 'pytrends.py');
-        const process = spawn('python', [scriptPath]);
+        // Get the URL and extract the 'country' query parameter
+        const url = new URL(request.url);
+        const country = url.searchParams.get('country') || 'worldwide'; // Default to 'worldwide' if no country is provided
+
+        const scriptPath = 'C:\\Users\\yaswa\\Downloads\\FYP\\app\\api\\trending\\googleTrends.py';
+        const process = spawn('python', [scriptPath, country]);
 
         let data = '';
         process.stdout.on('data', (chunk) => {
