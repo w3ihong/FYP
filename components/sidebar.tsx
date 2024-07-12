@@ -1,10 +1,11 @@
-"use client";
-import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
+'use client';
+import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { BarChart3, TrendingUp, LineChart, PieChart, LogOut, Calendar, Settings } from 'lucide-react';
 import Link from "next/link";
 import { logout } from '@/app/actions';
 import Image from 'next/image';
 import logo from "@/public/ESLogo.png";
+import { createClient } from '@/utils/supabase/client';
 
 // Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
@@ -21,32 +22,55 @@ interface SidebarItemProps {
 export function SidebarItem({ icon, text, link, onClick }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
 
-  const handleClick = () => {
-    if (onClick) {
-      onClick();
-    }
-  };
-
   return (
-    <div
-      className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-SBaccent text-gray-699 `}
-      onClick={handleClick} // Handle click directly on div
-    >
-      <Link href={link} passHref={true} legacyBehavior={true}>
-        <div className="w-full flex items-center">
-          <span className="text-white">{icon}</span>
-          <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3 text-white' : 'w-0 text-white'}`}>
-            {text}
-          </span>
-        </div>
-      </Link>
-    </div>
+    <Link href={link}>
+      <div
+        className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-SBaccent text-gray-699 `}
+        onClick={onClick} // onClick handler
+      >
+        <span className="text-white">{icon}</span>
+        <span
+          className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+            expanded ? 'w-auto ml-3 opacity-100 text-white' : 'w-0 opacity-0'
+          }`}
+        >
+          {text}
+        </span>
+      </div>
+    </Link>
   );
 }
 
 // Sidebar component
 export default function Sidebar({ email, userType }: { email: string, userType: number }) {
   const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
+  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('first_name, last_name')
+          .eq('email', email)
+          .single();
+
+        if (error) {
+          console.error('Supabase error:', error);
+          return;
+        }
+
+        if (data) {
+          setUserName({ firstName: data.first_name, lastName: data.last_name });
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+
+    fetchUserData();
+  }, [email, supabase]);
 
   return (
     <aside
@@ -55,43 +79,24 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
       onMouseLeave={() => setExpanded(false)}
     >
       <nav className="h-screen flex flex-col justify-between border-r shadow-sm">
-        <div className='flex-col h-full '>
+        <div className='flex-col h-full'>
           <div className="flex items-center p-3 pb-2">
             <Image src={logo} className="w-9 h-9" alt="Logo" />
-            <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
-              EchoSphere
-            </span>
+            {expanded && (
+              <span className="ml-3 text-white font-semibold">
+                EchoSphere
+              </span>
+            )}
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
-            <div className=" flex flex-col px-3 h-full ">
-              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/post/create" />
-              <hr className="border-t border-gray-200 my-2" />
-              <SidebarItem
-                icon={<LayoutDashboard size={20} />}
-                text="Dashboard"
-                link="/protected"
-              />
-              <SidebarItem
-                icon={<BarChart3 size={20} />}
-                text="Analytics"
-                link="/protected/analytics"
-                />
-              <SidebarItem
-                icon={<Calendar size={20} />}
-                text="Calendar"
-                link="/protected/calendar"
-              />
-              <SidebarItem
-                icon={<Brain size={20} />}
-                text="Visualize"
-                link="/protected/visualize"
-                />
-              <SidebarItem
-                icon={<Users size={20} />}
-                text="Team"
-                link="/protected/team"
-              />
+            <div className="flex flex-col px-3 h-full">
+              <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
+              <SidebarItem icon={<TrendingUp size={20} />} text="Sentiment Analysis" link="/protected/sentiment-analysis" />
+              <SidebarItem icon={<LineChart size={20} />} text="Trending Topics" link="/protected/trending-topics" />
+              <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative-analysis" />
+              <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
+
               <div className='grow' />
               <div className='pb-[63px]'>
                 <SidebarItem
@@ -100,33 +105,24 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
                   link="/settings"
                 />
                 <SidebarItem
-                icon={<Users size={20} />}
-                text="Team"
-                link="/protected/team"
-              />
-              
-                <SidebarItem
                   icon={<LogOut size={20} />}
                   text="Logout"
                   link="/landing"
-                  onClick={() => logout()} // Call the logout function on click
+                  onClick={() => logout()}
                 />
               </div>
             </div>
           </SidebarContext.Provider>
         </div>
 
-        <div className="border-t flex p-3 items-center ">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt="User Avatar"
-            className="w-10 h-10 rounded-md"
-          />
-          <div className={`flex items-center overflow-hidden ${expanded ? "w-52 ml-3" : "w-0"}`}>
-            <div className="leading-4">
-              <span className="text-xs text-gray-300 overflow-clip">{email}</span>
+        <div className="border-t flex p-3 items-center">
+          {expanded && userName && (
+            <div className="flex items-center ml-3">
+              <div className="leading-4">
+                <span className="text-xs text-gray-300">{userName.firstName} {userName.lastName}</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </nav>
     </aside>
