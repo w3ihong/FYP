@@ -15,7 +15,9 @@ const ModalPostDetail: React.FC<{ post: any, onClose: () => void }> = ({ post, o
             <source src={post.media_url} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-        ) : null}
+        ) : post.post_type === 'CAROUSEL_ALBUM' ? (
+            <img src={post.media_url} alt={post.title} className="mb-4 w-80 h-80 object-cover" />
+        ):null}
         <h2 className="text-xs font-bold mb-4">{post.caption}</h2>
         <button className="bg-accent w-24 h-8 text-white" onClick={onClose}>Close</button>
       </div>

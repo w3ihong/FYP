@@ -1093,6 +1093,44 @@ export const getPosts = async () => {
 
   
 };
+export const fetchUserName = async () => {
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return null;
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('user_id, first_name, last_name')
+    .eq('user_id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user:', error.message);
+    return null;
+  }
+
+  if (!data) {
+    console.error('User data not found');
+    return null;
+  }
+
+  return {
+    user_id: data.user_id,
+    first_name: data.first_name,
+    last_name: data.last_name,
+  };
+};
 
 
 

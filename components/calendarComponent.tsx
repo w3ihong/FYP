@@ -135,7 +135,9 @@ const CalendarComponent: React.FC = () => {
             <source src={post.media_url} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-        ) : null}
+        ) :post.post_type === 'CAROUSEL_ALBUM' ? (
+            <img src={post.media_url} alt={post.title} className="mb-4 h-30 object-cover" />
+        ):null}
           </div>
           
         );

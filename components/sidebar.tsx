@@ -1,8 +1,8 @@
-'use client';
+'use client'
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { BarChart3, TrendingUp, LineChart, PieChart, LogOut, Calendar, Settings } from 'lucide-react';
 import Link from "next/link";
-import { logout } from '@/app/actions';
+import { logout, fetchUserName } from '@/app/actions';
 import Image from 'next/image';
 import logo from "@/public/ESLogo.png";
 import { createClient } from '@/utils/supabase/client';
@@ -44,28 +44,14 @@ export function SidebarItem({ icon, text, link, onClick }: SidebarItemProps) {
 // Sidebar component
 export default function Sidebar({ email, userType }: { email: string, userType: number }) {
   const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
-  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
+  const [userName, setUserName] = useState<{ user_id: string; first_name: string; last_name: string } | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('first_name, last_name')
-          .eq('email', email)
-          .single();
-
-        if (error) {
-          console.error('Supabase error:', error);
-          return;
-        }
-
-        if (data) {
-          setUserName({ firstName: data.first_name, lastName: data.last_name });
-        }
-      } catch (error) {
-        console.error('Fetch error:', error);
+      const userData = await fetchUserName();
+      if (userData) {
+        setUserName(userData);
       }
     };
 
@@ -119,7 +105,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
           {expanded && userName && (
             <div className="flex items-center ml-3">
               <div className="leading-4">
-                <span className="text-xs text-gray-300">{userName.firstName} {userName.lastName}</span>
+                <span className="text-s text-gray-300">{userName.first_name} {userName.last_name}</span>
               </div>
             </div>
           )}
