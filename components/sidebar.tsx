@@ -50,7 +50,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
 
   return (
     <aside
-      className={`fixed top-0 h-screen bg-accent transition-all ${expanded ? 'w-60' : 'w-16'}`}
+      className={`fixed top-0 h-screen bg-accent transition-all z-10 ${expanded ? 'w-60' : 'w-16'}`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >

@@ -913,7 +913,9 @@ export async function updateUserCategory(profileData: any) {
   }
 
   return true;
-}export async function fetchUsers() {
+}
+
+export async function fetchUsers() {
   const supabase = createClient();
   try {
     const { data, error } = await supabase
@@ -1051,6 +1053,47 @@ export async function insertSuspensionData(userId: string, reason: string) {
   console.log('User data inserted successfully');
   return true;
 }
+
+
+export const getPosts = async () => {
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return [];
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      platform_account!inner (
+        user_id,client_name,platform
+      )
+    `)
+    .eq('platform_account.user_id', userId);
+
+  if (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
+  return data.map(post => ({
+    ...post,
+    client_name: post.platform_account.client_name,
+    platform: post.platform_account.platform
+  }));
+
+  
+};
+
 
 
 
