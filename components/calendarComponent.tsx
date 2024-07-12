@@ -128,9 +128,16 @@ const CalendarComponent: React.FC = () => {
                 <span>{post.client_name}</span>
               </div>
             )}
-            <p></p>
-            {post.media_url && <img src={post.media_url} alt={post.caption} className="mt-2 rounded-md h-30 object-cover w-full" />}
+            {post.post_type === 'IMAGE' ? (
+          <img src={post.media_url} alt={post.title} className="mb-4 h-30 object-cover" />
+        ) : post.post_type === 'VIDEO' ? (
+          <video controls className="mb-4 h-30 object-cover">
+            <source src={post.media_url} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : null}
           </div>
+          
         );
       } else {
         if (post.platform === 'Instagram') {
@@ -184,7 +191,7 @@ const CalendarComponent: React.FC = () => {
         </select>
       </div>
       <div className="rounded-2xl z-0">
-        <div className="w-full max-w-5xl mx-auto ">
+        <div className="">
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, interactionPlugin]}
