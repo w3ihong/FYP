@@ -18,22 +18,25 @@ export default async function InstagramConnectRedirect() {
         const expiresIn = params.get('expires_in');
         const longLiveToken = params.get('long_lived_token');
 
+        console.log("access token : "+accessToken)
+        console.log("access token : "+accessExpirationTime)
+        console.log("access token : "+expiresIn)
         console.log("long lived token : "+longLiveToken)
 
         if (accessToken) {
 
           // Store the user's access token
-          if (longLiveToken == null ) {
+          // if (longLiveToken == null ) {
             // await setAccessToken(accessToken, 'Instagram')
             const data = await getLongLivedToken(accessToken)
-            console.log(data)
+            console.log("exchanged long lived toekn " + data)
             
             await addInstagramAccount(data.access_token)
 
-          } else {
+          // } else {
 
-            await addInstagramAccount(longLiveToken);
-          }
+          //   await addInstagramAccount(longLiveToken);
+          // }
           
           // Redirect to another page or handle the token further
           router.push('/protected');
