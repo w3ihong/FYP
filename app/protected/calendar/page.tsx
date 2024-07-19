@@ -1,10 +1,12 @@
-export default function calendar()
-{
-    return (
-       <main>
-        <h3>
-            Calendar
-        </h3>
-       </main>
-    )
-}
+import React from 'react';
+import CalendarComponent from '@/components/calendarComponent';
+
+const CalendarPage: React.FC = () => {
+  return (
+    <div>
+      <CalendarComponent />
+    </div>
+  );
+};
+
+export default CalendarPage;

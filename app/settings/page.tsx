@@ -38,7 +38,6 @@ export default function Settings() {
   const [isAccountDisabled, setIsAccountDisabled] = useState(false); // State to track account status
 
 
-
   useEffect(() => {
     async function fetchEmail() {
       const fetchedEmail = await getEmail();
@@ -242,6 +241,8 @@ export default function Settings() {
     }
   };
 
+
+  
   return (
     <div className="flex w-full">
       <main className="flex-1 p-8"> 
@@ -252,8 +253,6 @@ export default function Settings() {
             <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
             <div className="bg-white p-6 rounded-lg shadow-md w-full"> 
               <div className="mb-4">
-                
-                {/* Email Address */}
                 <p className="text-sm mb-3 font-semibold text-accent">Email Address</p>
                 <div className="flex items-center">
                   <div className="relative flex-grow">
@@ -515,6 +514,7 @@ export default function Settings() {
       )}
 
       
+
       </div>
       
   );
