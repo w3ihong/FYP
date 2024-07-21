@@ -24,6 +24,7 @@ export default function adminReports() {
     (user) =>
       user.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.reporter_id.toLowerCase().includes(searchTerm.toLowerCase())
+      
   );
 
   const handleOpenViewModal = (reason) => {
@@ -55,7 +56,7 @@ export default function adminReports() {
           ) : filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
-                <div>{user.reportee_id} , {user.reporter_id}  </div>
+                <div>{user.reportee_id} , {user.reporter_id} , {user.last_name}  </div>
                 <button
                   className="bg-gray-400 text-white px-10 py-1 rounded-lg hover:bg-gray-500"
                   onClick={() => handleOpenViewModal(user.reason)}

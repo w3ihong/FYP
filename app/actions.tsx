@@ -941,7 +941,7 @@ export async function fetchReports()
   try {
     const { data, error } = await supabase
       .from('reports_on_user') // Replace 'users' with your actual table name
-      .select('reason , reporter_id , reportee_id ');
+      .select('reason , reporter_id , reportee_id , first_name ');
       
 
     if (error) {
@@ -963,7 +963,7 @@ export async function fetchSuspension()
   try {
     const { data, error } = await supabase
       .from('suspension') // Replace 'users' with your actual table name
-      .select('reason , user_id ');
+      .select('reason , user_id  ');
       
 
     if (error) {

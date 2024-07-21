@@ -57,12 +57,12 @@ export default function Home() {
         setSearchTerm(event.target.value);
     };
 
-    const handleCountryChange = (event) => {
-        setSelectedCountry(event.target.value);
-    };
-
-    const handleTopicChange = (event) => {
-        setSelectedTopic(event.target.value);
+    const handleFilterChange = (filterType, value) => {
+        if (filterType === 'country') {
+            setSelectedCountry(value);
+        } else if (filterType === 'topic') {
+            setSelectedTopic(value);
+        }
     };
 
     // Filter trendingWorldwide based on searchTerm and selectedTopic
@@ -73,37 +73,43 @@ export default function Home() {
 
     return (
         <div style={styles.container}>
-            <h1 style={styles.title}>Trend Analysis</h1>
-            <input
-                type="text"
-                placeholder="Search for any trend"
-                style={styles.searchBar}
-                value={searchTerm}
-                onChange={handleSearchChange}
-            />
-            <div style={styles.section}>
-                <h2 style={styles.sectionTitle}>Filter by Country</h2>
-                <select
-                    value={selectedCountry}
-                    onChange={handleCountryChange}
-                    style={styles.dropdown}
-                >
-                    {countryOptions.map(option => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                    ))}
-                </select>
+            <div style={styles.header }>
+                <h1 style={styles.title}>Trend Analysis</h1>
+            </div>
+            <div style={styles.filters}>
+                <div style={styles.filter}>
+                    <h2 style={styles.sectionTitle}>Filter by Country</h2>
+                    <select
+                        value={selectedCountry}
+                        onChange={(e) => handleFilterChange('country', e.target.value)}
+                        style={styles.dropdown}
+                    >
+                        {countryOptions.map(option => (
+                            <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                    </select>
+                </div>
+                <div style={styles.filter}>
+                    <h2 style={styles.sectionTitle}>Filter by Topic</h2>
+                    <select
+                        value={selectedTopic}
+                        onChange={(e) => handleFilterChange('topic', e.target.value)}
+                        style={styles.dropdown}
+                    >
+                        {topicOptions.map(option => (
+                            <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
             <div style={styles.section}>
-                <h2 style={styles.sectionTitle}>Filter by Topic</h2>
-                <select
-                    value={selectedTopic}
-                    onChange={handleTopicChange}
-                    style={styles.dropdown}
-                >
-                    {topicOptions.map(option => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                    ))}
-                </select>
+                <input
+                    type="text"
+                    placeholder="Search for any trend"
+                    style={styles.searchBar}
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                />
             </div>
             <div style={styles.section}>
                 <h2 style={styles.sectionTitle}>Trends Worldwide</h2>
@@ -143,6 +149,12 @@ const styles = {
         padding: '20px',
         fontFamily: 'Arial, sans-serif',
     },
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+    },
     title: {
         fontSize: '2em',
         fontWeight: 'bold',
@@ -151,20 +163,23 @@ const styles = {
         padding: '5px',
     },
     searchBar: {
-        marginTop: '10px',
         padding: '10px',
         fontSize: '1em',
-        width: '80%',
-        display: 'block',
-        margin: '20px auto',
+        width: '100%', // Adjusted width to fit the container
+        marginBottom: '10px', // Added margin bottom to separate from filters
     },
-    dropdown: {
-        marginTop: '10px',
-        padding: '10px',
-        fontSize: '1em',
-        width: '40%',
-        display: 'block',
-        margin: '10px auto',
+    filters: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginBottom: '20px',
+        flexWrap: 'wrap', // Added to allow filters to wrap to the next line if needed
+    },
+    filter: {
+        backgroundColor: '#f8e43e',
+        padding: '20px',
+        borderRadius: '10px',
+        flexBasis: '45%', // Adjusted to allow two filters per line
+        marginBottom: '10px', // Added margin bottom to separate filters
     },
     section: {
         marginTop: '20px',
@@ -175,6 +190,12 @@ const styles = {
     sectionTitle: {
         fontSize: '1.5em',
         fontWeight: 'bold',
+    },
+    dropdown: {
+        marginTop: '10px',
+        padding: '10px',
+        fontSize: '1em',
+        width: '100%',
     },
     trendList: {
         display: 'flex',
