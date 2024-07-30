@@ -1,10 +1,10 @@
-"use client";
-
-import React, { useState } from "react";
+'use client'
+import React, { useState, useEffect } from "react";
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
+import { fetchUserName } from "../actions"; // Import fetchUserName function
 
 declare global {
   interface Window {
@@ -21,6 +21,17 @@ export default function Index() {
   const [disconnectAccountIndex, setDisconnectAccountIndex] = useState<number | null>(null);
   const [isConnectSocialModalOpen, setConnectSocialModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await fetchUserName(); // Call fetchUserName to get user data
+      if (userData) {
+        setUserName(`${userData.first_name} ${userData.last_name}`);
+      }
+    };
+
+    fetchUserData();
+  }, []); // Empty dependency array to run only once when component mounts
 
   const handleFBLogin = () => {
     if (window.FB) {

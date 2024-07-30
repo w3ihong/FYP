@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
 
+import {  toZonedTime, format } from 'date-fns-tz';
+
 const otpStore = new Map();
 
 
@@ -1092,6 +1094,131 @@ export const getPosts = async () => {
   }));
 
   
+};
+export const fetchUserName = async () => {
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return null;
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('user_id, first_name, last_name')
+    .eq('user_id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user:', error.message);
+    return null;
+  }
+
+  if (!data) {
+    console.error('User data not found');
+    return null;
+  }
+
+  return {
+    user_id: data.user_id,
+    first_name: data.first_name,
+    last_name: data.last_name,
+  };
+};
+
+
+export const getPostsWithSentiment = async (
+  sortDirection: 'asc' | 'desc' = 'desc',
+  startDate?: string,
+  endDate?: string
+) => {
+  const supabase = createClient();
+
+  // Fetch the authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return [];
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return [];
+  }
+
+  // Construct the date filter
+  const dateFilter: any = {};
+  if (startDate) {
+    dateFilter['created_at'] = `gte.${startDate}`;
+  }
+  if (endDate) {
+    dateFilter['created_at'] = dateFilter['created_at']
+      ? [dateFilter['created_at'], `lte.${endDate}`]
+      : `lte.${endDate}`;
+  }
+
+  // Fetch posts with their sentiment metrics
+  const { data: postsWithSentiment, error: postsWithSentimentError } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      post_metrics!inner (
+        post_id,
+        post_sentiment, 
+        post_impressions, 
+        date_retrieved,
+        post_likes
+      )
+    `)
+    .filter('created_at', 'gte', startDate || '1970-01-01')
+    .filter('created_at', 'lte', endDate || new Date().toISOString())
+    .order('created_at', { ascending: sortDirection === 'asc' })
+    .limit(20);
+
+  if (postsWithSentimentError) {
+    console.error('Error fetching posts with sentiment:', postsWithSentimentError.message);
+    return [];
+  }
+
+  // Convert date_retrieved to Singapore Time (SGT) and add emoji based on sentiment
+  const timeZone = 'Asia/Singapore';
+  const getSentimentEmoji = (sentiment) => {
+    if (sentiment > 0.5) return '😀';
+    if (sentiment < -0.5) return '😞';
+    return '😐';
+  };
+
+  const postsWithConvertedDatesAndEmojis = postsWithSentiment.map(post => {
+    const postMetrics = post.post_metrics || [];
+    const convertedMetrics = postMetrics.map(metric => {
+      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
+      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
+      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
+      const sentimentEmoji = getSentimentEmoji(metric.post_sentiment);
+      return {
+        ...metric,
+        date_retrieved: formattedSgtDate,
+        sentiment_emoji: sentimentEmoji,
+      };
+    });
+    return {
+      ...post,
+      post_metrics: convertedMetrics,
+    };
+  });
+
+  return postsWithConvertedDatesAndEmojis;
 };
 
 

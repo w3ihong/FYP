@@ -1,6 +1,6 @@
 'use client';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { ArrowLeft, LogOut, User, CreditCard } from 'lucide-react';
+import { ArrowLeft, LogOut, User, CreditCard, Contact } from 'lucide-react';
 import Link from "next/link";
 import { logout } from '@/app/actions';
 
@@ -72,6 +72,7 @@ export default function SettingsSidebar() {
           <SidebarContext.Provider value={{ expanded }}>
             <div className="flex flex-col px-3 h-full">
               <SidebarItem icon={<User size={20} />} text="Account" link="/settings" />
+              <SidebarItem icon={<Contact size={20} />} text="Profile" link="/settings/profile" />
               <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
               <SidebarItem icon={<User size={20}/>} text="Profile" link="/settings/profile"/>
               <div className=' grow '/>
