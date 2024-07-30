@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { getPostsWithSentiment } from '@/app/actions'; // Adjust the path as needed
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -104,8 +106,12 @@ const Dashboard = () => {
                 </p>
                 <p className="text-gray-600">Date: {post.post_metrics?.[0]?.date_retrieved || 'N/A'}</p>
                 <p className="text-gray-600">
-                  <span className="mr-2"><i className="fas fa-heart"></i> {post.post_metrics?.[0]?.post_likes || 'N/A'}</span>
-                  <span><i className="fas fa-arrow-down"></i> {post.post_metrics?.[0]?.post_impressions || 'N/A'}</span>
+                  <span className="mr-2">
+                    <FontAwesomeIcon icon={faHeart} /> {post.post_metrics?.[0]?.post_likes || 'N/A'}
+                  </span>
+                  <span>
+                    <FontAwesomeIcon icon={faArrowDown} /> {post.post_metrics?.[0]?.post_impressions || 'N/A'}
+                  </span>
                 </p>
                 <a href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-blue-500">
                   View Post
