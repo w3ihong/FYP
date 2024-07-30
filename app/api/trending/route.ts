@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-export async function GET(request) {
+export async function GET(request: Request): Promise<Response> {
     return new Promise((resolve, reject) => {
         // Get the URL and extract the 'country' query parameter
         const url = new URL(request.url);
@@ -20,7 +20,7 @@ export async function GET(request) {
 
         process.on('close', (code) => {
             if (code !== 0) {
-                reject(new Response('Error fetching trends', { status: 500 }));
+                resolve(new Response('Error fetching trends', { status: 500 }));
             } else {
                 resolve(new Response(data, {
                     status: 200,

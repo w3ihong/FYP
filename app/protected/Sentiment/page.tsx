@@ -5,15 +5,34 @@ import { getPostsWithSentiment } from '@/app/actions'; // Adjust the path as nee
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
+type SortOrder = 'asc' | 'desc';
+
+interface PostMetrics {
+  sentiment_emoji: string;
+  post_sentiment: string;
+  date_retrieved: string;
+  post_likes: number;
+  post_impressions: number;
+}
+
+interface Post {
+  id: string;
+  caption: string;
+  post_type: 'IMAGE' | 'VIDEO';
+  media_url: string;
+  permalink: string;
+  post_metrics?: PostMetrics[];
+}
+
 const Dashboard = () => {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
-  const fetchData = async (order: 'asc' | 'desc', start?: string, end?: string) => {
+  const fetchData = async (order: SortOrder, start?: string, end?: string) => {
     try {
       // Fetch posts with sentiment
       const postsWithSentiment = await getPostsWithSentiment(order, start, end);
