@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, CSSProperties } from 'react';
 
 export default function Home() {
-    const [trendingWorldwide, setTrendingWorldwide] = useState([]);
-    const [trendingCatered, setTrendingCatered] = useState([]);
+    const [trendingWorldwide, setTrendingWorldwide] = useState<string[]>([]);
+    const [trendingCatered, setTrendingCatered] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCountry, setSelectedCountry] = useState('singapore'); // Default selection
     const [selectedTopic, setSelectedTopic] = useState(''); // Default no topic filter
@@ -31,7 +31,7 @@ export default function Home() {
         fetchTrendingData(selectedCountry);
     }, [selectedCountry]); // Fetch data whenever selectedCountry changes
 
-    const fetchTrendingData = (country) => {
+    const fetchTrendingData = (country: string) => {
         let url = `/api/trending?country=${country}`;
 
         fetch(url)
@@ -53,11 +53,11 @@ export default function Home() {
             });
     };
 
-    const handleSearchChange = (event) => {
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
 
-    const handleFilterChange = (filterType, value) => {
+    const handleFilterChange = (filterType: 'country' | 'topic', value: string) => {
         if (filterType === 'country') {
             setSelectedCountry(value);
         } else if (filterType === 'topic') {
@@ -73,7 +73,7 @@ export default function Home() {
 
     return (
         <div style={styles.container}>
-            <div style={styles.header }>
+            <div style={styles.header}>
                 <h1 style={styles.title}>Trend Analysis</h1>
             </div>
             <div style={styles.filters}>
@@ -143,7 +143,7 @@ export default function Home() {
     );
 }
 
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
     container: {
         backgroundColor: '#f3f3c1',
         padding: '20px',
@@ -208,6 +208,6 @@ const styles = {
         margin: '5px',
         borderRadius: '5px',
         width: '45%',
-        textAlign: 'center',
+        textAlign: 'center' as 'center',
     },
 };
