@@ -13,12 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-background text-accent font-sans scroll-smooth">
+    <html lang="en" className="bg-white text-accent font-sans scroll-smooth">
       <body className="">
         <main className="min-h-screen w-full">
           {children}
         </main>
-        <Footer/>
       </body>
     </html>
   );
