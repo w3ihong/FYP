@@ -86,6 +86,34 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
             <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
             <div className='my-4' />  {/* Spacer Div */}
           </div>
+<<<<<<< HEAD
+=======
+
+          <SidebarContext.Provider value={{ expanded }}>
+            <div className="flex flex-col px-3 h-full">
+              <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
+              <SidebarItem icon={<TrendingUp size={20} />} text="Sentiment Analysis" link="/protected/Sentiment" />
+              <SidebarItem icon={<LineChart size={20} />} text="Trending Topics" link="/protected/Trending" />
+              <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative-analysis" />
+              <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
+
+              <div className='grow' />
+              <div className='pb-[63px]'>
+                <SidebarItem
+                  icon={<Settings size={20} />}
+                  text="Settings"
+                  link="/settings"
+                />
+                <SidebarItem
+                  icon={<LogOut size={20} />}
+                  text="Logout"
+                  link="/landing"
+                  onClick={() => logout()}
+                />
+              </div>
+            </div>
+          </SidebarContext.Provider>
+>>>>>>> d9151480afabaee81b3f4c641393e988ce9c9446
         </div>
         <div className='flex flex-col px-3 py-2'>
           <SidebarItem

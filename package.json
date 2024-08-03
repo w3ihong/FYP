@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
@@ -22,8 +23,12 @@
     "autoprefixer": "10.4.17",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
+<<<<<<< HEAD
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+=======
+    "date-fns-tz": "^3.1.3",
+>>>>>>> d9151480afabaee81b3f4c641393e988ce9c9446
     "dom": "^0.0.3",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.9.0",

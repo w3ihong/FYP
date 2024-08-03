@@ -36,7 +36,7 @@ export default function AdminHome() {
   }, []);
   
   const handleOpenModal = (user: any) => {
-    setSelectedUser({ user_id: user.user_id, name: user.name, suspended: user.suspended });
+    setSelectedUser({ user_id: user.user_id, name: user.first_name, suspended: user.suspended });
     setIsModalOpen(true);
   };
 
@@ -89,7 +89,7 @@ export default function AdminHome() {
 
   // Filter users based on search term
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.user_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -110,7 +110,7 @@ export default function AdminHome() {
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
-                <div>{user.name}, {user.user_id}, {user.suspended ? 'Suspended' : 'Active'}</div>
+                <div>{user.first_name}, {user.user_id}, {user.suspended ? 'Suspended' : 'Active'}</div>
                 <button
                   className={`text-white px-8 py-1 rounded-lg ${user.suspended ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}
                   onClick={() => handleOpenModal(user)}
