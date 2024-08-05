@@ -174,7 +174,7 @@ const CalendarComponent: React.FC = () => {
         </select>
       </div>
 
-      <div className="flex justify-center items-center mb-4 z-1 relative w-full">
+      <div className="flex justify-center bg-gray items-center mb-4 z-1 relative w-full shadow">
         <Datepicker
           value={{ startDate: dayjs(currentDate).tz().format('YYYY-MM-DD'), endDate: dayjs(currentDate).tz().format('YYYY-MM-DD') }}
           onChange={handleDateChange}
@@ -186,7 +186,7 @@ const CalendarComponent: React.FC = () => {
         />
       </div>
 
-      <div className="rounded-2xl z-0 relative">
+      <div className="rounded z-0 relative">
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -198,16 +198,17 @@ const CalendarComponent: React.FC = () => {
           eventMouseLeave={handleEventMouseLeave}
           headerToolbar={{
             start: '',
-            center: '',
+            center: 'title',
             end: ''
           }}
           eventContent={renderEventContent}
           dayHeaderClassNames="bg-accent text-white text-s"
           dayCellClassNames={dayCellClassNames}
-          viewClassNames="rounded-3xl overflow-hidden shadow"
+          viewClassNames="rounded-2xl overflow-hidden shadow"
           eventDisplay="block"
           eventBackgroundColor="white"
           eventBorderColor="white"
+          titleFormat={{ year: 'numeric', month: 'long'} }
         />
         {modalOpen && <ModalPostDetail post={selectedPost} onClose={() => setModalOpen(false)} />}
       </div>
