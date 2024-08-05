@@ -74,7 +74,6 @@ export default function SettingsSidebar() {
               <SidebarItem icon={<User size={20} />} text="Account" link="/settings" />
               <SidebarItem icon={<Contact size={20} />} text="Profile" link="/settings/profile" />
               <SidebarItem icon={<CreditCard size={20} />} text="Billing" link="/settings/billing" />
-              <SidebarItem icon={<User size={20}/>} text="Profile" link="/settings/profile"/>
               <div className=' grow '/>
             </div>
           </SidebarContext.Provider>

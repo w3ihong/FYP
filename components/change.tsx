@@ -3,18 +3,52 @@ import React, { FormEvent, useState } from 'react';
 import { CreditCard, Calendar, Key } from 'lucide-react';
 import CVVModal from './cvvmodal';
 import PaymentSuccessModal from './saveModal';
-import { updateCardDetails } from '@/app/actions'; 
+import { updateCardDetails } from '@/app/actions';
 
-const ChangePayment = ({
-  billingDetails,
-  onBillingDetailsChange,
-  onCancel,
-}) => {
+interface BillingDetails {
+  credit_card_no: string;
+  credit_card_expiry: string;
+  credit_card_cvv: string;
+  full_name: string;
+  state: string;
+  city: string;
+  street: string;
+  unit: string;
+  postalcode: string;
+}
+
+interface ChangePaymentProps {
+  billingDetails: BillingDetails;
+  onBillingDetailsChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  onCancel: () => void;
+}
+
+const ChangePayment: React.FC<ChangePaymentProps> = ({ billingDetails, onBillingDetailsChange, onCancel }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+  const [cardType, setCardType] = useState('Visa'); // New state for card type
+  const [errors, setErrors] = useState<{ credit_card_no?: string; agreement?: string }>({});
+
+  const validateForm = () => {
+    const errors: { credit_card_no?: string; agreement?: string } = {};
+    if (billingDetails.credit_card_no.length !== 16) {
+      errors.credit_card_no = 'Card number must be 16 digits';
+    }
+    if (!isAgreementChecked) {
+      errors.agreement = ' You must agree to the terms';
+    }
+    return errors;
+  };
 
   const handlePaymentChangeSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     try {
       await updateCardDetails(billingDetails); // Update payment information in Supabase
 
@@ -36,8 +70,20 @@ const ChangePayment = ({
       <form onSubmit={handlePaymentChangeSubmit} className="text-gray-700 space-y-4">
         <div className='border px-4 py-4 space-y-4'>
           <div className='flex space-x-4 mb-4'>
-            <img className="object-scale-down h-12 w-12" src='/visa.png' alt="Visa" />
-            <img className="object-scale-down h-12 w-12" src='/mc.png' alt="MasterCard" />
+            <button type="button" onClick={() => setCardType('Visa')} className="focus:outline-none">
+              <img
+                className={`object-scale-down h-12 w-12 ${cardType === 'Visa' ? 'border-2 border-gray-300 rounded' : ''}`}
+                src="/visa.png"
+                alt="Visa"
+              />
+            </button>
+            <button type="button" onClick={() => setCardType('MasterCard')} className="focus:outline-none">
+              <img
+                className={`object-scale-down h-12 w-12 ${cardType === 'MasterCard' ? 'border-2 border-gray-300 rounded' : ''}`}
+                src="/mc.png"
+                alt="MasterCard"
+              />
+            </button>
           </div>
           <div className="relative">
             <label htmlFor="credit_card_no" className="block text-sm font-medium text-gray-900 mb-1">
@@ -54,6 +100,7 @@ const ChangePayment = ({
               required
             />
             <CreditCard className="absolute top-1/2 right-3 transform -translate-y-1/5 text-gray-400" />
+            {errors.credit_card_no && <p className="text-red-500 text-sm">{errors.credit_card_no}</p>}
           </div>
           <div className="flex space-x-4">
             <div className="relative flex-1">
@@ -61,16 +108,15 @@ const ChangePayment = ({
                 Expiry Date
               </label>
               <input
-                type="text"
+                type="date"
                 id="credit_card_expiry"
                 name="credit_card_expiry"
                 value={billingDetails.credit_card_expiry}
                 onChange={onBillingDetailsChange}
-                className="bg-white border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 pr-10"
+                className="bg-white border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 pr-6"
                 placeholder="MM/YYYY"
                 required
               />
-              <Calendar className="absolute top-1/2 right-3 transform -translate-y-1/5 text-gray-400" />
             </div>
             <div className="relative flex-1">
               <label htmlFor="credit_card_cvv" className="block text-sm font-medium text-gray-900 mb-1">
@@ -191,7 +237,7 @@ const ChangePayment = ({
             Your payments will be processed internationally. Additional bank fees may apply.
           </p>
           <p className="text-gray-600 mt-4">
-            By ticking the tickbox below, you agree that EchoSphere will automatically continue your membership and charge the membership fee (currently $39/month) to your payment method until you cancel. You may cancel at any time to avoid future charges.
+            By ticking the tickbox below, you agree that EchoSphere will automatically continue your membership and charge the membership fee (currently $99/month) to your payment method until you cancel. You may cancel at any time to avoid future charges.
           </p>
           <div className="flex items-center mt-4">
             <input
@@ -199,10 +245,13 @@ const ChangePayment = ({
               id="agreement"
               name="agreement"
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+              checked={isAgreementChecked}
+              onChange={() => setIsAgreementChecked(!isAgreementChecked)}
             />
             <label htmlFor="agreement" className="ml-2 text-sm font-medium text-gray-900">
               I agree!
             </label>
+            {errors.agreement && <p className="text-red-500 text-sm">{errors.agreement}</p>}
           </div>
           <div className='flex justify-center mt-4 space-x-4'>
             <button

@@ -87,7 +87,7 @@ const ProfileUpdateForm: React.FC = () => {
           <div className="grid grid-cols-3 gap-4 mb-4 items-center">
             <label className="text-sm font-bold text-gray-700">Date of Birth</label>
             <input
-              type="text"
+              type="date"
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={handleChange}

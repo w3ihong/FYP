@@ -183,47 +183,89 @@ export async function billingDetails() {
   }
 }
 
-export async function updateCardDetails(cardDetails: any): Promise<void> {
+
+export async function updateCardDetails(cardDetails: any) {
   const supabase = createClient();
   try {
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) {
-      throw userError;
+      console.error('Error fetching authenticated user:', userError.message);
+      return false;
     }
 
     const userId = user?.id;
 
     if (!userId) {
-      throw new Error('User ID not found');
+      console.error('User ID not found');
+      return false;
     }
 
-    const { data, error } = await supabase
+    // Check if user exists in billing table
+    const { data: existingBillingUsers, error: billingError } = await supabase
       .from('billing')
-      .update({
-        full_name: cardDetails.full_name,
-        credit_card_no: cardDetails.credit_card_no,
-        credit_card_expiry: cardDetails.credit_card_expiry,
-        credit_card_cvv: cardDetails.credit_card_cvv,
-        state: cardDetails.state,
-        city: cardDetails.city,
-        street: cardDetails.street,
-        unit: cardDetails.unit,
-        postalcode: cardDetails.postalcode,
-      })
-      .eq('user_id', userId); // Use the actual user ID
+      .select('*')
+      .eq('user_id', userId);
 
-    if (error) {
-      throw error;
+    if (billingError) {
+      throw billingError;
     }
 
-    // Handle success
-    console.log('Card details updated successfully:', data);
-  } catch (error : any) {
+    const existingBillingUser = existingBillingUsers?.[0]; // Take the first result if available
+
+    if (!existingBillingUser) {
+      // Insert new billing record if user doesn't exist in billing table
+      const { data: newBillingUser, error: insertError } = await supabase
+        .from('billing')
+        .insert({
+          user_id: userId,
+          full_name: cardDetails.full_name,
+          credit_card_no: cardDetails.credit_card_no,
+          credit_card_expiry: cardDetails.credit_card_expiry,
+          credit_card_cvv: cardDetails.credit_card_cvv,
+          state: cardDetails.state,
+          city: cardDetails.city,
+          street: cardDetails.street,
+          unit: cardDetails.unit,
+          postalcode: cardDetails.postalcode
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      // Handle success
+      console.log('New billing record created for user:', newBillingUser);
+    } else {
+      // Update existing billing record
+      const { data: updatedBillingUser, error: updateError } = await supabase
+        .from('billing')
+        .update({
+          full_name: cardDetails.full_name,
+          credit_card_no: cardDetails.credit_card_no,
+          credit_card_expiry: cardDetails.credit_card_expiry,
+          credit_card_cvv: cardDetails.credit_card_cvv,
+          state: cardDetails.state,
+          city: cardDetails.city,
+          street: cardDetails.street,
+          unit: cardDetails.unit,
+          postalcode: cardDetails.postalcode
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Handle success
+      console.log('Billing details updated successfully:', updatedBillingUser);
+    }
+  } catch (error) {
     throw new Error(`Error updating card details: ${error.message}`);
   }
 }
+
 
 export async function planType() {
   const supabase = createClient();
@@ -1076,7 +1118,7 @@ export const getPosts = async () => {
     .select(`
       *,
       platform_account!inner (
-        user_id,client_name,platform
+        user_id,account_username,platform
       )
     `)
     .eq('platform_account.user_id', userId);
@@ -1087,7 +1129,7 @@ export const getPosts = async () => {
   }
   return data.map(post => ({
     ...post,
-    client_name: post.platform_account.client_name,
+    client_name: post.platform_account.account_username,
     platform: post.platform_account.platform
   }));
 
@@ -1131,6 +1173,77 @@ export const fetchUserName = async () => {
     last_name: data.last_name,
   };
 };
+
+export const getPostMetrics = async () => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('post_metrics')
+    .select('*');
+
+  if (error) {
+    console.error('Error fetching post metrics:', error.message);
+    return null;
+  }
+
+  return data;
+};
+
+export const getPostsWithMetrics = async () => {
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return [];
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return [];
+  }
+
+  // Fetch posts for the authenticated user with platform information
+  const { data: posts, error: postsError } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      platform_account!inner (
+        user_id, account_username, platform
+      )
+    `)
+    .eq('platform_account.user_id', userId);
+
+  if (postsError) {
+    console.error('Error fetching posts:', postsError.message);
+    return [];
+  }
+
+  // Fetch post metrics
+  const { data: metrics, error: metricsError } = await supabase
+    .from('post_metrics')
+    .select('*');
+
+  if (metricsError) {
+    console.error('Error fetching post metrics:', metricsError.message);
+    return [];
+  }
+
+  // Merge posts with their metrics
+  const postsWithMetrics = posts.map(post => {
+    const postMetrics = metrics.find(metric => metric.post_id === post.id) || {};
+    return {
+      ...post,
+      metrics: postMetrics,
+      platform: post.platform_account?.platform // Ensure platform data is included
+    };
+  });
+
+  return postsWithMetrics;
+};
+
 
 
 

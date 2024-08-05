@@ -80,7 +80,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
               <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
               <SidebarItem icon={<TrendingUp size={20} />} text="Sentiment Analysis" link="/protected/sentiment-analysis" />
               <SidebarItem icon={<LineChart size={20} />} text="Trending Topics" link="/protected/trending-topics" />
-              <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative-analysis" />
+              <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative" />
               <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
 
               <div className='grow' />

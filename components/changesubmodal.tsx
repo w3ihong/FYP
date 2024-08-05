@@ -15,7 +15,7 @@ const ChangeSubscription: React.FC<ChangeSubscriptionProps> = ({ currentPlan, cu
 
   const handleConfirm = async () => {
     try {
-      await upgradeSubscription('business'); // Pass the new plan type here
+      await upgradeSubscription('premium'); // Pass the new plan type here
       setIsSuccessModalOpen(true); // Open the success modal
     } catch (error) {
       console.error('Failed to upgrade subscription:', error);
@@ -34,7 +34,7 @@ const ChangeSubscription: React.FC<ChangeSubscriptionProps> = ({ currentPlan, cu
       </div>
       <div className="mb-4">
         <p className='bg-yellow-100 px-2 py-2 mb-2'>Current Plan:<br /> {currentPlan} {currentPlanCost}</p>
-        <p className='bg-yellow-200 px-2 py-2'>New Plan:<br /> Business Plan {newPlanCost}</p>
+        <p className='bg-yellow-200 px-2 py-2'>New Plan:<br /> Premium Plan {newPlanCost}</p>
       </div>
       <p className="mb-4">Your new plan starts now. You'll pay {newPlanCost} starting 31/5/24.</p>
       <p className="mb-4">You agree that your EchoSphere membership will continue and that we will charge the updated monthly fee until you cancel. You may cancel at any time to avoid future charges.</p>
