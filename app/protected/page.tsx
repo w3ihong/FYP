@@ -1,10 +1,13 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from "react";
+import { motion } from 'framer-motion';
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
-import { fetchUserName } from "../actions"; // Import fetchUserName function
+import { supabase } from '@/utils/supabase/client';
+import ModalPostDetail from "@/components/ModalPostDetails"; 
+import { getPosts } from "../actions";
 
 declare global {
   interface Window {
@@ -14,24 +17,42 @@ declare global {
   }
 }
 
+interface Post {
+  id: string;
+  created_at: string;
+  post_type: string;
+  platform_account: string;
+  caption: string;
+  media_url: string;
+  permalink: string;
+  video_thumbnail: string;
+}
+
 export default function Index() {
-  const [isDraftModalOpen, setDraftModalOpen] = useState(false);
   const [isAccountModalOpen, setAccountModalOpen] = useState(false);
-  const [deleteDraftIndex, setDeleteDraftIndex] = useState<number | null>(null);
   const [disconnectAccountIndex, setDisconnectAccountIndex] = useState<number | null>(null);
   const [isConnectSocialModalOpen, setConnectSocialModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const userData = await fetchUserName(); // Call fetchUserName to get user data
-      if (userData) {
-        setUserName(`${userData.first_name} ${userData.last_name}`);
+    // Fetch posts from Supabase
+    const fetchPosts = async () => {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('id, created_at, post_type, platform_account, caption, media_url, permalink, video_thumbnail')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching posts:", error);
+      } else {
+        setPosts(data);
       }
     };
 
-    fetchUserData();
-  }, []); // Empty dependency array to run only once when component mounts
+    fetchPosts();
+  }, []);
 
   const handleFBLogin = () => {
     if (window.FB) {
@@ -52,14 +73,6 @@ export default function Index() {
     setUserName(response.name);
   };
 
-  const drafts = [
-    { id: 1, name: "John Doe", caption: "hello", lastEdited: "21 October 2023" },
-    { id: 2, name: "Draft 2" },
-    { id: 3, name: "Draft 3" },
-    { id: 4, name: "Draft 4" },
-    { id: 5, name: "Draft 5" },
-  ];
-
   const accounts = [
     { id: 1, name: "John Doe" },
     { id: 2, name: "Account 2" },
@@ -67,14 +80,6 @@ export default function Index() {
     { id: 4, name: "Account 4" },
     { id: 5, name: "Account 5" },
   ];
-
-  const handleDeleteDraft = () => {
-    if (deleteDraftIndex !== null) {
-      console.log("Deleting draft:", deleteDraftIndex + 1);
-      setDeleteDraftIndex(null);
-      setDraftModalOpen(false);
-    }
-  };
 
   const handleDisconnectAccount = () => {
     if (disconnectAccountIndex !== null) {
@@ -84,44 +89,31 @@ export default function Index() {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+    exit: { opacity: 0, y: 20, transition: { duration: 0.5, ease: "easeInOut" } }
+  };
+
   return (
     <div className="flex">
       {/* Include the FacebookSDK component */}
       <FacebookSDK onLoginSuccess={handleLoginSuccess} />
-
       <div className="flex-1 ml-1">
-        <div className="p-6 -mt-4">
+        <motion.div
+          className="p-6 -mt-4"
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={containerVariants}
+        >
           <h1 className="text-2xl font-bold text-accent">Welcome Back, {userName || "Username"}!</h1>
           <p className="text-sm text-gray-600">Feel free to explore around</p>
-          <div className="bg-yellow-200 p-4 rounded-lg shadow-md mt-4">
+          <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <h2 className="text-xl font-bold text-accent">Account Overview</h2>
           </div>
           <div className="flex flex-row gap-6 mt-4">
-            <div className="flex-1 bg-yellow-200 p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-accent">Your Drafts</h3>
-                <button
-                  className="bg-white text-accent px-3 py-1 rounded-md border border-accent"
-                  onClick={() => setDraftModalOpen(true)}
-                >
-                  Manage Your Drafts
-                </button>
-              </div>
-              <p className="text-sm text-gray-600">Recently Edited</p>
-              <div className="overflow-y-auto max-h-[400px] mt-3 space-y-3 pb-2">
-                {drafts.map((draft) => (
-                  <div key={draft.id} className="bg-white p-3 rounded-md shadow-md flex items-center">
-                    <img src="/sky.jpeg" alt="Draft" className="w-16 h-16 object-cover rounded-md mr-4" />
-                    <div>
-                      <div className="text-sm font-bold">{draft.name}</div>
-                      <div className="text-sm text-gray-600">{draft.caption}</div>
-                      <div className="text-sm text-gray-400">Last edited: {draft.lastEdited}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex-1 bg-yellow-200 p-4 rounded-lg shadow-md">
+            <div className="flex-1 bg-white p-4 rounded-lg shadow-md">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-bold text-accent">Social Accounts</h3>
                 <button
@@ -149,65 +141,29 @@ export default function Index() {
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Posts Feed Section */}
+          <div className="bg-white p-4 rounded-lg shadow-md mt-4">
+            <h2 className="text-xl font-bold text-accent">Your Posts</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3 max-h-[800px] overflow-y-auto">
+              {posts.map((post) => (
+                <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer" onClick={() => setSelectedPost(post)}>
+                  <div className="aspect-square overflow-hidden">
+                    {post.post_type === 'VIDEO' ? (
+                      <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Add a status element */}
+      {/* Status element */}
       <div id="status" className="hidden"></div>
-
-      {/* Manage Draft Modal */}
-      <ModalContainer isOpen={isDraftModalOpen} onClose={() => setDraftModalOpen(false)}>
-        <h2 className="text-2xl font-bold mb-2 mt-8">Manage Your Drafts</h2>
-        <div className="mb-6">
-          <input
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
-            placeholder="Search drafts..."
-          />
-        </div>
-
-        <div className="space-y-4 max-h-[320px] overflow-y-auto pb-4">
-          {drafts.map((draft, index) => (
-            <div key={draft.id} className="bg-white p-3 rounded-md shadow-md flex justify-between items-center">
-              <div className="flex items-center">
-                <img src="/sky.jpeg" alt="Draft" className="w-16 h-16 object-cover rounded-md mr-4" />
-                <div>
-                  <div className="text-sm font-bold">{draft.name}</div>
-                  <div className="text-sm text-gray-600">{draft.caption}</div>
-                  <div className="text-sm text-gray-400">Last edited: {draft.lastEdited}</div>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  className="bg-gray-400 text-white px-6 py-1 rounded-lg hover:bg-gray-500"
-                  onClick={() => console.log("Edit draft", index + 1)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="bg-red-600 text-white px-4 py-1 rounded-lg hover:bg-red-700"
-                  onClick={() => setDeleteDraftIndex(index)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center mt-6">
-          <button className="bg-accent text-white px-20 py-2 rounded-lg hover:bg-blue-900">
-            Make a Draft
-          </button>
-        </div>
-
-        <ModalRemoveConfirmation
-          isOpen={deleteDraftIndex !== null}
-          onClose={() => setDeleteDraftIndex(null)}
-          message="Are you sure you want to delete this draft?"
-          onConfirm={handleDeleteDraft}
-        />
-      </ModalContainer>
 
       {/* Manage Account Modal */}
       <ModalContainer isOpen={isAccountModalOpen} onClose={() => setAccountModalOpen(false)}>
@@ -235,7 +191,6 @@ export default function Index() {
             </div>
           ))}
         </div>
-
         <div className="flex justify-center mt-6">
           <button
             className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-900"
@@ -271,6 +226,9 @@ export default function Index() {
           </button>
         </div>
       </ModalContainer>
+
+      {/* Modal for Post Details */}
+      <ModalPostDetail post={selectedPost} onClose={() => setSelectedPost(null)} />
     </div>
   );
 }
