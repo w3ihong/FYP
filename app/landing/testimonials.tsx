@@ -1,59 +1,117 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import React, { useEffect, useState, useRef} from 'react';
+import { motion, useInView } from 'framer-motion';
+import { supabase } from '@/utils/supabase/client';
 
-interface Testimonial {
-  id: string;
-  testimonial: string;
+type Testimonial = {
+  text: string;
   name: string;
-}
+};
+
+type TestimonialsColumnProps = {
+  testimonials: Testimonial[];
+  className?: string;
+  duration?: number;
+};
+
+const fetchTestimonials = async () => {
+  const { data, error } = await supabase.from('testimonials').select('*');
+  if (error) {
+    console.error('Error fetching testimonials:', error);
+    return [];
+  }
+  return data.map((item: any) => ({
+    text: item.text,  // Correcting the key to match the table structure
+    name: item.name,
+  }));
+};
+
+const shuffleArray = (array: Testimonial[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+const TestimonialsColumn: React.FC<TestimonialsColumnProps> = ({ testimonials, className, duration = 10 }) => (
+  <div className={className}>
+    <motion.div 
+      animate={{
+        translateY: "-50%",
+      }}
+      transition={{
+        duration: duration,
+        repeat: Infinity,
+        ease: 'linear',
+        repeatType: "loop",
+      }}
+      className="flex flex-col gap-6 pb-6"
+    >
+      {[...new Array(2)].fill(0).map((_, index) => (
+        <React.Fragment key={index}>
+          {testimonials.map(({ text, name }, i) => (
+            <div key={i} className="card">
+              <div>{text}</div>
+              <div className="flex flex-col items-center gap-2 mt-5">
+                <div className="flex items-center flex-col font-lg font-bold tracking-tight">
+                  {name}
+                </div>
+              </div>
+            </div>
+          ))}
+        </React.Fragment>
+      ))}
+    </motion.div>
+  </div>
+);
 
 const Testimonials = () => {
-  const [testimonial, setTestimonial] = useState<Testimonial | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
-    const fetchTestimonials = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('*');
-
-      if (error) {
-        console.error('Error fetching testimonials:', error);
-      } else if (data && data.length > 0) {
-        const randomIndex = Math.floor(Math.random() * data.length);
-        setTestimonial(data[randomIndex] as Testimonial);
-      }
+    const getTestimonials = async () => {
+      const data = await fetchTestimonials();
+      const shuffledData = shuffleArray(data);
+      setTestimonials(shuffledData);
     };
 
-    fetchTestimonials();
+    getTestimonials();
   }, []);
 
+  const firstColumn = testimonials.slice(0, 3);
+  const secondColumn = testimonials.slice(3, 6);
+  const thirdColumn = testimonials.slice(6, 9);
+  const headingRef = useRef(null);
+  const isHeadingInView = useInView(headingRef, { once: true });
+  
   return (
-    <div>
-      <section id="testimonials">
-        <div className="max-w-screen-md px-2 py-4 mx-auto text-center lg:py-8 lg:px-4">
-          <svg className="h-12 mx-auto mb-3 text-gray-400 dark:text-gray-600" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14.017 18L14.017 10.609C14.017 4.905 17.748 1.039 23 0L23.995 2.151C21.563 3.068 20 5.789 20 8H24V18H14.017ZM0 18V10.609C0 4.905 3.748 1.038 9 0L9.996 2.151C7.563 3.068 6 5.789 6 8H9.983L9.983 18L0 18Z" fill="currentColor"/>
-          </svg>
-          {testimonial && (
-            <figure className="max-w-screen-sm mx-auto mb-4">
-              <blockquote>
-                <p className="text-2xl font-medium font-raleway text-gray-900 md:text-3xl">
-                  "{testimonial.testimonial}"
-                </p>
-              </blockquote>
-              <figcaption className="flex items-center justify-center mt-4 space-x-2">
-                <div className="flex items-center divide-x-2 divide-gray-500">
-                  <div className="pr-2 text-xl font-bold font-sans text-gray-900">{testimonial.name}</div>
-                </div>
-              </figcaption>
-            </figure>
-          )}
+    <section id="testimonials">
+      <div className="container">
+        <motion.h2 
+        ref={headingRef}
+        initial={{ opacity: 0, y: 20 }}
+        animate={isHeadingInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8 }}
+        className="section-title">
+          What our users say
+        </motion.h2>
+        <motion.p 
+        ref={headingRef}
+        initial={{ opacity: 0, y: 20 }}
+        animate={isHeadingInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8 }}
+        className="section-description">
+          With our powerful features, our app has become an essential tool for users around the World.
+        </motion.p>
+        <div className="flex justify-center gap-6 mt-10 max-h-[738px] overflow-hidden" style={{ maskImage: 'linear-gradient(to bottom, transparent, black 25%, black 75%, transparent)' }}>
+          <TestimonialsColumn testimonials={firstColumn} duration={15} />
+          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
+          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 

@@ -15,7 +15,20 @@
     @apply rounded shadow-md;
   }
 
-  .outline {
-    @apply border-2 border-cgreen;
-  }
+    .outline {
+        @apply border-2 border-cgreen;
+    }
+
+    .section-title {
+        @apply text-center text-5xl sm:text-6xl sm:max-w-[648px] mx-auto font-bold tracking-tighter
+    }
+
+    .section-description {
+        @apply text-center mt-5 text-xl text-gray-500
+    }
+
+    .card {
+        @apply p-10 border border-[#222222]/10 rounded-3xl shadow-[0_7px_14px_#EAEAEA] max-w-xs w-full
+    }
+
 }

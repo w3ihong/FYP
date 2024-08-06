@@ -1,19 +1,28 @@
 import React from 'react'
+import Link from 'next/link';
 
 const FreeTrial = () => {
   return (
-    <section id="freetrial">
-      <div className="max-w-screen-xl px-4 py-8 mx-auto lg:py-16 lg:px-6 mb-10">
-        <div className="max-w-screen-sm mx-auto text-center">
-          <h2 className="mb-4 text-3xl font-bold font-raleway leading-tight tracking-tight text-accent">
-            Start your free trial today
+    <section id="freetrial" className="bg-gradient-to-b from-white to-secondary py-36 overflow-x-clip">
+      <div className="container text-center">
+        <div className="relative">
+          <h2 className="section-title mb-4"> 
+            Try out our 14 days trial! 
           </h2>
-          <p className="mb-6 font-light text-gray-500 md:text-lg">
-            Try EchoSphere for 14 days. No credit card required.
+          <p className="section-description mb-6">
+            Have a hands-on experience with our analytical tools! No credit card required.
           </p>
-          <a href="#" className="text-white bg-accent hover:bg-SBaccent border-2 border-gray-800 font-medium rounded-lg text-sm px-10 py-2.5 mr-2 mb-2">
-            Free trial for 14 days
-          </a>
+          <img
+            className="absolute -left-[137px] -top-[137px]"
+            width={360}
+            src="/bluechart.png"
+            alt="Blue Chart"
+          />
+          <div className="flex mt-10 justify-center">
+            <button className="text-white bg-accent hover:bg-blue-800 font-bold font-raleway rounded-lg text-sm py-2.5 px-10 me-2 mb-2">
+              Try It Out!
+            </button>
+          </div>
         </div>
       </div>
     </section>
