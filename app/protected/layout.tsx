@@ -31,7 +31,7 @@ export default async function ProtectedLayout({
     
     
     return (
-        <div className='flex flex-row w-full min-h-screen'>
+        <div className='flex flex-row w-full min-h-screen bg-gray-50'>
             <Sidebar email={userObj.email} userType= {0}/>
             <div className="h-full w-16">
             </div>
