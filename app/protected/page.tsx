@@ -7,7 +7,7 @@ import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
 import { supabase } from '@/utils/supabase/client';
 import ModalPostDetail from "@/components/ModalPostDetails"; 
-import { getPosts } from "../actions";
+
 
 declare global {
   interface Window {

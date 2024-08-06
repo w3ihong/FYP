@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Pie } from 'react-chartjs-2';
@@ -21,6 +20,7 @@ const formatLabel = (label: string) => {
 };
 
 const PieChart: React.FC<PieChartProps> = ({ data, metrics, colors, title }) => {
+  console.log('PieChart data:', data);
   const chartData = {
     labels: metrics.map(metric => formatLabel(metric)),
     datasets: [

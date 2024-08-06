@@ -12,12 +12,12 @@ const CheckmarkIcon = () => (
 const Upgrade = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const currentPlan = 'Premium Plan';
-  const currentPlanDetails = ['SMMT Functionalities', 'Posting Recommendations', 'Sentiment & Competition Analysis'];
-  const newPlan = 'Business Plan';
-  const newPlanDetails = ['Everything Premium member has', 'Includes 2 additional members', 'Network Visualization', 'Custom Workflow'];
-  const currentPlanCost = '$39/month';
-  const newPlanCost = '$99/month';
+  const currentPlan = 'Free Plan';
+  const currentPlanDetails = ['Small scale metrics'];
+  const newPlan = 'Premium Plan';
+  const newPlanDetails = ["In-depth Visual Insights", "Competitive Analysis", "Sentiment Analysis", "Trend Indicator"];
+  const currentPlanCost = '$0';
+  const newPlanCost = '$99';
 
   const handleUpgradeClick = () => {
     setIsModalOpen(true);
@@ -55,48 +55,51 @@ const Upgrade = () => {
               </Link>
 
               <h2 className="bg-gray-100 rounded px-2 py-2 text-3xl font-semibold mb-4 text-center">Upgrade Your Plan</h2>
-              <div className="border p-6 rounded-lg mb-6">
-                <h3 className="text-sm font-grey-100 mb-2">Current Plan:</h3>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-60 ">
-                    <p className="text-2xl font-semibold">{currentPlan}</p>
-                    
-                    <ul className="ml-4">
-                      {currentPlanDetails.map((detail, index) => (
-                        <li key={index} className="mb-1 flex items-center">
-                          <CheckmarkIcon />
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
+              <div className="flex flex-col lg:flex-row justify-around items-start lg:items-stretch space-y-6 lg:space-y-0 lg:space-x-6">
+                <div className="border p-6 rounded-lg w-full lg:w-1/2 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-sm font-grey-100 mb-2">Current Plan:</h3>
+                    <div className="flex flex-col items-center">
+                      <p className="text-2xl font-semibold mb-2">{currentPlan}</p>
+                      <p className="text-gray-500 mb-4">Best option for personal use</p>
+                      <p className="text-4xl font-bold mb-4">{currentPlanCost}/month</p>
+                      <ul className="mb-4">
+                        {currentPlanDetails.map((detail, index) => (
+                          <li key={index} className="mb-1 flex items-center">
+                            <CheckmarkIcon/>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                  <p className="text-2xl font-semibold">{currentPlanCost}</p>
+                  <button className="border border-accent text-accent px-6 py-2 rounded mt-4">
+                    Current plan
+                  </button>
                 </div>
-              </div>
-              <div className="border p-6 rounded-lg mb-6">
-                <h3 className="text-sm font-grey-100 mb-2">New Plan:</h3>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-60">
-                    <p className="text-2xl font-semibold">{newPlan}</p>
-                    <ul className="ml-4">
-                      {newPlanDetails.map((detail, index) => (
-                        <li key={index} className="mb-1 flex items-center">
-                          <CheckmarkIcon />
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
+                <div className="border p-6 rounded-lg w-full lg:w-1/2 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-sm font-grey-100 mb-2">New Plan:</h3>
+                    <div className="flex flex-col items-center">
+                      <p className="text-2xl font-semibold mb-2">{newPlan}</p>
+                      <p className="text-gray-500 mb-4">Relevant for social media managers, small businesses</p>
+                      <p className="text-4xl font-bold mb-4">{newPlanCost}/month</p>
+                      <ul className="mb-4">
+                        {newPlanDetails.map((detail, index) => (
+                          <li key={index} className="mb-1 flex items-center">
+                            <CheckmarkIcon/>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-semibold">{newPlanCost}</p>
-                    <p className="text-xs text-gray-500">*Additional member at $30/month</p>
-                    <button
-                      onClick={handleUpgradeClick}
-                      className="bg-cyan-950 text-white px-6 py-2 rounded hover:bg-cyan-900 mt-4"
-                    >
-                      Upgrade
-                    </button>
-                  </div>
+                  <button
+                    onClick={handleUpgradeClick}
+                    className="bg-cyan-950 text-white px-6 py-2 rounded mt-4 hover:bg-cyan-900"
+                  >
+                    Upgrade
+                  </button>
                 </div>
               </div>
             </div>

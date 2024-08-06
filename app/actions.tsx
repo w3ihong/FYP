@@ -185,47 +185,89 @@ export async function billingDetails() {
   }
 }
 
-export async function updateCardDetails(cardDetails: any): Promise<void> {
+
+export async function updateCardDetails(cardDetails: any) {
   const supabase = createClient();
   try {
     // Get the current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) {
-      throw userError;
+      console.error('Error fetching authenticated user:', userError.message);
+      return false;
     }
 
     const userId = user?.id;
 
     if (!userId) {
-      throw new Error('User ID not found');
+      console.error('User ID not found');
+      return false;
     }
 
-    const { data, error } = await supabase
+    // Check if user exists in billing table
+    const { data: existingBillingUsers, error: billingError } = await supabase
       .from('billing')
-      .update({
-        full_name: cardDetails.full_name,
-        credit_card_no: cardDetails.credit_card_no,
-        credit_card_expiry: cardDetails.credit_card_expiry,
-        credit_card_cvv: cardDetails.credit_card_cvv,
-        state: cardDetails.state,
-        city: cardDetails.city,
-        street: cardDetails.street,
-        unit: cardDetails.unit,
-        postalcode: cardDetails.postalcode,
-      })
-      .eq('user_id', userId); // Use the actual user ID
+      .select('*')
+      .eq('user_id', userId);
 
-    if (error) {
-      throw error;
+    if (billingError) {
+      throw billingError;
     }
 
-    // Handle success
-    console.log('Card details updated successfully:', data);
-  } catch (error : any) {
+    const existingBillingUser = existingBillingUsers?.[0]; // Take the first result if available
+
+    if (!existingBillingUser) {
+      // Insert new billing record if user doesn't exist in billing table
+      const { data: newBillingUser, error: insertError } = await supabase
+        .from('billing')
+        .insert({
+          user_id: userId,
+          full_name: cardDetails.full_name,
+          credit_card_no: cardDetails.credit_card_no,
+          credit_card_expiry: cardDetails.credit_card_expiry,
+          credit_card_cvv: cardDetails.credit_card_cvv,
+          state: cardDetails.state,
+          city: cardDetails.city,
+          street: cardDetails.street,
+          unit: cardDetails.unit,
+          postalcode: cardDetails.postalcode
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      // Handle success
+      console.log('New billing record created for user:', newBillingUser);
+    } else {
+      // Update existing billing record
+      const { data: updatedBillingUser, error: updateError } = await supabase
+        .from('billing')
+        .update({
+          full_name: cardDetails.full_name,
+          credit_card_no: cardDetails.credit_card_no,
+          credit_card_expiry: cardDetails.credit_card_expiry,
+          credit_card_cvv: cardDetails.credit_card_cvv,
+          state: cardDetails.state,
+          city: cardDetails.city,
+          street: cardDetails.street,
+          unit: cardDetails.unit,
+          postalcode: cardDetails.postalcode
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Handle success
+      console.log('Billing details updated successfully:', updatedBillingUser);
+    }
+  } catch (error) {
     throw new Error(`Error updating card details: ${error.message}`);
   }
 }
+
 
 export async function planType() {
   const supabase = createClient();
@@ -1078,7 +1120,7 @@ export const getPosts = async () => {
     .select(`
       *,
       platform_account!inner (
-        user_id,client_name,platform
+        user_id,account_username,platform
       )
     `)
     .eq('platform_account.user_id', userId);
@@ -1089,7 +1131,7 @@ export const getPosts = async () => {
   }
   return data.map(post => ({
     ...post,
-    client_name: post.platform_account.client_name,
+    client_name: post.platform_account.account_username,
     platform: post.platform_account.platform
   }));
 
@@ -1134,6 +1176,77 @@ export const fetchUserName = async () => {
   };
 };
 
+export const getPostMetrics = async () => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('post_metrics')
+    .select('*');
+
+  if (error) {
+    console.error('Error fetching post metrics:', error.message);
+    return null;
+  }
+
+  return data;
+};
+
+export const getPostsWithMetrics = async () => {
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return [];
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return [];
+  }
+
+  // Fetch posts for the authenticated user with platform information
+  const { data: posts, error: postsError } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      platform_account!inner (
+        user_id, account_username, platform
+      )
+    `)
+    .eq('platform_account.user_id', userId);
+
+  if (postsError) {
+    console.error('Error fetching posts:', postsError.message);
+    return [];
+  }
+
+  // Fetch post metrics
+  const { data: metrics, error: metricsError } = await supabase
+    .from('post_metrics')
+    .select('*');
+
+  if (metricsError) {
+    console.error('Error fetching post metrics:', metricsError.message);
+    return [];
+  }
+
+  // Merge posts with their metrics
+  const postsWithMetrics = posts.map(post => {
+    const postMetrics = metrics.find(metric => metric.post_id === post.id) || {};
+    return {
+      ...post,
+      metrics: postMetrics,
+      platform: post.platform_account?.platform // Ensure platform data is included
+    };
+  });
+
+  return postsWithMetrics;
+};
+
+
 
 export const getPostsWithSentiment = async (
   sortDirection: 'asc' | 'desc' = 'desc',
@@ -1151,6 +1264,8 @@ export const getPostsWithSentiment = async (
   }
 
   const userId = user?.id;
+  
+
 
   if (!userId) {
     console.error('User ID not found');
@@ -1222,12 +1337,298 @@ export const getPostsWithSentiment = async (
 };
 
 
+export const getPlatformMetricDates = async () => {
+  const supabase = createClient();
+  const timeZone = 'Asia/Singapore';
+
+  try {
+    // Fetch platform metrics
+    const { data: platformMetrics, error: platformError } = await supabase
+      .from('platform_metrics')
+      .select('*');
+
+    if (platformError) {
+      console.error('Supabase error fetching platform metrics:', platformError);
+      return [];
+    }
+
+    // Convert date_retrieved to Singapore Time (SGT)
+    const formattedMetrics = platformMetrics.map(metric => {
+      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
+      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
+      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
+      return {
+        ...metric,
+        date_retrieved: formattedSgtDate,
+      };
+    });
+
+    return formattedMetrics;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return [];
+  }
+};
+
+
+
+export const getPlatformMetricDatesThree = async () => {
+  const supabase = createClient();
+  const timeZone = 'Asia/Singapore';
+
+  try {
+    // Fetch post metrics and platform metrics in one query
+    const { data: postMetrics, error: postError } = await supabase
+      .from('post_metrics')
+      .select('*, platform_metrics(platform_account, post_likes, post_shares, post_impressions)')
+      .order('date_retrieved', { ascending: false });
+
+    if (postError) {
+      console.error('Supabase error fetching post metrics:', postError);
+      return [];
+    }
+
+    // Convert date_retrieved to Singapore Time (SGT)
+    const formattedMetrics = postMetrics.map(metric => {
+      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
+      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
+      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
+      return {
+        ...metric,
+        date_retrieved: formattedSgtDate,
+      };
+    });
+
+    return formattedMetrics;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return [];
+  }
+};
+
+
+
+export const getPlatformMetricDatesTwo = async () => {
+  const supabase = createClient();
+  const timeZone = 'Asia/Singapore';
+
+  try {
+    // Fetch recent post metrics
+    const { data: postMetrics, error: postError } = await supabase
+      .from('post_metrics')
+      .select('*')
+      .order('date_retrieved', { ascending: true })
+      .limit(12);
+      
+      
+
+    if (postError) {
+      console.error('Supabase error fetching post metrics:', postError);
+      return [];
+    }
+
+    // Fetch total platform metrics
+    const { data: platformMetricsData, error: platformError } = await supabase
+      .from('platform_metrics')
+      .select('*')
+      .eq('platform_account', '17841466917978018');
+      
+      
+
+    if (platformError) {
+      console.error('Supabase error fetching platform metrics:', platformError);
+      return [];
+    }
+
+    // Combine post metrics and platform metrics
+    const joinedData = [...postMetrics, ...platformMetricsData];
+
+    // Convert date_retrieved to Singapore Time (SGT)
+    const formattedMetrics = joinedData.map(metric => {
+      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
+      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
+      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
+      return {
+        ...metric,
+        date_retrieved: formattedSgtDate,
+      };
+    });
+
+    return formattedMetrics;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return [];
+  }
+};
+
+
+export const getDateRetrievedFromMetrics = async () => {
+  const supabase = createClient();
+
+  // Fetch the authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return [];
+  }
+
+  const userId = "17841466917978018";
+
+ // const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return [];
+  }
+
+  // Fetch date_retrieved from platform_metrics table
+  const { data: metrics, error: metricsError } = await supabase
+    .from('platform_metrics')
+    .select('date_retrieved')
+    .eq('platform_account', userId); // Assuming you want to filter by user_id
+
+  if (metricsError) {
+    console.error('Error fetching metrics:', metricsError.message);
+    return [];
+  }
+
+  // Return the date_retrieved fields
+  return metrics.map(metric => metric.date_retrieved);
+};
+
+export const test = async (
+  sortDirection: 'asc' | 'desc' = 'desc',
+  startDate?: string,
+  endDate?: string
+) => {
+  const supabase = createClient();
+
+  // Fetch the authenticated user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error('Error fetching authenticated user:', userError.message);
+    return [];
+  }
+
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error('User ID not found');
+    return [];
+  }
+
+  // Fetch posts with their sentiment metrics
+  const { data: postsWithSentiment, error: postsWithSentimentError } = await supabase
+    .from('post_metrics')
+    .select(`
+      *,
+      platform_metrics!inner (
+        date_retrieved
+      )
+    `)
+    .order('created_at', { ascending: sortDirection === 'asc' })
+    .limit(10);
+
+  if (postsWithSentimentError) {
+    console.error('Error fetching posts with sentiment:', postsWithSentimentError.message);
+    return [];
+  }
+
+  // Convert date_retrieved to Singapore Time (SGT)
+  const postsWithConvertedDates = convertDateToSGT(postsWithSentiment);
+
+  return postsWithConvertedDates;
+};
+
+
+
+const timeZone = 'Asia/Singapore';
+
+export const convertDatesToSGT = async (data: any[]) => {
+  return data.map(item => {
+    const utcDate = item.date_retrieved ? new Date(item.date_retrieved) : new Date(0); // Default to epoch start if null
+    const sgtDate = toZonedTime(utcDate, timeZone);
+    const formattedSgtDate = format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone });
+    return {
+      ...item,
+      date_retrieved: formattedSgtDate,
+    };
+  });
+};
 
 
 
 
 
 
+
+
+
+
+function convertDateToSGT(postsWithSentiment: any[]) {
+  return postsWithSentiment.map(post => {
+    const date = new Date(post.date_retrieved);
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', post.date_retrieved);
+      return post;
+    }
+    // Convert to SGT (UTC+8)
+    const sgtOffset = 8 * 60; // SGT is UTC+8
+    const sgtDate = new Date(date.getTime() + sgtOffset * 60 * 1000);
+    return { ...post, date_retrieved: sgtDate.toISOString() };
+  });
+}
+
+
+export const toggleBlurEffect = async () => {
+  if (typeof document !== 'undefined') {
+    const supabase = createClient();
+    try {
+      // Fetch the authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error('Error fetching authenticated user:', userError.message);
+        return;
+      }
+
+      // console.log('User:', user);  // Log the user details
+
+      const userId = user?.id;
+
+      if (!userId) {
+        console.error('User ID not found');
+        return;
+      }
+
+      // Fetch the user's membership status
+      const { data: membership, error: membershipError } = await supabase
+        .from('users')
+        .select('user_type')
+        .eq('user_id', userId)
+        .single();
+
+      if (membershipError) {
+        console.error('Error fetching membership status:', membershipError.message);
+        return;
+      }
+
+      console.log('Membership:', membership);  // Log the membership details
+
+      // Check if the user is not premium
+      if (membership.user_type !== 'premium') {
+        document.body.classList.add('blurred');
+        console.log('User type is not premium:', membership.user_type);
+      } else {
+        document.body.classList.remove('blurred');
+        console.log('User type is premium:', membership.user_type);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+};
 
 
 
