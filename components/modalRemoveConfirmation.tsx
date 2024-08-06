@@ -1,5 +1,5 @@
 import React from 'react';
-import ModalBackdrop from './modalBackdrop';
+import SmallModalContainer from './smallModalContainer';
 
 interface ModalRemoveConfirmationProps {
   children?: React.ReactNode;
@@ -15,7 +15,7 @@ const ModalRemoveConfirmation: React.FC<ModalRemoveConfirmationProps> = ({ isOpe
   }
 
   return (
-    <ModalBackdrop onClick={onClose}>
+    <SmallModalContainer isOpen={isOpen} onClose={onClose}>
 
       {/* "X" button on top left */}
       <div
@@ -66,7 +66,7 @@ const ModalRemoveConfirmation: React.FC<ModalRemoveConfirmationProps> = ({ isOpe
           </button>
         </div>
       </div>
-    </ModalBackdrop>
+    </SmallModalContainer>
   );
 };
 
