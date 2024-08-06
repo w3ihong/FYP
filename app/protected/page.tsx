@@ -6,8 +6,8 @@ import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
 import { supabase } from '@/utils/supabase/client';
-import ModalPostDetail from "@/components/ModalPostDetails"; 
-
+import ModalPostDetail from "@/components/ModalPostDetails";
+import { getPosts } from "../actions";
 
 declare global {
   interface Window {
@@ -35,23 +35,20 @@ export default function Index() {
   const [userName, setUserName] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Fetch posts from Supabase
-    const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('id, created_at, post_type, platform_account, caption, media_url, permalink, video_thumbnail')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error("Error fetching posts:", error);
+    async function initialize() {
+      const postsData = await getPosts();
+      if (postsData.length > 0) {
+        setPosts(postsData);
+        setLoggedIn(true);
       } else {
-        setPosts(data);
+        setLoggedIn(false);
       }
-    };
+    }
 
-    fetchPosts();
+    initialize();
   }, []);
 
   const handleFBLogin = () => {
@@ -71,6 +68,7 @@ export default function Index() {
 
   const handleLoginSuccess = (response: any) => {
     setUserName(response.name);
+    setLoggedIn(true);
   };
 
   const accounts = [
@@ -97,7 +95,6 @@ export default function Index() {
 
   return (
     <div className="flex">
-      {/* Include the FacebookSDK component */}
       <FacebookSDK onLoginSuccess={handleLoginSuccess} />
       <div className="flex-1 ml-1">
         <motion.div
@@ -146,17 +143,25 @@ export default function Index() {
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <h2 className="text-xl font-bold text-accent">Your Posts</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3 max-h-[800px] overflow-y-auto">
-              {posts.map((post) => (
-                <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer" onClick={() => setSelectedPost(post)}>
-                  <div className="aspect-square overflow-hidden">
-                    {post.post_type === 'VIDEO' ? (
-                      <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                </div>
-              ))}
+              {loggedIn ? (
+                posts.length > 0 ? (
+                  posts.map((post) => (
+                    <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer" onClick={() => setSelectedPost(post)}>
+                      <div className="aspect-square overflow-hidden">
+                        {post.post_type === 'VIDEO' ? (
+                          <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No posts to display. Connect to Instagram to see your posts.</p>
+                )
+              ) : (
+                <p>Not logged-in to any account. Connect to your social media to start!</p>
+              )}
             </div>
           </div>
         </motion.div>
@@ -213,11 +218,11 @@ export default function Index() {
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold mb-2">Connect To More Social Media Accounts</h2>
           <button
-            onClick={instagramOAuth} 
+            onClick={instagramOAuth}
             className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
             <img src="/Instagram.png" alt="Instagram" className="w-6 h-6 mr-2" /> Instagram
           </button>
-          
+
           <button
             onClick={handleFBLogin}
             className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900"
