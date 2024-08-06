@@ -25,23 +25,20 @@ export default async function InstagramConnectRedirect() {
 
         if (accessToken) {
 
-          // Store the user's access token
-          // if (longLiveToken == null ) {
-            // await setAccessToken(accessToken, 'Instagram')
-            const data = await getLongLivedToken(accessToken)
-            console.log("exchanged long lived toekn " + data)
-            
-            await addInstagramAccount(data.access_token)
-
-          // } else {
-
-          //   await addInstagramAccount(longLiveToken);
-          // }
+          const data = await getLongLivedToken(accessToken)
           
-          // Redirect to another page or handle the token further
-          router.push('/protected');
+          const success =  await addInstagramAccount(data.access_token)
+
+          if (success) {
+            router.push('/protected');
+
+          } else {  
+
+            router.push('./error?message=Account Onboarding Failed');
+          }
+
         } else {
-          router.push('./error')
+          router.push('./error?message=Error connecting to Instagram account');
 
         }
       }
