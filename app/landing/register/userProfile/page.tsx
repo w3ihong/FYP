@@ -92,7 +92,7 @@ const ProfileSetForm: React.FC = () => {
           <div className="mb-4">
             <label className="block text-sm font-bold text-gray-700 mb-2">Date of Birth</label>
             <input
-              type="text"
+              type="date"
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={handleChange}
