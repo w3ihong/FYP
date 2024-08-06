@@ -1,4 +1,5 @@
 "use client";
+import { planType } from '@/app/actions';
 import { useEffect, useState, CSSProperties } from 'react';
 
 export default function Home() {
@@ -7,7 +8,8 @@ export default function Home() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCountry, setSelectedCountry] = useState('singapore'); // Default selection
     const [selectedTopic, setSelectedTopic] = useState(''); // Default no topic filter
-    
+    const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
+
     // Define country options
     const countryOptions = [
         { value: 'singapore', label: 'Singapore' },
@@ -30,6 +32,17 @@ export default function Home() {
     useEffect(() => {
         fetchTrendingData(selectedCountry);
     }, [selectedCountry]); // Fetch data whenever selectedCountry changes
+
+    useEffect(() => {
+        const checkPlanType = async () => {
+            // Replace with your actual API or function call to get the plan type
+            const type = await planType();
+            console.log('Plan Type:', type);
+            setUserPlanType(type);
+        };
+        
+        checkPlanType();
+    }, []);
 
     const fetchTrendingData = (country: string) => {
         let url = `/api/trending?country=${country}`;
@@ -70,6 +83,9 @@ export default function Home() {
         (topic.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (selectedTopic === '' || topic.toLowerCase().includes(selectedTopic.toLowerCase()))
     );
+
+    // Apply blur effect based on the user plan type
+    const trendListStyle = userPlanType !== 'premium' ? { ...styles.trendList, ...styles.blurred } : styles.trendList;
 
     return (
         <div style={styles.container}>
@@ -131,7 +147,7 @@ export default function Home() {
             </div>
             <div style={styles.section}>
                 <h2 style={styles.sectionTitle}>Trends Catered To You</h2>
-                <div style={styles.trendList}>
+                <div style={trendListStyle}>
                     {trendingCatered.slice(0, 20).map((topic, index) => (
                         <div key={index} style={styles.trendItem}>
                             #{index + 1} {topic}
@@ -210,4 +226,13 @@ const styles: { [key: string]: CSSProperties } = {
         width: '45%',
         textAlign: 'center' as 'center',
     },
+    blurred: {
+        filter: 'blur(4px)', // Adjust blur amount as needed
+    },
 };
+
+// Placeholder function for fetching the plan type
+async function fetchPlanType() {
+    // Replace this with the actual API call or logic to get the user's plan type
+    return "basic"
+}

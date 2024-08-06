@@ -4,17 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
-
+  .blurred {
+    @apply filter blur-lg;
+  }
 }
 
 @layer components {
-    .rectangle-generic {
-        @apply rounded shadow-md;
-    }
+  .rectangle-generic {
+    @apply rounded shadow-md;
+  }
 
-    .outline {
-        @apply border-2 border-cgreen;
-    }
+  .outline {
+    @apply border-2 border-cgreen;
+  }
 }

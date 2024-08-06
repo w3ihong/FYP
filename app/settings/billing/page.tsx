@@ -4,7 +4,7 @@ import ChangePayment from '@/components/change';
 import Link from 'next/link';
 import ChangeAddress from '@/components/changeAddress';
 import SuccessSubscription from '@/components/successSub';
-import { billingDetails } from '@/app/actions';
+import {billingDetails } from '@/app/actions';
 import { planType } from '@/app/actions';
 import { downgradeSubscription } from '@/app/actions';
 
@@ -49,6 +49,7 @@ const Billing = () => {
           ...billingInfo
         }));
       }
+      
     }
 
     async function fetchPlanType() {

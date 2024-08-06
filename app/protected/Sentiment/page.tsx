@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getPostsWithSentiment } from '@/app/actions'; // Adjust the path as needed
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { planType } from '@/app/actions'; // Adjust the path as needed
 
 type SortOrder = 'asc' | 'desc';
 
@@ -31,6 +32,7 @@ const Dashboard = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
 
   const fetchData = async (order: SortOrder, start?: string, end?: string) => {
     try {
@@ -56,6 +58,16 @@ const Dashboard = () => {
     fetchData(sortOrder, startDate, endDate);
   }, [sortOrder, startDate, endDate]);
 
+  useEffect(() => {
+    const checkPlanType = async () => {
+      const type = await planType();
+      console.log('Plan Type:', type);
+      setUserPlanType(type);
+    };
+    
+    checkPlanType();
+  }, []);
+
   const toggleSortOrder = () => {
     setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
   };
@@ -75,7 +87,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className={`grid grid-cols-4 gap-4 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
       <div className="col-span-4">
         <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
         <button
