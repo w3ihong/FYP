@@ -1,7 +1,7 @@
 
 import SmallModalContainer from "./smallModalContainer";
 
-export default function ModalSuccess({ message = "Success", onClose, isOpen }: { message: string, onClose: any, isOpen: any }) {
+export default function ModalSuccess({ message, onClose, isOpen }: { message: string, onClose: any, isOpen: any }) {
   return (
     <SmallModalContainer isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col items-center justify-center rounded-2xl bg-primary w-[32rem] h-80 opacity-100">

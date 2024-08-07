@@ -96,6 +96,12 @@ export async function getAssociatedDetails(accessToken:string ) {
     return response.data
 }
 
+export async function getDemographics(accessToken:string ) {
+    const endpoint = `https://fyp-ml-ejbkojtuia-ts.a.run.app/demographics/17841466917978018?type=reached&timeframe=this_month`
+    const response = await axios.get(endpoint)
+    return response.data
+}
+
 export async function getLongLivedToken(accessToken: string) {
     const APPID = '2153953224988805'
     const APPSECRET = '5e5874258a0f788689edadaadfb3b6a4'
