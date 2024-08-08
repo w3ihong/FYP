@@ -1,13 +1,17 @@
 'use client';
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from 'framer-motion';
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
-import { supabase } from '@/utils/supabase/client';
 import ModalPostDetail from "@/components/ModalPostDetails";
-import { getPosts } from "../actions";
+import { getPosts, fetchUserName, getAccounts } from "../actions";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInstagram, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import DatePicker, { DateRangeType } from 'react-tailwindcss-datepicker';
 
 declare global {
   interface Window {
@@ -33,21 +37,38 @@ export default function Index() {
   const [isAccountModalOpen, setAccountModalOpen] = useState(false);
   const [disconnectAccountIndex, setDisconnectAccountIndex] = useState<number | null>(null);
   const [isConnectSocialModalOpen, setConnectSocialModalOpen] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState<{ user_id: string; first_name: string; last_name: string } | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [platformFilter, setPlatformFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRangeType>({ startDate: null, endDate: null });
+  const [accounts, setAccounts] = useState<{ id: number; account_username: string }[]>([]); // the social accounts name
 
   useEffect(() => {
-    async function initialize() {
-      const postsData = await getPosts();
-      if (postsData.length > 0) {
-        setPosts(postsData);
-        setLoggedIn(true);
-      } else {
-        setLoggedIn(false);
+    const initialize = async () => {
+      try {
+        // Fetch user data
+        const userData = await fetchUserName();
+        if (userData) {
+          setUserName(userData);
+
+          // Fetch accounts for the user
+          const accountsData = await getAccounts(userData.user_id);
+          setAccounts(accountsData);
+        }
+
+        const postsData = await getPosts();
+        if (postsData.length > 0) {
+          setPosts(postsData);
+          setLoggedIn(true);
+        } else {
+          setLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    }
+    };
 
     initialize();
   }, []);
@@ -72,14 +93,6 @@ export default function Index() {
     setLoggedIn(true);
   };
 
-  const accounts = [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Account 2" },
-    { id: 3, name: "Account 3" },
-    { id: 4, name: "Account 4" },
-    { id: 5, name: "Account 5" },
-  ];
-
   const handleDisconnectAccount = () => {
     if (disconnectAccountIndex !== null) {
       console.log("Disconnecting account:", disconnectAccountIndex + 1);
@@ -94,6 +107,73 @@ export default function Index() {
     exit: { opacity: 0, y: 20, transition: { duration: 0.5, ease: "easeInOut" } }
   };
 
+  const filteredPosts = posts
+    .filter(post => platformFilter === "all" || post.platform === platformFilter)
+    .filter(post => {
+      const postDate = new Date(post.created_at);
+      if (!dateRange.startDate && !dateRange.endDate) return true;
+      if (dateRange.startDate && postDate < new Date(dateRange.startDate)) return false;
+      if (dateRange.endDate && postDate > new Date(dateRange.endDate)) return false;
+      return true;
+    });
+
+  // Custom Dropdown Component
+  const CustomDropdown = ({ value, onChange }) => {
+    const options = [
+      { value: 'all', label: 'All', icon: null },
+      { value: 'Instagram', label: 'Instagram', icon: faInstagram },
+    ];
+
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [dropdownRef]);
+
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <button
+          className="bg-white text-accent px-3 py-1 w-40 rounded-md border border-0 shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1 flex items-center justify-between"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="flex items-center">
+            {options.find(option => option.value === value)?.label}
+          </span>
+          <FontAwesomeIcon icon={faCaretDown} className="ml-2" />
+        </button>
+        {isOpen && (
+          <div className="absolute right-0 mt-1 w-40 bg-white shadow-lg rounded-md z-10">
+            {options.map(option => (
+              <div
+                key={option.value}
+                className="cursor-pointer px-4 py-2 hover:bg-gray-200 flex items-center"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+              >
+                {option.icon && (
+                  <FontAwesomeIcon icon={option.icon} className="mr-2" />
+                )}
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="flex">
       <FacebookSDK onLoginSuccess={handleLoginSuccess} />
@@ -105,7 +185,7 @@ export default function Index() {
           exit="exit"
           variants={containerVariants}
         >
-          <h1 className="text-2xl font-bold text-accent">Welcome Back, {userName || "Username"}!</h1>
+          <h1 className="text-2xl font-bold text-accent">Welcome Back, {userName ? `${userName.first_name} ${userName.last_name}` : ''}!</h1>
           <p className="text-sm text-gray-600">Feel free to explore around</p>
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <h2 className="text-xl font-bold text-accent">Account Overview</h2>
@@ -123,31 +203,50 @@ export default function Index() {
               </div>
               <p className="text-sm text-gray-600">Recently Added</p>
               <div className="overflow-y-auto max-h-[400px] mt-3 space-y-3 pb-2">
-                {accounts.map((account) => (
-                  <div key={account.id} className="bg-white rounded-md shadow-md p-3 mb-2">
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm font-bold">{account.name}</div>
-                      <button
-                        className="bg-red-600 text-white px-4 py-1 rounded-lg hover:bg-red-700"
-                        onClick={() => setDisconnectAccountIndex(account.id)}
-                      >
-                        Disconnect
-                      </button>
+                {accounts.length > 0 ? (
+                  accounts.map((account) => (
+                    <div key={account.id} className="bg-white rounded-md shadow-md p-3 mb-2">
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm font-bold">{account.account_username}</div>
+                        <button
+                          className="bg-red-600 text-white px-4 py-1 rounded-lg hover:bg-red-700"
+                          onClick={() => setDisconnectAccountIndex(account.id)}
+                        >
+                          Disconnect
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p>No accounts connected. Connect to social media to see your accounts.</p>
+                )}
               </div>
             </div>
           </div>
 
           {/* Posts Feed Section */}
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
-            <h2 className="text-xl font-bold text-accent">Your Posts</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-accent">Your Posts</h2>
+              <div className="flex gap-4">
+                <DatePicker
+                  value={dateRange}
+                  onChange={(range) => setDateRange(range)}
+                  displayFormat="MM/DD/YYYY"
+                  placeholder="Date Filter"
+                  useRange={false}
+                />
+                <CustomDropdown
+                  value={platformFilter}
+                  onChange={setPlatformFilter}
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3 max-h-[800px] overflow-y-auto">
               {loggedIn ? (
-                posts.length > 0 ? (
-                  posts.map((post) => (
-                    <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer" onClick={() => setSelectedPost(post)}>
+                filteredPosts.length > 0 ? (
+                  filteredPosts.map((post) => (
+                    <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105" onClick={() => setSelectedPost(post)}>
                       <div className="aspect-square overflow-hidden">
                         {post.post_type === 'VIDEO' ? (
                           <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
@@ -183,19 +282,23 @@ export default function Index() {
         </div>
 
         <div className="space-y-4 max-h-[320px] overflow-y-auto pb-4">
-          {accounts.map((account) => (
-            <div key={account.id} className="bg-white rounded-md shadow-md p-3 mb-2">
-              <div className="flex justify-between items-center">
-                <div className="text-sm font-bold">{account.name}</div>
-                <button
-                  className="bg-red-600 text-white px-4 py-1 rounded-lg hover:bg-red-700"
-                  onClick={() => setDisconnectAccountIndex(account.id)}
-                >
-                  Disconnect
-                </button>
+          {accounts.length > 0 ? (
+            accounts.map((account) => (
+              <div key={account.id} className="bg-white rounded-md shadow-md p-3 mb-2">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm font-bold">{account.account_username}</div>
+                  <button
+                    className="bg-red-600 text-white px-4 py-1 rounded-lg hover:bg-red-700"
+                    onClick={() => setDisconnectAccountIndex(account.id)}
+                  >
+                    Disconnect
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>No accounts connected. Connect to social media to see your accounts.</p>
+          )}
         </div>
         <div className="flex justify-center mt-6">
           <button

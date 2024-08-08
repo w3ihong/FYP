@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import ChangePayment from '@/components/change';
 import Link from 'next/link';
@@ -13,7 +14,7 @@ const CheckmarkIcon = () => (
 );
 
 const planCosts = {
-  premium: '$99/month',
+  premium: '$39/month',
   basic: 'Free'
 };
 
@@ -46,7 +47,6 @@ const Billing = () => {
           ...billingInfo
         }));
       }
-      
     }
 
     async function fetchPlanType() {
@@ -61,18 +61,18 @@ const Billing = () => {
     }
 
     fetchBillingDetails();
-    fetchPlanType(); 
+    fetchPlanType();
   }, []);
 
   const handleDowngrade = async () => {
     try {
-      await downgradeSubscription('basic'); 
+      await downgradeSubscription('basic');
       setBillingDetailsState(prevState => ({
         ...prevState,
         planType: 'basic',
         planCost: planCosts.basic
       }));
-      setIsSuccessModalOpen(true); 
+      setIsSuccessModalOpen(true);
     } catch (error) {
       console.error('Error downgrading subscription:', error);
     }
@@ -117,14 +117,14 @@ const Billing = () => {
     <div className="flex flex-col min-h-screen font-raleway">
       <main className="flex-grow container mx-auto px-5 py-24">
         <section className="body-font">
-          <div className="container mx-auto flex flex-col items-center">
+          <div className="container mx-auto flex flex-col items-start px-20">
             <h1 className="w-full mb-1 text-4xl font-bold text-left lg:w-4/5">Billing</h1>
             <p className="w-full mb-6 font-bold text-left lg:w-4/5">Manage your billing and payment details</p>
             {!isChangingPayment && !isChangingAddress ? (
               <>
                 {/* Current Plan Summary */}
-                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full ">
-                  <h2 className=" rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Current Plan Summary</h2>
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full">
+                  <h2 className="rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Current Plan Summary</h2>
                   <div className="flex justify-center items-center space-x-4 text-center">
                     <div className="flex flex-col items-center">
                       <label htmlFor="planType" className="text-xs font-semibold">PLAN TYPE:</label>
@@ -166,8 +166,8 @@ const Billing = () => {
                 </div>
 
                 {/* Payment Method */}
-                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full lg:w-4/5">
-                  <h2 className=" rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Payment Method</h2>
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full">
+                  <h2 className="rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Payment Method</h2>
                   <div className="border px-6 py-6 flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <div className="mr-4">
@@ -193,21 +193,21 @@ const Billing = () => {
                 </div>
 
                 {/* Upgrade or Downgrade Plan */}
-                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full lg:w-4/5">
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full">
                   {billingDetailsState.planType.toLowerCase() !== 'premium' ? (
                     <div className='border px-6 py-6 flex flex-col items-center lg:items-start'>
                       <h2 className="text-2xl font-semibold mb-4 text-cyan-950 text-left w-full">Upgrade Your Plan</h2>
                       <div className="flex flex-col lg:flex-row justify-between items-center w-full">
                         <div className="flex items-center">
                           <div className="mr-4">
-                            <p className=" px-8 py-10 text-2xl font-semibold">Premium Plan</p>
+                            <p className="px-8 py-10 text-2xl font-semibold">Premium Plan</p>
                           </div>
                           <div className=''>
                             {renderPlanDetails()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-semibold">$99/month</p>
+                          <p className="text-2xl font-semibold">$39/month</p>
                           <Link href="/settings/billing/upgrade" passHref>
                             <button className="bg-cyan-950 text-white px-6 py-1 rounded hover:bg-cyan-900 mt-2">Upgrade</button>
                           </Link>
@@ -220,14 +220,14 @@ const Billing = () => {
                       <div className="flex flex-col lg:flex-row justify-between items-center w-full">
                         <div className="flex items-center">
                           <div className="mr-4">
-                            <p className=" px-8 py-10 text-2xl font-semibold">Premium Plan</p>
+                            <p className="px-8 py-10 text-2xl font-semibold">Premium Plan</p>
                           </div>
                           <div className=''>
                             {renderPlanDetails()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-semibold">$99/month</p>
+                          <p className="text-2xl font-semibold">$39/month</p>
                           <button
                             className="bg-red-700 text-white px-6 py-1 rounded-2xl hover:bg-red-600 mt-2"
                             onClick={handleDowngrade}

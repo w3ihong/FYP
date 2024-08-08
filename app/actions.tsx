@@ -1630,6 +1630,22 @@ export const toggleBlurEffect = async () => {
   }
 };
 
+export const getAccounts = async (userId: string) => {
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('platform_account')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching accounts:', error);
+    return [];
+  }
+};
 
 
 
