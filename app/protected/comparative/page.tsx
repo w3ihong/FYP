@@ -186,6 +186,13 @@ export default function ComparePosts() {
   const [bestTimes, setBestTimes] = useState<{ hour: number, averageEngagement: number, averageComments: number, averageLikes: number, averageReach: number }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
+  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Example logic for setting premium status
+    // Replace with actual check or API call
+    setIsPremiumUser(false); // Or true if the user is premium
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -234,7 +241,7 @@ export default function ComparePosts() {
     : posts.filter(post => post.platform.toLowerCase() === selectedPlatform);
 
   return (
-    <div className="p-6">
+    <div className={`p-6 ${!isPremiumUser ? 'blur-md' : ''}`}>
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-accent">Compare Posts</h1>
         <div className="flex items-center space-x-4">
