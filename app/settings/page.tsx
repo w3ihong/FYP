@@ -1,14 +1,12 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { EnvelopeIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'; 
 import SmallModalContainer from '@/components/smallModalContainer';
 import ModalBackdrop from '@/components/modalBackdrop';
-import { checkOTP, checkUserStatus, deleteUser, disableUser, getEmail, sendOTP, updateEmail, updatePassword, verifyOTP } from '../actions';
+import { checkOTP, deleteUser, disableUser, getEmail, sendOTP, updateEmail, updatePassword, verifyOTP } from '../actions';
 import { enableUser } from '../actions';
-import { redirect } from 'next/dist/server/api-utils';
 import router from 'next/router';
-import { login } from '../actions';
 import ModalSuccess from '@/components/modalSuccess';
 import { motion } from 'framer-motion';
 
@@ -83,7 +81,7 @@ export default function Settings() {
         await enableUser();
         setIsSuccessModalOpen(true);
         setSuccessMessage('Account has been enabled successfully.');
-        setIsAccountDisabled(true); // Update account status
+        setIsAccountDisabled(false); // Update account status
       } catch (error) {
         console.error('Error enabling account:', error.message);
         // Handle error
@@ -143,7 +141,7 @@ export default function Settings() {
       await updateEmail(email, modalEmail);  // Call the updateEmail function
       setEmail(modalEmail); 
       setIsEmailModalOpen(false);
-      showSuccessModal('An email has been sent to your new email ');
+      showSuccessModal('An email has been sent to your new email.');
     } catch (error) {
       console.error('Error updating email:', error);
       router.push('/settings/change-email?message=Error updating email');  // Redirect on error
@@ -163,7 +161,7 @@ export default function Settings() {
       await updatePassword(currentPassword , newPassword);
       console.log('Password changed');
       setIsPasswordModalOpen(false);
-      showSuccessModal('Password has been changed succesfully');
+      showSuccessModal('Password has been changed successfully.');
       setShowValidation(false);
     } catch (error) {
       console.error('Error changing password:', error.message);
@@ -204,7 +202,7 @@ export default function Settings() {
       if (isValidOtp) {
         console.log('OTP verified successfully');
         setIs2FAModalOpen(false);
-        showSuccessModal('2FA enabled');
+        showSuccessModal('2FA enabled.');
         setOtpError(false);
       } else {
         console.error('Invalid OTP');
@@ -226,7 +224,7 @@ export default function Settings() {
       }
       
       setIsDisableAccountModalOpen(false);
-      showSuccessModal('Disabled account succesfully');
+      showSuccessModal('Disabled account successfully.');
     } catch (error) {
       console.error('Error disabling account:', error.message);
     }
@@ -239,26 +237,27 @@ export default function Settings() {
       if (isDeleted) {
         console.log('Account deleted successfully');
         router.push('/goodbye'); // Redirect the user to a goodbye page or home page
+        showSuccessModal("hello");
       } else {
         console.error('Failed to delete account');
       }
   
       setIsDeleteAccountModalOpen(false);
-      showSuccessModal('Deleted Account');
+      showSuccessModal('Deleted account successfully.');
     } catch (error) {
       console.error('Error deleting account:', error.message);
     }
   };
 
   return (
-      <motion.div
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={pageTransition}
-        className="flex w-full"
-      >
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="flex w-full"
+    >
       <main className="flex-1 p-6 ml-10 bg-gray-50"> 
         <div className="mx-auto">
           <h1 className="text-2xl font-bold mb-6 mx-8">Account</h1> 
@@ -290,96 +289,96 @@ export default function Settings() {
           <section className="mb-6 mx-8">
             <h2 className="text-xl font-semibold mb-2">Password and Authentication</h2>
             
-          <div className="bg-white p-6 w-full mb-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Change Your Password</h3>
-            <div className="mb-4 relative">
-              <p className="text-medium font-bold mb-2">Current Password:</p>
-              <div className="relative">
-                <input 
-                  type={showCurrentPassword ? 'text' : 'password'} 
-                  placeholder="••••••••••"
-                  value={currentPassword} 
-                  onChange={(e) => setCurrentPassword(e.target.value)} 
-                  className={`text-sm ${showValidation && !currentPassword ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'} font-inter border rounded-md p-2 w-full pr-10`}
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
-                  {showCurrentPassword ? (
-                    <EyeSlashIcon 
-                      className="h-5 w-5 text-gray-500 cursor-pointer"
-                      onClick={() => togglePasswordVisibility(setShowCurrentPassword)}
-                    />
-                  ) : (
-                    <EyeIcon 
-                      className="h-5 w-5 text-gray-500 cursor-pointer"
-                      onClick={() => togglePasswordVisibility(setShowCurrentPassword)}
-                    />
-                  )}
+            <div className="bg-white p-6 w-full mb-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Change Your Password</h3>
+              <div className="mb-4 relative">
+                <p className="text-medium font-bold mb-2">Current Password:</p>
+                <div className="relative">
+                  <input 
+                    type={showCurrentPassword ? 'text' : 'password'} 
+                    placeholder="••••••••••"
+                    value={currentPassword} 
+                    onChange={(e) => setCurrentPassword(e.target.value)} 
+                    className={`text-sm ${showValidation && !currentPassword ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'} font-inter border rounded-md p-2 w-full pr-10`}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                    {showCurrentPassword ? (
+                      <EyeSlashIcon 
+                        className="h-5 w-5 text-gray-500 cursor-pointer"
+                        onClick={() => togglePasswordVisibility(setShowCurrentPassword)}
+                      />
+                    ) : (
+                      <EyeIcon 
+                        className="h-5 w-5 text-gray-500 cursor-pointer"
+                        onClick={() => togglePasswordVisibility(setShowCurrentPassword)}
+                      />
+                    )}
+                  </div>
                 </div>
+                {showValidation && !currentPassword && (
+                  <p className="mt-2 text-sm text-red-600">This field cannot be empty.</p>
+                )}
               </div>
-              {showValidation && !currentPassword && (
-                <p className="mt-2 text-sm text-red-600">This field cannot be empty.</p>
-              )}
-            </div>
-            <div className="mb-4 relative">
-              <p className="text-medium font-bold mb-2">New Password:</p>
-              <div className="relative">
-                <input 
-                  type={showNewPassword ? 'text' : 'password'} 
-                  placeholder="••••••••••"
-                  value={newPassword} 
-                  onChange={(e) => setNewPassword(e.target.value)} 
-                  className={`text-sm ${showValidation && !newPassword ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'} font-inter border rounded-md p-2 w-full pr-10`}
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
-                  {showNewPassword ? (
-                    <EyeSlashIcon 
-                      className="h-5 w-5 text-gray-500 cursor-pointer"
-                      onClick={() => togglePasswordVisibility(setShowNewPassword)}
-                    />
-                  ) : (
-                    <EyeIcon 
-                      className="h-5 w-5 text-gray-500 cursor-pointer"
-                      onClick={() => togglePasswordVisibility(setShowNewPassword)}
-                    />
-                  )}
+              <div className="mb-4 relative">
+                <p className="text-medium font-bold mb-2">New Password:</p>
+                <div className="relative">
+                  <input 
+                    type={showNewPassword ? 'text' : 'password'} 
+                    placeholder="••••••••••"
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    className={`text-sm ${showValidation && !newPassword ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'} font-inter border rounded-md p-2 w-full pr-10`}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                    {showNewPassword ? (
+                      <EyeSlashIcon 
+                        className="h-5 w-5 text-gray-500 cursor-pointer"
+                        onClick={() => togglePasswordVisibility(setShowNewPassword)}
+                      />
+                    ) : (
+                      <EyeIcon 
+                        className="h-5 w-5 text-gray-500 cursor-pointer"
+                        onClick={() => togglePasswordVisibility(setShowNewPassword)}
+                      />
+                    )}
+                  </div>
                 </div>
+                {showValidation && !newPassword && (
+                  <p className="mt-2 text-sm text-red-600"><span className="font-medium">Oh, snap!</span> This field cannot be empty.</p>
+                )}
               </div>
-              {showValidation && !newPassword && (
-                <p className="mt-2 text-sm text-red-600"><span className="font-medium">Oh, snapp!</span> This field cannot be empty.</p>
-              )}
-            </div>
-            <div className="mb-4 relative">
-              <p className="text-medium font-bold mb-2">Confirm New Password:</p>
-              <div className="relative">
-                <input 
-                  type={showConfirmPassword ? 'text' : 'password'} 
-                  placeholder="••••••••••"
-                  value={confirmPassword} 
-                  onChange={(e) => setConfirmPassword(e.target.value)} 
-                  className={`text-sm ${showValidation && !confirmPassword ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'} font-inter border rounded-md p-2 w-full pr-10`}
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
-                  {showConfirmPassword ? (
-                    <EyeSlashIcon 
-                      className="h-5 w-5 text-gray-500 cursor-pointer"
-                      onClick={() => togglePasswordVisibility(setShowConfirmPassword)}
-                    />
-                  ) : (
-                    <EyeIcon 
-                      className="h-5 w-5 text-gray-500 cursor-pointer"
-                      onClick={() => togglePasswordVisibility(setShowConfirmPassword)}
-                    />
-                  )}
+              <div className="mb-4 relative">
+                <p className="text-medium font-bold mb-2">Confirm New Password:</p>
+                <div className="relative">
+                  <input 
+                    type={showConfirmPassword ? 'text' : 'password'} 
+                    placeholder="••••••••••"
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    className={`text-sm ${showValidation && !confirmPassword ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'} font-inter border rounded-md p-2 w-full pr-10`}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                    {showConfirmPassword ? (
+                      <EyeSlashIcon 
+                        className="h-5 w-5 text-gray-500 cursor-pointer"
+                        onClick={() => togglePasswordVisibility(setShowConfirmPassword)}
+                      />
+                    ) : (
+                      <EyeIcon 
+                        className="h-5 w-5 text-gray-500 cursor-pointer"
+                        onClick={() => togglePasswordVisibility(setShowConfirmPassword)}
+                      />
+                    )}
+                  </div>
                 </div>
+                {showValidation && !confirmPassword && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-500"><span className="font-medium">Oh, snap!</span> This field cannot be empty.</p>
+                )}
               </div>
-              {showValidation && !confirmPassword && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-500"><span className="font-medium">Oh, snapp!</span> This field cannot be empty.</p>
-              )}
+              <div className="flex justify-end mt-4">
+                <button className="bg-accent font-roboto text-white w-64 py-2 rounded-md" onClick={changePassword}>Change Password</button>
+              </div>
             </div>
-            <div className="flex justify-end mt-4">
-              <button className="bg-accent font-roboto text-white w-64 py-2 rounded-md" onClick={changePassword}>Change Password</button>
-            </div>
-        </div>
 
             {/* Enable 2 Factor Authentication */}
             <div className="bg-white p-6 rounded-lg shadow-md w-full mb-4">
@@ -445,39 +444,39 @@ export default function Settings() {
         </SmallModalContainer>
       )}
 
-{is2FAModalOpen && (
-      <SmallModalContainer isOpen={is2FAModalOpen} onClose={toggle2FAModal}>
-        <div className="flex flex-col items-center justify-center text-center w-full">
-          <h2 className="text-lg font-semibold mb-4">Enable 2-Factor Authentication</h2>
-          <div className="flex justify-center mb-4">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <input 
-                key={index}
-                type="text" 
-                maxLength={1}
-                pattern="[0-9]*"
-                className={`text-sm font-inter border rounded-md p-2 w-12 h-12 mx-1 text-center ${
-                  otpError ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'
-                }`}
-                value={otp[index] || ''}
-                onChange={(e) => {
-                  const newOtp = [...otp];
-                  newOtp[index] = e.target.value.replace(/[^0-9]/g, '');
-                  setOtp(newOtp);
-                }}
-              />
-            ))}
+      {is2FAModalOpen && (
+        <SmallModalContainer isOpen={is2FAModalOpen} onClose={toggle2FAModal}>
+          <div className="flex flex-col items-center justify-center text-center w-full">
+            <h2 className="text-lg font-semibold mb-4">Enable 2-Factor Authentication</h2>
+            <div className="flex justify-center mb-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <input 
+                  key={index}
+                  type="text" 
+                  maxLength={1}
+                  pattern="[0-9]*"
+                  className={`text-sm font-inter border rounded-md p-2 w-12 h-12 mx-1 text-center ${
+                    otpError ? 'bg-red-50 border-red-500 text-red-900 placeholder-red-700' : 'text-gray-900 border-gray-300'
+                  }`}
+                  value={otp[index] || ''}
+                  onChange={(e) => {
+                    const newOtp = [...otp];
+                    newOtp[index] = e.target.value.replace(/[^0-9]/g, '');
+                    setOtp(newOtp);
+                  }}
+                />
+              ))}
+            </div>
+            {otpError && (
+              <p className="mt-2 text-sm text-red-600">Invalid OTP. Please try again.</p>
+            )}
+            <div className="flex justify-center space-x-4 mt-4">
+              <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={enable2FA}>Send OTP</button>
+              <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={handleVerifyOTP}>Confirm</button>
+            </div>
           </div>
-          {otpError && (
-            <p className="mt-2 text-sm text-red-600">Invalid OTP. Please try again.</p>
-          )}
-          <div className="flex justify-center space-x-4 mt-4">
-            <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={enable2FA}>Send OTP</button>
-            <button className="bg-accent font-roboto text-white px-6 py-2 rounded-md w-52" onClick={handleVerifyOTP}>Confirm</button>
-          </div>
-        </div>
-      </SmallModalContainer>
-    )}
+        </SmallModalContainer>
+      )}
 
       {/* Disable Account Modal */}
       {isDisableAccountModalOpen && (
@@ -537,7 +536,7 @@ export default function Settings() {
 
       {/* Success Modal */}
       {isSuccessModalOpen && (
-        <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} isOpen={""} />
+        <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} isOpen={isSuccessModalOpen} />
       )}
 
     </motion.div>

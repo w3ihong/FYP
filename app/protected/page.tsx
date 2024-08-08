@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import DatePicker, { DateRangeType } from 'react-tailwindcss-datepicker';
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 declare global {
   interface Window {
@@ -224,7 +225,7 @@ export default function Index() {
             </div>
           </div>
 
-          {/* Posts Feed Section */}
+          {/* Display Posts */}
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-accent">Your Posts</h2>
@@ -257,15 +258,21 @@ export default function Index() {
                     </div>
                   ))
                 ) : (
-                  <p>No posts to display. Connect to Instagram to see your posts.</p>
+                  <div className="flex flex-col items-center justify-center h-80 w-full col-span-3">
+                    <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                    <p className="text-lg font-bold justify-center text-center text-gray-600">No posts to display.</p>
+                  </div>
                 )
               ) : (
-                <p>Not logged-in to any account. Connect to your social media to start!</p>
+                <div className="flex flex-col items-center justify-center h-80 w-full col-span-3">
+                  <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                  <p className="text-lg font-bold justify-center text-center text-gray-600">Not logged-in to any account. Connect to your social media to start!</p>
+                </div>
               )}
-            </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
-      </div>
 
       {/* Status element */}
       <div id="status" className="hidden"></div>
