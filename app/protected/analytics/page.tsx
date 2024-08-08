@@ -167,6 +167,25 @@ const Dashboard = () => {
           title="Distribution of Different Interactions"
         />
       </div>
+
+      <LineGraph
+  data={postMetrics}
+  metric="post_sentiment"
+  color="rgba(255, 99, 132, 1)"
+  label="Post Sentiment  Over Time"
+  title="Post Sentiment Rate Over Time"
+/>
+
+<LineGraph
+  data={postMetrics}
+  metric="post_profile_visits"
+  color="rgba(255, 99, 132, 1)"
+  label="Post Profile visits  Over Time"
+  title="Post Profile vists  Over Time"
+/>
+
+
+
     </>
   );
 };
