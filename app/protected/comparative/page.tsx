@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import ComparisonModal from "@/components/comparativeModal";
-import { getPostsWithMetrics } from "@/app/actions";
+import { getPostsWithMetrics, planType } from "@/app/actions";
 
 interface Post {
   id: string;
@@ -176,7 +176,6 @@ function BestHashtagsModal({ bestHashtags, isOpen, onClose }: { bestHashtags: st
   );
 }
 
-
 export default function ComparePosts() {
   const [selectedPosts, setSelectedPosts] = useState<Post[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -186,23 +185,33 @@ export default function ComparePosts() {
   const [bestTimes, setBestTimes] = useState<{ hour: number, averageEngagement: number, averageComments: number, averageLikes: number, averageReach: number }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
-  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
+  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false); // Ensure the type is boolean
 
   useEffect(() => {
     // Example logic for setting premium status
-    // Replace with actual check or API call
-    setIsPremiumUser(false); // Or true if the user is premium
+    async function fetchPlanType() {
+      try {
+        const type = await planType(); // Assuming planType is a function that returns the type
+        setIsPremiumUser(type);
+      } catch (error) {
+        console.error("Error fetching plan type:", error);
+      }
+    }
+
+    fetchPlanType();
   }, []);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const postsWithMetrics = await getPostsWithMetrics();
-        console.log("Posts with Metrics:", postsWithMetrics); // Debug log
+        if (postsWithMetrics) {
+          console.log("Posts with Metrics:", postsWithMetrics); // Debug log
 
-        setPosts(postsWithMetrics);
-        setBestTimes(analyzeBestTimes(postsWithMetrics));
-        setBestHashtags(getBestHashtags(postsWithMetrics));
+          setPosts(postsWithMetrics);
+          setBestTimes(analyzeBestTimes(postsWithMetrics));
+          setBestHashtags(getBestHashtags(postsWithMetrics));
+        }
       } catch (error) {
         console.error("Error fetching posts with metrics:", error);
       }
