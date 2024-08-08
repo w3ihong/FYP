@@ -1,11 +1,14 @@
 'use client'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
-import { supabase } from '@/utils/supabase/client';
+import { getPostsWithMetrics } from "@/app/actions"; 
 import ModalPostDetail from "@/components/ModalPostDetails"; // Import ModalPostDetail component
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInstagram, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 declare global {
   interface Window {
@@ -24,6 +27,7 @@ interface Post {
   media_url: string;
   permalink: string;
   video_thumbnail: string;
+  platform: string;
 }
 
 export default function Index() {
@@ -35,20 +39,13 @@ export default function Index() {
   const [userName, setUserName] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [platformFilter, setPlatformFilter] = useState<string>("all");
 
   useEffect(() => {
-    // Fetch posts from Supabase
+    // Fetch posts with metrics
     const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('id, created_at, post_type, platform_account, caption, media_url, permalink, video_thumbnail')
-        .order('created_at', { ascending: false }); // Order by most recent
-
-      if (error) {
-        console.error("Error fetching posts:", error);
-      } else {
-        setPosts(data);
-      }
+      const postsWithMetrics = await getPostsWithMetrics();
+      setPosts(postsWithMetrics);
     };
 
     fetchPosts();
@@ -88,6 +85,69 @@ export default function Index() {
       setAccountModalOpen(false);
     }
   };
+
+  const filteredPosts = platformFilter === "all" ? posts : posts.filter(post => post.platform === platformFilter);
+
+  //for the dropdown in the your posts
+  const CustomDropdown = ({ value, onChange }) => {
+    const options = [
+      { value: 'all', label: 'All', icon: null },
+      //{ value: 'Facebook', label: 'Facebook', icon: faFacebook },
+      { value: 'Instagram', label: 'Instagram', icon: faInstagram },
+    ];
+  
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+  
+   
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+  
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [dropdownRef]);
+  
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <button
+          className="bg-white text-accent px-3 py-1 w-40 rounded-md border border-0 shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1 flex items-center justify-between"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="flex items-center">
+            {options.find(option => option.value === value)?.label}
+          </span>
+          <FontAwesomeIcon icon={faCaretDown} className="ml-2" />
+        </button>
+        {isOpen && (
+          <div className="absolute right-0 mt-1 w-40 bg-white shadow-lg rounded-md z-10">
+            {options.map(option => (
+              <div
+                key={option.value}
+                className="cursor-pointer px-4 py-2 hover:bg-gray-200 flex items-center"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+              >
+                {option.icon && (
+                  <FontAwesomeIcon icon={option.icon} className="mr-2" />
+                )}
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+  //---end of the custom dropdown function---//
+  
 
   return (
     <div className="flex">
@@ -132,11 +192,19 @@ export default function Index() {
           </div>
 
           {/* Posts Feed Section */}
-          <div className="bg-yellow-200 p-4 rounded-lg shadow-md mt-4">
-            <h2 className="text-xl font-bold text-accent">Your Posts</h2>
+          <div className="bg-white p-4 rounded-lg shadow-md mt-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-accent">Your Posts</h2>
+              <div className="relative">
+                <CustomDropdown
+                  value={platformFilter}
+                  onChange={setPlatformFilter}
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-              {posts.map((post) => (
-                <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer" onClick={() => setSelectedPost(post)}>
+              {filteredPosts.map((post) => (
+                <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105" onClick={() => setSelectedPost(post)}>
                   <div className="aspect-square overflow-hidden">
                     {post.post_type === 'VIDEO' ? (
                       <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />

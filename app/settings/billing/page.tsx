@@ -122,7 +122,7 @@ const Billing = () => {
             {!isChangingPayment && !isChangingAddress ? (
               <>
                 {/* Current Plan Summary */}
-                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full lg:w-4/5">
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full ">
                   <h2 className=" rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Current Plan Summary</h2>
                   <div className="flex justify-center items-center space-x-4 text-center">
                     <div className="flex flex-col items-center">
