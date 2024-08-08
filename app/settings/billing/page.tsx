@@ -46,6 +46,7 @@ const Billing = () => {
           ...billingInfo
         }));
       }
+      
     }
 
     async function fetchPlanType() {

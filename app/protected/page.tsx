@@ -1,14 +1,13 @@
-'use client'
-import React, { useState, useEffect, useRef } from "react";
+'use client';
+import React, { useState, useEffect } from "react";
+import { motion } from 'framer-motion';
 import ModalContainer from "@/components/modalContainer";
 import ModalRemoveConfirmation from "@/components/modalRemoveConfirmation";
 import FacebookSDK from './facebook/facebookSDK';
 import { instagramOAuth } from "../auth/socials/instagram";
-import { getPostsWithMetrics } from "@/app/actions"; 
-import ModalPostDetail from "@/components/ModalPostDetails"; // Import ModalPostDetail component
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInstagram, faFacebook } from '@fortawesome/free-brands-svg-icons';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { supabase } from '@/utils/supabase/client';
+import ModalPostDetail from "@/components/ModalPostDetails";
+import { getPosts } from "../actions";
 
 declare global {
   interface Window {
@@ -31,24 +30,26 @@ interface Post {
 }
 
 export default function Index() {
-  const [isDraftModalOpen, setDraftModalOpen] = useState(false);
   const [isAccountModalOpen, setAccountModalOpen] = useState(false);
-  const [deleteDraftIndex, setDeleteDraftIndex] = useState<number | null>(null);
   const [disconnectAccountIndex, setDisconnectAccountIndex] = useState<number | null>(null);
   const [isConnectSocialModalOpen, setConnectSocialModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [platformFilter, setPlatformFilter] = useState<string>("all");
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Fetch posts with metrics
-    const fetchPosts = async () => {
-      const postsWithMetrics = await getPostsWithMetrics();
-      setPosts(postsWithMetrics);
-    };
+    async function initialize() {
+      const postsData = await getPosts();
+      if (postsData.length > 0) {
+        setPosts(postsData);
+        setLoggedIn(true);
+      } else {
+        setLoggedIn(false);
+      }
+    }
 
-    fetchPosts();
+    initialize();
   }, []);
 
   const handleFBLogin = () => {
@@ -68,6 +69,7 @@ export default function Index() {
 
   const handleLoginSuccess = (response: any) => {
     setUserName(response.name);
+    setLoggedIn(true);
   };
 
   const accounts = [
@@ -86,83 +88,30 @@ export default function Index() {
     }
   };
 
-  const filteredPosts = platformFilter === "all" ? posts : posts.filter(post => post.platform === platformFilter);
-
-  //for the dropdown in the your posts
-  const CustomDropdown = ({ value, onChange }) => {
-    const options = [
-      { value: 'all', label: 'All', icon: null },
-      //{ value: 'Facebook', label: 'Facebook', icon: faFacebook },
-      { value: 'Instagram', label: 'Instagram', icon: faInstagram },
-    ];
-  
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
-  
-   
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setIsOpen(false);
-        }
-      };
-  
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, [dropdownRef]);
-  
-    return (
-      <div className="relative" ref={dropdownRef}>
-        <button
-          className="bg-white text-accent px-3 py-1 w-40 rounded-md border border-0 shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1 flex items-center justify-between"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="flex items-center">
-            {options.find(option => option.value === value)?.label}
-          </span>
-          <FontAwesomeIcon icon={faCaretDown} className="ml-2" />
-        </button>
-        {isOpen && (
-          <div className="absolute right-0 mt-1 w-40 bg-white shadow-lg rounded-md z-10">
-            {options.map(option => (
-              <div
-                key={option.value}
-                className="cursor-pointer px-4 py-2 hover:bg-gray-200 flex items-center"
-                onClick={() => {
-                  onChange(option.value);
-                  setIsOpen(false);
-                }}
-              >
-                {option.icon && (
-                  <FontAwesomeIcon icon={option.icon} className="mr-2" />
-                )}
-                {option.label}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+    exit: { opacity: 0, y: 20, transition: { duration: 0.5, ease: "easeInOut" } }
   };
-  //---end of the custom dropdown function---//
-  
 
   return (
     <div className="flex">
-      {/* Include the FacebookSDK component */}
       <FacebookSDK onLoginSuccess={handleLoginSuccess} />
-
       <div className="flex-1 ml-1">
-        <div className="p-6 -mt-4">
+        <motion.div
+          className="p-6 -mt-4"
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={containerVariants}
+        >
           <h1 className="text-2xl font-bold text-accent">Welcome Back, {userName || "Username"}!</h1>
           <p className="text-sm text-gray-600">Feel free to explore around</p>
-          <div className="bg-yellow-200 p-4 rounded-lg shadow-md mt-4">
+          <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <h2 className="text-xl font-bold text-accent">Account Overview</h2>
           </div>
           <div className="flex flex-row gap-6 mt-4">
-            <div className="flex-1 bg-yellow-200 p-4 rounded-lg shadow-md">
+            <div className="flex-1 bg-white p-4 rounded-lg shadow-md">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-bold text-accent">Social Accounts</h3>
                 <button
@@ -193,33 +142,33 @@ export default function Index() {
 
           {/* Posts Feed Section */}
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-accent">Your Posts</h2>
-              <div className="relative">
-                <CustomDropdown
-                  value={platformFilter}
-                  onChange={setPlatformFilter}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-              {filteredPosts.map((post) => (
-                <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105" onClick={() => setSelectedPost(post)}>
-                  <div className="aspect-square overflow-hidden">
-                    {post.post_type === 'VIDEO' ? (
-                      <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                </div>
-              ))}
+            <h2 className="text-xl font-bold text-accent">Your Posts</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3 max-h-[800px] overflow-y-auto">
+              {loggedIn ? (
+                posts.length > 0 ? (
+                  posts.map((post) => (
+                    <div key={post.id} className="bg-white rounded-md shadow-md p-3 cursor-pointer" onClick={() => setSelectedPost(post)}>
+                      <div className="aspect-square overflow-hidden">
+                        {post.post_type === 'VIDEO' ? (
+                          <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No posts to display. Connect to Instagram to see your posts.</p>
+                )
+              ) : (
+                <p>Not logged-in to any account. Connect to your social media to start!</p>
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Add a status element */}
+      {/* Status element */}
       <div id="status" className="hidden"></div>
 
       {/* Manage Account Modal */}
@@ -270,11 +219,11 @@ export default function Index() {
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold mb-2">Connect To More Social Media Accounts</h2>
           <button
-            onClick={instagramOAuth} 
+            onClick={instagramOAuth}
             className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900">
             <img src="/Instagram.png" alt="Instagram" className="w-6 h-6 mr-2" /> Instagram
           </button>
-          
+
           <button
             onClick={handleFBLogin}
             className="w-80 px-2 py-2 bg-accent text-white text-base font-medium rounded-md shadow-sm flex items-center justify-center hover:bg-blue-900"

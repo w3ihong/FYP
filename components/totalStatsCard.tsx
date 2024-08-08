@@ -1,7 +1,6 @@
 import React from 'react';
 
 interface TotalStatsCardProps {
-  profileViews: number;
   followers: number;
   likes: number;
   shares: number;
@@ -10,7 +9,6 @@ interface TotalStatsCardProps {
 }
 
 const TotalStatsCard: React.FC<TotalStatsCardProps> = ({
-  profileViews,
   followers,
   likes,
   shares,
@@ -20,10 +18,6 @@ const TotalStatsCard: React.FC<TotalStatsCardProps> = ({
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 flex justify-center">
       <div className="grid grid-cols-6 gap-4 w-full max-w-screen-lg">
-        <div className="col-span-1 text-center">
-          <p className="text-sm font-medium text-gray-600 font-raleway">Total Profile Views</p>
-          <p className="text-lg font-bold">{profileViews}</p>
-        </div>
         <div className="col-span-1 text-center">
           <p className="text-sm font-medium text-gray-600 font-raleway">Total Followers</p>
           <p className="text-lg font-bold">{followers}</p>
