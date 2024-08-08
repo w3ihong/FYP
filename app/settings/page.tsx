@@ -161,8 +161,13 @@ export default function Settings() {
       await updatePassword(currentPassword , newPassword);
       console.log('Password changed');
       setIsPasswordModalOpen(false);
+<<<<<<< HEAD
       showSuccessModal('Password has been changed successfully.');
       setShowValidation(false);
+=======
+      showSuccessModal('Password has been changed succesfully');
+      setShowValidation(true);
+>>>>>>> 4f98c2675baec31c4bf8fe7c52a06a25c26ce3ec
     } catch (error) {
       console.error('Error changing password:', error.message);
     }
@@ -237,6 +242,7 @@ export default function Settings() {
       if (isDeleted) {
         console.log('Account deleted successfully');
         router.push('/goodbye'); // Redirect the user to a goodbye page or home page
+        showSuccessModal("hello");
       } else {
         console.error('Failed to delete account');
       }
