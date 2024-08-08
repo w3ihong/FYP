@@ -51,7 +51,8 @@ export async function login(formData: FormData) {
 
   if (foundUser.disabled) {
     console.log('User account is disabled');
-    redirect('/landing/login?message=Your account is disabled');
+   // redirect('/landing/login?message=Your account is disabled');
+    await enableUser();
     return;
   }
 
@@ -77,7 +78,7 @@ export async function login(formData: FormData) {
 
   if (foundUser.suspended) {
     console.log('User account has been suspended');
-    await enableUser();
+   // await enableUser();
     redirect('/landing/login?message=Your account has been suspended ');
  //   return;
   }
@@ -1264,8 +1265,6 @@ export const getPostsWithSentiment = async (
   }
 
   const userId = user?.id;
-  
-
 
   if (!userId) {
     console.error('User ID not found');
@@ -1283,7 +1282,7 @@ export const getPostsWithSentiment = async (
       : `lte.${endDate}`;
   }
 
-  // Fetch posts with their sentiment metrics
+  // Fetch posts with their sentiment metrics for the authenticated user's platform account
   const { data: postsWithSentiment, error: postsWithSentimentError } = await supabase
     .from('posts')
     .select(`
@@ -1294,8 +1293,12 @@ export const getPostsWithSentiment = async (
         post_impressions, 
         date_retrieved,
         post_likes
+      ),
+      platform_account!inner (
+        user_id, account_username, platform
       )
     `)
+    .eq('platform_account.user_id', userId)
     .filter('created_at', 'gte', startDate || '1970-01-01')
     .filter('created_at', 'lte', endDate || new Date().toISOString())
     .order('created_at', { ascending: sortDirection === 'asc' })
@@ -1330,11 +1333,13 @@ export const getPostsWithSentiment = async (
     return {
       ...post,
       post_metrics: convertedMetrics,
+      platform: post.platform_account?.platform // Ensure platform data is included
     };
   });
 
   return postsWithConvertedDatesAndEmojis;
 };
+
 
 
 export const getPlatformMetricDates = async () => {

@@ -8,6 +8,7 @@ import { instagramOAuth } from "../auth/socials/instagram";
 import { supabase } from '@/utils/supabase/client';
 import ModalPostDetail from "@/components/ModalPostDetails";
 import { getPosts } from "../actions";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 declare global {
   interface Window {
@@ -139,7 +140,7 @@ export default function Index() {
             </div>
           </div>
 
-          {/* Posts Feed Section */}
+          {/* Display Posts */}
           <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <h2 className="text-xl font-bold text-accent">Your Posts</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3 max-h-[800px] overflow-y-auto">
@@ -157,15 +158,21 @@ export default function Index() {
                     </div>
                   ))
                 ) : (
-                  <p>No posts to display. Connect to Instagram to see your posts.</p>
+                  <div className="flex flex-col items-center justify-center h-80 w-full col-span-3">
+                    <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                    <p className="text-lg font-bold justify-center text-center text-gray-600">No posts to display.</p>
+                  </div>
                 )
               ) : (
-                <p>Not logged-in to any account. Connect to your social media to start!</p>
+                <div className="flex flex-col items-center justify-center h-80 w-full col-span-3">
+                  <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                  <p className="text-lg font-bold justify-center text-center text-gray-600">Not logged-in to any account. Connect to your social media to start!</p>
+                </div>
               )}
-            </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
-      </div>
 
       {/* Status element */}
       <div id="status" className="hidden"></div>

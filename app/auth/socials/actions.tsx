@@ -1,4 +1,5 @@
 'use server'
+
 import { createClient } from '@/utils/supabase/server';
 import axios from 'axios';
 
@@ -96,11 +97,56 @@ export async function getAssociatedDetails(accessToken:string ) {
     return response.data
 }
 
-export async function getDemographics(accessToken:string ) {
-    const endpoint = `https://fyp-ml-ejbkojtuia-ts.a.run.app/demographics/17841466917978018?type=reached&timeframe=this_month`
-    const response = await axios.get(endpoint)
-    return response.data
-}
+
+
+export const getDemographicsData = async (platformAccountId, viewType, timeframe) => {
+    const supabase = createClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError) {
+      console.error('Error fetching authenticated user:', userError.message);
+      return { error: 'User not authenticated' };
+    }
+  
+    const userId = user?.id;
+  
+    if (!userId) {
+      console.error('User ID not found');
+      return { error: 'User ID not found' };
+    }
+  
+    const { data, error } = await supabase
+      .from('platform_account')
+      .select('platform_account_id')
+      .eq('user_id', userId);
+  
+    if (error || !data.length) {
+      console.error('Error fetching platform accounts:', error);
+      return { error: 'No platform accounts found' };
+    }
+  
+    const account = data.find(account => account.platform_account_id === platformAccountId);
+  
+    if (!account) {
+      console.error('Platform account not found for user');
+      return { error: 'Platform account not found for user' };
+    }
+  
+    try {
+      const response = await fetch(`https://fyp-ml-ejbkojtuia-ts.a.run.app/demographics/${platformAccountId}?type=${viewType}&timeframe=${timeframe}`);
+      const demographicsData = await response.json();
+      
+      if (demographicsData.error) {
+        console.error('Error fetching demographics:', demographicsData.error.message);
+        return { error: demographicsData.error.message };
+      }
+  
+      return demographicsData;
+    } catch (error) {
+      console.error('Error fetching demographics:', error);
+      return { error: 'Failed to fetch demographics data' };
+    }
+  };
 
 export async function getLongLivedToken(accessToken: string) {
     const APPID = '2153953224988805'
