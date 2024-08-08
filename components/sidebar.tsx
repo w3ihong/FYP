@@ -1,6 +1,6 @@
 'use client'
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { BarChart3, TrendingUp, LineChart, PieChart, LogOut, Calendar, Settings, User } from 'lucide-react';
+import { BarChart3, TrendingUp, LineChart, PieChart, LogOut, Calendar, Settings, User, Map } from 'lucide-react';
 import Link from "next/link";
 import { logout, fetchUserName } from '@/app/actions';
 import Image from 'next/image';
@@ -80,11 +80,12 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
           </div>
           <div className="flex flex-col px-3 overflow-y-auto">
             <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
+            <SidebarItem icon={<Map size={20} />} text="Demographics" link="/protected/demographics"/>
             <SidebarItem icon={<TrendingUp size={20} />} text="Sentiment Analysis" link="/protected/Sentiment" />
             <SidebarItem icon={<LineChart size={20} />} text="Trending Topics" link="/protected/Trending" />
             <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative" />
             <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
-            <div className='my-4' />  {/* Spacer Div */}
+            <div className='my-4' /> 
           </div>
         </div>
         <div className='flex flex-col px-3 py-2'>
