@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { EnvelopeIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'; 
 import SmallModalContainer from '@/components/smallModalContainer';
-import ModalBackdrop from '@/components/modalBackdrop';
 import { checkOTP, deleteUser, disableUser, getEmail, sendOTP, updateEmail, updatePassword, verifyOTP } from '../actions';
 import { enableUser } from '../actions';
 import router from 'next/router';
 import ModalSuccess from '@/components/modalSuccess';
+import ModalFail from '@/components/modalFail';
 import { motion } from 'framer-motion';
 
 const user = {
@@ -48,7 +48,9 @@ export default function Settings() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState(Array(6).fill(''));
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isFailModalOpen, setIsFailModalOpen ] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [failMessage, setFailMessage] = useState('');
   const [isAccountDisabled, setIsAccountDisabled] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -81,8 +83,10 @@ export default function Settings() {
         await enableUser();
         setIsSuccessModalOpen(true);
         setSuccessMessage('Account has been enabled successfully.');
-        setIsAccountDisabled(false); // Update account status
+        setIsAccountDisabled(false); 
       } catch (error) {
+        setIsFailModalOpen(true);
+        setFailMessage('Error enabling account. Please Try Again.');
         console.error('Error enabling account:', error.message);
         // Handle error
       }
@@ -94,6 +98,8 @@ export default function Settings() {
         setSuccessMessage('Account has been disabled successfully.');
         setIsAccountDisabled(true); // Update account status
       } catch (error) {
+        setIsFailModalOpen(true);
+        setFailMessage('Error disabling account. Please Try Again.');
         console.error('Error disabling account:', error.message);
         // Handle error
       }
@@ -104,6 +110,11 @@ export default function Settings() {
   const showSuccessModal = (message) => {
     setSuccessMessage(message);
     setIsSuccessModalOpen(true);
+  };
+
+  const showFailModal = (message) => {
+    setFailMessage(message);
+    setIsFailModalOpen(true);
   };
 
   const toggleEmailModal = () => {
@@ -164,6 +175,9 @@ export default function Settings() {
       showSuccessModal('Password has been changed successfully.');
       setShowValidation(false);
     } catch (error) {
+      setIsPasswordModalOpen(false);
+      showFailModal('Error changing the password. Try again');
+      setShowValidation(false);
       console.error('Error changing password:', error.message);
     }
   };
@@ -538,6 +552,12 @@ export default function Settings() {
       {isSuccessModalOpen && (
         <ModalSuccess message={successMessage} onClose={() => setIsSuccessModalOpen(false)} isOpen={isSuccessModalOpen} />
       )}
+
+      {/* Fail Modal */}
+      {isFailModalOpen && (
+        <ModalFail message={failMessage} onClose={() => setIsFailModalOpen(false)} isOpen={isFailModalOpen} />
+      )}
+      
 
     </motion.div>
   );
