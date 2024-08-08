@@ -1,6 +1,12 @@
 import Link from "next/link";
 
-export default function error() {
+export default function error(
+    {
+        searchParams,
+    }: {
+        searchParams: { message: string };
+    }
+) {
     return (
         <div>
             {/* header */}
@@ -14,7 +20,7 @@ export default function error() {
             </div>
             {/* main */}
             <div className="flex flex-col items-center justify-center">
-                <h1 className="text-2xl  text-accent mt-10 pb-10">Account linking canceled or failed</h1>
+                <h1 className="text-2xl  text-accent mt-10 pb-10">{searchParams.message}</h1>
             </div>
         </div>
     )
