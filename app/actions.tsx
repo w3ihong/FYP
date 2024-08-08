@@ -986,7 +986,7 @@ export async function fetchReports()
   try {
     const { data, error } = await supabase
       .from('reports_on_user') // Replace 'users' with your actual table name
-      .select('reason , reporter_id , reportee_id , first_name ');
+      .select('reason , reporter_id , reportee_id  ');
       
 
     if (error) {
@@ -1413,32 +1413,38 @@ export const getPlatformMetricDatesThree = async () => {
 
 
 
-export const getPlatformMetricDatesTwo = async () => {
+export const getPlatformMetricDatesTwo = async (
+  accountId: string | null,
+  startDate: Date | null,
+  endDate: Date | null
+) => {
   const supabase = createClient();
   const timeZone = 'Asia/Singapore';
 
   try {
+    // Initialize query
+    let query = supabase.from('post_metrics').select('*').order('date_retrieved', { ascending: true }).limit(12);
+
+    // Apply date range filter if provided
+    if (startDate && endDate) {
+      query = query.gte('date_retrieved', startDate.toISOString()).lte('date_retrieved', endDate.toISOString());
+    }
+
     // Fetch recent post metrics
-    const { data: postMetrics, error: postError } = await supabase
-      .from('post_metrics')
-      .select('*')
-      .order('date_retrieved', { ascending: true })
-      .limit(12);
-      
-      
+    const { data: postMetrics, error: postError } = await query;
 
     if (postError) {
       console.error('Supabase error fetching post metrics:', postError);
       return [];
     }
 
-    // Fetch total platform metrics
-    const { data: platformMetricsData, error: platformError } = await supabase
-      .from('platform_metrics')
-      .select('*')
-      .eq('platform_account', '17841466917978018');
-      
-      
+    // Fetch total platform metrics if an account ID is provided
+    const platformQuery = supabase.from('platform_metrics').select('*');
+    if (accountId) {
+      platformQuery.eq('platform_account', accountId);
+    }
+
+    const { data: platformMetricsData, error: platformError } = await platformQuery;
 
     if (platformError) {
       console.error('Supabase error fetching platform metrics:', platformError);
