@@ -46,6 +46,8 @@ const Demographics = () => {
   const [timeframe, setTimeframe] = useState<'this_month' | 'this_week'>('this_month');
   const [platformAccountId, setPlatformAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+  const [accountNames, setAccountNames] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchPlatformAccounts = async () => {
@@ -65,7 +67,7 @@ const Demographics = () => {
         if (user) {
           const { data, error } = await supabase
             .from('platform_account')
-            .select('platform_account_id')
+            .select('*') //query all cause i want to get account names
             .eq('user_id', user.id);
 
           if (error) {
@@ -77,6 +79,8 @@ const Demographics = () => {
           if (data && data.length > 0) {
             console.log('Platform Accounts Data:', data);
             setPlatformAccountId(data[0].platform_account_id);
+            setAccountNames(data.map(account => account.account_username));
+            setSelectedAccount(data[0].account_username);
           } else {
             console.log('No platform accounts found');
             setError('No platform accounts found');
@@ -175,6 +179,16 @@ const Demographics = () => {
               Engaged
             </button>
           </div>
+          <div className="flex space-x-4">
+          <select //this part is the account names 
+            value={selectedAccount || ''}
+            onChange={(e) => setSelectedAccount(e.target.value)}
+            className="px-4 py-2 bg-white text-accent hover:bg-gray-100 font-medium text-sm rounded-lg "
+          >
+            {accountNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
           <select
             value={timeframe}
             onChange={(e) => setTimeframe(e.target.value as 'this_month' | 'this_week')}
@@ -183,6 +197,7 @@ const Demographics = () => {
             <option value="this_month">This Month</option>
             <option value="this_week">This Week</option>
           </select>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <MapContainer
