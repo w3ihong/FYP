@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { getDemographicsData } from "@/app/auth/socials/actions";
 import { LatLngTuple } from 'leaflet';
 import { supabase } from '@/utils/supabase/client';
+import { planType } from '@/app/actions'; // Adjust the path as needed
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
@@ -48,6 +49,7 @@ const Demographics = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [accountNames, setAccountNames] = useState<string[]>([]);
+  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
 
   useEffect(() => {
     const fetchPlatformAccounts = async () => {
@@ -132,6 +134,16 @@ const Demographics = () => {
     }
   }, [viewType, timeframe, platformAccountId]);
 
+  useEffect(() => {
+    const checkPlanType = async () => {
+      const type = await planType();
+      console.log('Plan Type:', type);
+      setUserPlanType(type);
+    };
+
+    checkPlanType();
+  }, []);
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full">
@@ -152,7 +164,7 @@ const Demographics = () => {
   if (!demographics || !demographics.gender) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full">
-       <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+        <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
         <p className="text-lg font-raleway">Loading demographics data...</p>
       </div>
     );
@@ -161,7 +173,7 @@ const Demographics = () => {
   const totalGenderCount = demographics.gender.F + demographics.gender.M + demographics.gender.U;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className={`container mx-auto p-4 ${userPlanType !== 'premium' ? 'blur-md' : ''}`}>
       <h1 className="text-2xl font-bold mb-8">User Demographics</h1>
       <div className="grid grid-cols-1 gap-2">
         <div className="flex justify-between mb-2">
@@ -212,59 +224,38 @@ const Demographics = () => {
           >
             <MapSetter center={center} />
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {countries.map(country => {
-              const count = demographics.country[country.countryCode] || 0;
-              if (count > 0) {
-                return (
-                  <CircleMarker
-                    key={country.countryCode}
-                    center={[country.latitude, country.longitude] as LatLngTuple}
-                    pathOptions={{ color: 'blue', fillOpacity: 0.75 }}
-                    radius={Math.sqrt(count) * 2}
-                  >
-                    <LeafletTooltip>{`${country.name}: ${count}`}</LeafletTooltip>
-                  </CircleMarker>
-                );
-              }
-              return null;
+            {countries.map((country) => {
+              const demographicCount = demographics.country[country.countryCode] || 0;
+              return (
+                <CircleMarker
+                  key={country.countryCode}
+                  center={[country.latitude, country.longitude]}
+                  radius={demographicCount / 1000}
+                  color="blue"
+                  fillColor="blue"
+                  fillOpacity={0.5}
+                >
+                  <LeafletTooltip>
+                    {country.name}: {demographicCount} users
+                  </LeafletTooltip>
+                </CircleMarker>
+              );
             })}
           </MapContainer>
-          <div className="col-span-1">
-            <div className="bg-white p-4 shadow rounded-lg mb-2">
-              <h2 className="text-lg font-semibold">Gender Distribution</h2>
-              <div className="relative h-8 bg-gray-200 rounded">
-                {Object.entries(demographics.gender).map(([key, value]) => (
-                  <div key={key} className={`absolute h-full ${key === 'F' ? 'bg-pink-300' : key === 'M' ? 'bg-blue-300' : 'bg-gray-300'}`}
-                       style={{ width: `${(value / totalGenderCount) * 100}%` }}
-                       data-tooltip-id="tooltip-gender"
-                       data-tooltip-content={`${key === 'F' ? 'Female' : key === 'M' ? 'Male' : 'Undecided'}: ${value}`}>
-                  </div>
-                ))}
-              </div>
-              <Tooltip id="tooltip-gender" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-6 shadow rounded-lg" style={{ maxHeight: '350px' }}>
-                <h2 className="text-lg font-semibold">Age Distribution</h2>
-                {Object.keys(demographics.age).map(age => (
-                  <div key={age} className="mt-2" data-tooltip-id="tooltip-age" data-tooltip-content={`Age ${age}: ${demographics.age[age]}`}>
-                    <span>{age}: </span>
-                    <span className="font-bold">{demographics.age[age]}</span>
-                  </div>
-                ))}
-                <Tooltip id="tooltip-age" />
-              </div>
-              <div className="bg-white p-6 shadow rounded-lg overflow-y-auto" style={{ maxHeight: '350px' }}>
-                <h2 className="text-lg font-semibold">City Distribution</h2>
-                {Object.keys(demographics.city).map(city => (
-                  <div key={city} className="mt-2" data-tooltip-id="tooltip-city" data-tooltip-content={`${city}: ${demographics.city[city]}`}>
-                    <span>{city}: </span>
-                    <span className="font-bold">{demographics.city[city]}</span>
-                  </div>
-                ))}
-                <Tooltip id="tooltip-city" />
-              </div>
-            </div>
+          <div className="bg-white shadow-lg rounded-lg p-4">
+            <h2 className="text-xl font-bold mb-4">Demographics Overview</h2>
+            <h3 className="text-lg font-medium mb-2">Gender Distribution</h3>
+            <p>Female: {(demographics.gender.F / totalGenderCount * 100).toFixed(2)}%</p>
+            <p>Male: {(demographics.gender.M / totalGenderCount * 100).toFixed(2)}%</p>
+            <p>Unknown: {(demographics.gender.U / totalGenderCount * 100).toFixed(2)}%</p>
+            <h3 className="text-lg font-medium mt-4 mb-2">Age Distribution</h3>
+            {Object.entries(demographics.age).map(([ageRange, count]) => (
+              <p key={ageRange}>{ageRange}: {count} users</p>
+            ))}
+            <h3 className="text-lg font-medium mt-4 mb-2">City Distribution</h3>
+            {Object.entries(demographics.city).map(([city, count]) => (
+              <p key={city}>{city}: {count} users</p>
+            ))}
           </div>
         </div>
       </div>

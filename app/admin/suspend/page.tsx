@@ -27,8 +27,6 @@ export default function AdminSuspend() {
           suspended: user.suspended ? true : false, // Default to false if not provided
         }));
 
-      
-
         setUsers(formattedUsers);
         localStorage.setItem('users', JSON.stringify(formattedUsers));
         setLoading(false);
@@ -118,55 +116,70 @@ export default function AdminSuspend() {
 
   return (
     <main className="flex-1 max-w-full p-8">
-      <h1 className="text-2xl font-bold mb-6 -mt-4">Suspended Users</h1>
-      <div className="bg-yellow-200 rounded-lg shadow-md p-8 max-h-[80vh] overflow-auto">
+      <h1 className="text-3xl font-extrabold text-gray-800 mb-8">Suspended Users</h1>
+      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-6 max-h-[80vh] overflow-auto">
         <div className="mb-6">
           <input 
             type="text" 
-            className="w-full p-3 pr-5 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-500" 
+            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" 
             placeholder="Search users..."
             value={searchTerm}
             onChange={handleSearchChange}
           />
         </div>
         
-        <div className="space-y-4">
-          {suspendedUsers.length > 0 ? (
-            suspendedUsers.map((user, index) => {
-              const suspension = suspensions.find(s => s.user_id === user.user_id);
-              const suspensionReason = suspension ? suspension.reason : 'Reason not available';
+        <table className="w-full bg-gray-50 border border-gray-200 rounded-lg">
+          <thead>
+            <tr className="bg-gray-200 text-left text-sm font-semibold text-gray-700">
+              <th className="p-3">Name</th>
+              <th className="p-3">Account ID</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {suspendedUsers.length > 0 ? (
+              suspendedUsers.map((user, index) => {
+                const suspension = suspensions.find(s => s.user_id === user.user_id);
+                const suspensionReason = suspension ? suspension.reason : 'Reason not available';
 
-              return (
-                <div key={index} className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
-                  <div>{user.first_name} , {user.user_id}</div>
-                  <div>
-                    <button 
-                      className="bg-gray-400 text-roboto text-white px-10 py-1 mr-2 rounded-lg hover:bg-gray-500"
-                      onClick={() => handleOpenViewModal(user.user_id, suspensionReason)}
-                    >
-                      View
-                    </button>
-                    <button
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-lg"
-                      onClick={() => handleOpenConfirmModal(user)}
-                    >
-                      Unsuspend
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center text-gray-500">No users found</div>
-          )}
-        </div>
+                return (
+                  <tr key={index} className="border-t">
+                    <td className="p-3 text-gray-700">{user.first_name}</td>
+                    <td className="p-3 text-gray-700">{user.user_id}</td>
+                    <td className="p-3 text-gray-700">{user.suspended ? 'Suspended' : 'Active'}</td>
+                    <td className="p-3 flex space-x-2">
+                      <button 
+                        className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
+                        onClick={() => handleOpenViewModal(user.user_id, suspensionReason)}
+                      >
+                        View
+                      </button>
+                      <button
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                        onClick={() => handleOpenConfirmModal(user)}
+                      >
+                        Unsuspend
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-3 text-center text-gray-500">No users found</td>
+
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* View Suspension Modal */}
       <ModalContainer isOpen={isViewModalOpen} onClose={handleCloseViewModal}>
-        <h2 className="text-2xl font-bold mb-4 mt-24">Suspension ID: #{viewSuspensionId}</h2>
+        <h2 className="text-2xl font-extrabold text-gray-800 mb-4">Suspension ID: #{viewSuspensionId}</h2>
         <textarea
-          className="w-full h-60 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 mb-6 resize-none"
+          className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4 resize-none"
           value={suspensionReason}
           readOnly
         />
@@ -174,11 +187,11 @@ export default function AdminSuspend() {
 
       {/* Confirm Suspension Toggle Modal */}
       <ModalContainer isOpen={isConfirmModalOpen} onClose={handleCloseConfirmModal}>
-        <h2 className="text-2xl font-bold mb-4 mt-20">Confirm {selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
+        <h2 className="text-2xl font-extrabold text-gray-800 mb-4">Confirm {selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
         <h3 className="text-lg mb-2">Suspension ID: #{confirmSuspensionId}</h3>
-        <label className="block text-lg mb-2">Reason for {selectedUser?.suspended ? 'Unsuspending' : 'Suspending'}:</label>
+        <label className="block text-lg font-medium text-gray-700 mb-2">Reason for {selectedUser?.suspended ? 'Unsuspending' : 'Suspending'}:</label>
         <textarea
-          className="w-full h-60 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 mb-6 resize-none"
+          className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4 resize-none"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         />
@@ -190,7 +203,7 @@ export default function AdminSuspend() {
             Cancel
           </button>
           <button
-            className="bg-accent text-white px-6 py-2 rounded-lg hover:bg-blue-900"
+            className="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600"
             onClick={handleConfirmSuspend}
           >
             Confirm
