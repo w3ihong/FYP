@@ -1,10 +1,11 @@
-"use client";
-import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { BarChart3, Calendar, LogOut, Users, SquarePlus, LayoutDashboard, Settings, Brain } from 'lucide-react';
+'use client'
+import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { BarChart3, TrendingUp, LineChart, PieChart, LogOut, Calendar, Settings, User, Map } from 'lucide-react';
 import Link from "next/link";
-import { logout } from '@/app/actions';
+import { logout, fetchUserName } from '@/app/actions';
 import Image from 'next/image';
 import logo from "@/public/ESLogo.png";
+import { createClient } from '@/utils/supabase/client';
 
 // Sidebar context to manage the expanded state
 const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
@@ -13,120 +14,98 @@ const SidebarContext = createContext<{ expanded: boolean }>({ expanded: true });
 interface SidebarItemProps {
   icon: ReactNode;
   text: string;
-  link: string;
-  onClick?: () => void; // onClick prop added
+  link?: string;
+  onClick?: () => void;
+  clickable?: boolean;
 }
 
 // SidebarItem component
-export function SidebarItem({ icon, text, link, onClick }: SidebarItemProps) {
+export function SidebarItem({ icon, text, link, onClick, clickable = true }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
 
-  const handleClick = () => {
-    if (onClick) {
-      onClick();
-    }
-  };
-
-  return (
+  const content = (
     <div
-      className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors hover:bg-SBaccent text-gray-699 `}
-      onClick={handleClick} // Handle click directly on div
+      className={`relative flex items-center p-2 my-1 font-medium rounded-md cursor-pointer transition-colors ${clickable ? 'hover:bg-blue-700 text-gray-699' : 'text-gray-500'}`}
+      onClick={clickable ? onClick : undefined}
     >
-      <Link href={link} passHref={true} legacyBehavior={true}>
-        <div className="w-full flex items-center">
-          <span className="text-white">{icon}</span>
-          <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3 text-white' : 'w-0 text-white'}`}>
-            {text}
-          </span>
-        </div>
-      </Link>
+      <span className="text-white">{icon}</span>
+      <span
+        className={`ml-3 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+          expanded ? 'w-auto opacity-100 text-white' : 'w-0 opacity-0'
+        }`}
+      >
+        {text}
+      </span>
     </div>
   );
+
+  return link ? <Link href={link}>{content}</Link> : content;
 }
 
 // Sidebar component
 export default function Sidebar({ email, userType }: { email: string, userType: number }) {
-  const [expanded, setExpanded] = useState(false); // State to manage sidebar expansion
+  const [expanded, setExpanded] = useState(false);
+  const [userName, setUserName] = useState<{ user_id: string; first_name: string; last_name: string } | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await fetchUserName();
+      if (userData) {
+        setUserName(userData);
+      }
+    };
+
+    fetchUserData();
+  }, [email, supabase]);
 
   return (
     <aside
-      className={`fixed top-0 h-screen bg-accent transition-all ${expanded ? 'w-60' : 'w-16'}`}
+      className={`fixed top-0 left-0 bottom-0 h-full bg-accent transition-all duration-300 ease-in-out z-10 ${
+        expanded ? 'w-60' : 'w-16'
+      }`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
-      <nav className="h-screen flex flex-col justify-between border-r shadow-sm">
-        <div className='flex-col h-full '>
-          <div className="flex items-center p-3 pb-2">
-            <Image src={logo} className="w-9 h-9" alt="Logo" />
-            <span className={`ml-3 text-white font-semibold transition-all ${expanded ? 'block' : 'hidden'}`}>
+      <nav className="flex flex-col justify-between h-full border-r shadow-sm">
+        <div>
+          <div className="flex items-center justify-start p-3">
+            <Image src={logo} width={36} height={36} alt="Logo" priority/>
+            <span
+              className={`ml-3 text-white font-semibold overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out opacity-100
+              `}
+            >
               EchoSphere
             </span>
           </div>
-
-          <SidebarContext.Provider value={{ expanded }}>
-            <div className=" flex flex-col px-3 h-full ">
-              <SidebarItem icon={<SquarePlus size={20} />} text="Create" link="/protected/post/create" />
-              <hr className="border-t border-gray-200 my-2" />
-              <SidebarItem
-                icon={<LayoutDashboard size={20} />}
-                text="Dashboard"
-                link="/protected"
-              />
-              <SidebarItem
-                icon={<BarChart3 size={20} />}
-                text="Analytics"
-                link="/protected/analytics"
-                />
-              <SidebarItem
-                icon={<Calendar size={20} />}
-                text="Calendar"
-                link="/protected/calendar"
-              />
-              <SidebarItem
-                icon={<Brain size={20} />}
-                text="Visualize"
-                link="/protected/visualize"
-                />
-              <SidebarItem
-                icon={<Users size={20} />}
-                text="Team"
-                link="/protected/team"
-              />
-              <div className='grow' />
-              <div className='pb-[63px]'>
-                <SidebarItem
-                  icon={<Settings size={20} />}
-                  text="Settings"
-                  link="/settings"
-                />
-                <SidebarItem
-                icon={<Users size={20} />}
-                text="Team"
-                link="/protected/team"
-              />
-              
-                <SidebarItem
-                  icon={<LogOut size={20} />}
-                  text="Logout"
-                  link="/landing"
-                  onClick={() => logout()} // Call the logout function on click
-                />
-              </div>
-            </div>
-          </SidebarContext.Provider>
-        </div>
-
-        <div className="border-t flex p-3 items-center ">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt="User Avatar"
-            className="w-10 h-10 rounded-md"
-          />
-          <div className={`flex items-center overflow-hidden ${expanded ? "w-52 ml-3" : "w-0"}`}>
-            <div className="leading-4">
-              <span className="text-xs text-gray-300 overflow-clip">{email}</span>
-            </div>
+          <div className="flex flex-col px-3 overflow-y-auto">
+            <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
+            <SidebarItem icon={<Map size={20} />} text="Demographics" link="/protected/demographics"/>
+            <SidebarItem icon={<TrendingUp size={20} />} text="Sentiment Analysis" link="/protected/Sentiment" />
+            <SidebarItem icon={<LineChart size={20} />} text="Trending Topics" link="/protected/Trending" />
+            <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative" />
+            <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
+            <div className='my-4' /> 
           </div>
+        </div>
+        <div className='flex flex-col px-3 py-2'>
+          <SidebarItem
+            icon={<Settings size={20} />}
+            text="Settings"
+            link="/settings"
+          />
+          <SidebarItem
+            icon={<LogOut size={20} />}
+            text="Logout"
+            link="/landing"
+            onClick={() => logout()}
+          />
+
+          <SidebarItem
+            icon={<User size={20} className="text-white" />}
+            text={userName ? `${userName.first_name} ${userName.last_name}` : ''}
+            clickable={false}
+          />
         </div>
       </nav>
     </aside>

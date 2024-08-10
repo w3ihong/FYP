@@ -1,168 +1,193 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LineGraph from '@/components/lineGraph';
+import BarGraph from '@/components/barChart';
 import PieChart from '@/components/pieChart';
-import BarChart from '@/components/barChart';
-import DonutChart from '@/components/donutChart';
+import TotalStatsCard from '@/components/totalStatsCard';
+import { getPlatformMetricDatesTwo } from '@/app/actions'; // Import the updated method
 
-// Sample data for charts
-const sampleLineData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      label: 'Follower Growth Over Time',
-      data: [200, 250, 300, 350, 400, 450, 500],
-      fill: false,
-      backgroundColor: 'rgba(75, 192, 192, 0.4)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-    },
-    {
-      label: 'Engagement Rate Over Time',
-      data: [3.5, 3.7, 4.0, 4.2, 4.5, 4.7, 5.0],
-      fill: false,
-      backgroundColor: 'rgba(153, 102, 255, 0.4)',
-      borderColor: 'rgba(153, 102, 255, 1)',
-    },
-    {
-      label: 'Post Frequency Over Time',
-      data: [5, 6, 7, 8, 9, 10, 11],
-      fill: false,
-      backgroundColor: 'rgba(255, 159, 64, 0.4)',
-      borderColor: 'rgba(255, 159, 64, 1)',
-    },
-    {
-      label: 'Click-Through Rate (CTR) Over Time',
-      data: [2.0, 2.2, 2.5, 2.7, 3.0, 3.2, 3.5],
-      fill: false,
-      backgroundColor: 'rgba(54, 162, 235, 0.4)',
-      borderColor: 'rgba(54, 162, 235, 1)',
-    },
-    {
-      label: 'Conversion Rate Over Time',
-      data: [1.0, 1.2, 1.5, 1.7, 2.0, 2.2, 2.5],
-      fill: false,
-      backgroundColor: 'rgba(255, 206, 86, 0.4)',
-      borderColor: 'rgba(255, 206, 86, 1)',
-    },
-    {
-      label: 'Video Views Over Time',
-      data: [1000, 1200, 1400, 1600, 1800, 2000, 2200],
-      fill: false,
-      backgroundColor: 'rgba(75, 192, 192, 0.4)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-    },
-  ],
-};
+const Dashboard = () => {
+  const [metrics, setMetrics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<string | null>(null); // State for selected account
+  const [accounts, setAccounts] = useState<{ id: string; name: string }[]>([]); // State for account options
 
-const sampleBarData = {
-  labels: ['Post 1', 'Post 2', 'Post 3', 'Post 4', 'Post 5', 'Post 6', 'Post 7'],
-  datasets: [
-    {
-      label: 'Top Performing Posts',
-      data: [120, 150, 180, 200, 220, 250, 300],
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1,
-    },
-    {
-      label: 'Engagement by Post Type',
-      data: [30, 45, 60, 50, 70, 90, 110],
-      backgroundColor: 'rgba(153, 102, 255, 0.2)',
-      borderColor: 'rgba(153, 102, 255, 1)',
-      borderWidth: 1,
-    },
-    {
-      label: 'Reach by Social Media Platform',
-      data: [500, 600, 700, 800, 900, 1000, 1100],
-      backgroundColor: 'rgba(255, 159, 64, 0.2)',
-      borderColor: 'rgba(255, 159, 64, 1)',
-      borderWidth: 1,
-    },
-  ],
-};
+  useEffect(() => {
+    // Fetch account options for the dropdown
+    const fetchAccounts = async () => {
+      // Replace with your logic to fetch account options
+      // Example: const { data, error } = await supabase.from('accounts').select('*');
+      const accountOptions = [
+        { id: '17841466917978018', name: 'Account 1' },
+        { id: '12345678901234567', name: 'Account 2' }
+      ]; // Example data
+      setAccounts(accountOptions);
+      setSelectedAccount(accountOptions[0]?.id || null); // Set default selected account
+    };
 
-const samplePieData = {
-  labels: ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
-  datasets: [
-    {
-      label: 'Audience Demographics',
-      data: [25, 35, 20, 10, 5, 5],
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255, 99, 132, 1)',
-        'rgba(54, 162, 235, 1)',
-        'rgba(255, 206, 86, 1)',
-        'rgba(75, 192, 192, 1)',
-        'rgba(153, 102, 255, 1)',
-        'rgba(255, 159, 64, 1)',
-      ],
-      borderWidth: 1,
-    },
-  ],
-};
+    fetchAccounts();
+  }, []);
 
-const sampleDonutData = {
-  labels: ['Negative', 'Neutral', 'Positive'],
-  datasets: [
-    {
-      label: 'Sentiment Analysis',
-      data: [12, 15, 73],
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255, 99, 132, 1)',
-        'rgba(255, 206, 86, 1)',
-        'rgba(75, 192, 192, 1)',
-      ],
-      borderWidth: 1,
-    },
-  ],
-};
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedAccount) {
+        try {
+          // Fetch metrics data using the combined method with the selected account
+          const data = await getPlatformMetricDatesTwo(selectedAccount, null, null);
 
-const DashboardPage = () => {
-  const [lineGraphData, setLineGraphData] = useState(sampleLineData);
-  const [pieChartData, setPieChartData] = useState(samplePieData);
-  const [barChartData, setBarChartData] = useState(sampleBarData);
-  const [donutChartData, setDonutChartData] = useState(sampleDonutData);
+          // Separate the combined data into post metrics and platform metrics
+          const postMetrics = data.filter((item: any) => item.date_retrieved && item.post_likes !== undefined);
+          const platformMetricsData = data.find((item: any) => item.platform_followers !== undefined) || {};
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const { data: lineData, error: lineError } = await supabase.from('line_data').select('*');
-  //     const { data: pieData, error: pieError } = await supabase.from('pie_data').select('*');
-  //
-  //     if (!lineError) setLineGraphData(lineData);
-  //     if (!pieError) setPieChartData(pieData);
-  //   };
-  //   fetchData();
-  // }, []);
+          setMetrics(postMetrics);
+
+          // If there's only one set of platform metrics
+          if (Object.keys(platformMetricsData).length) {
+            const { platform_followers = 0, platform_likes = 0, platform_comments = 0, platform_saves = 0, platform_shares = 0 } = platformMetricsData;
+            setMetrics(prevMetrics => [...prevMetrics, {
+              platform_followers,
+              platform_likes,
+              platform_comments,
+              platform_saves,
+              platform_shares
+            }]);
+          }
+
+          setLoading(false);
+        } catch (error) {
+          console.error('Fetch error:', error);
+          setError((error as Error).message);
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedAccount]); // Refetch data when selectedAccount changes
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const totalStats = metrics.find((item: any) => item.platform_followers !== undefined) || {};
+  const postMetrics = metrics.filter((item: any) => item.date_retrieved && item.post_likes !== undefined);
+
+  const { platform_followers = 0, platform_likes = 0, platform_comments = 0, platform_saves = 0, platform_shares = 0 } = totalStats;
 
   return (
     <>
-      <LineGraph data={{ labels: lineGraphData.labels, datasets: [lineGraphData.datasets[0]] }} title="Follower Growth Over Time" />
-      <LineGraph data={{ labels: lineGraphData.labels, datasets: [lineGraphData.datasets[1]] }} title="Engagement Rate Over Time" />
-      <LineGraph data={{ labels: lineGraphData.labels, datasets: [lineGraphData.datasets[2]] }} title="Post Frequency Over Time" />
-      <BarChart data={{ labels: barChartData.labels, datasets: [barChartData.datasets[0]] }} title="Top Performing Posts" />
-      <BarChart data={{ labels: barChartData.labels, datasets: [barChartData.datasets[1]] }} title="Engagement by Post Type" />
-      <BarChart data={{ labels: barChartData.labels, datasets: [barChartData.datasets[2]] }} title="Reach by Social Media Platform" />
-      <PieChart data={pieChartData} title="Audience Demographics" />
-      <PieChart data={pieChartData} title="Engagement by Platform" />
-      <DonutChart data={donutChartData} title="Sentiment Analysis" />
-      <LineGraph data={{ labels: lineGraphData.labels, datasets: [lineGraphData.datasets[3]] }} title="Click-Through Rate (CTR) Over Time" />
-      <LineGraph data={{ labels: lineGraphData.labels, datasets: [lineGraphData.datasets[4]] }} title="Conversion Rate Over Time" />
-      <LineGraph data={{ labels: lineGraphData.labels, datasets: [lineGraphData.datasets[5]] }} title="Video Views Over Time" />
+      <div className="flex justify-between items-center mb-4">
+        <select
+          value={selectedAccount || ''}
+          onChange={(e) => setSelectedAccount(e.target.value)}
+          className="p-2 border rounded"
+        >
+          {accounts.map(account => (
+            <option key={account.id} value={account.id}>
+              {account.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="col-span-3">
+        <TotalStatsCard
+          followers={platform_followers}
+          likes={platform_likes}
+          shares={platform_shares}
+          comments={platform_comments}
+          saved={platform_saves}
+        />
+      </div>
+      <div className="col-span-1">
+        <LineGraph 
+          data={postMetrics} 
+          metric="post_likes" 
+          color="rgba(75, 192, 192, 1)" 
+          label="Post Likes Over Time"
+          title="Post Likes Over Time"
+        />
+      </div>
+      <div className="col-span-1">
+        <LineGraph 
+          data={postMetrics} 
+          metric="post_shares" 
+          color="rgba(153, 102, 255, 1)" 
+          label="Post Shares Over Time"
+          title="Post Shares Over Time"
+        />
+      </div>
+      <div className="col-span-1">
+        <LineGraph 
+          data={postMetrics} 
+          metric="post_comments" 
+          color="rgba(255, 159, 64, 1)" 
+          label="Post Comments Over Time"
+          title="Post Comments Over Time"
+        />
+      </div>
+      <div className="col-span-1">
+        <LineGraph 
+          data={postMetrics} 
+          metric="post_impressions" 
+          color="rgba(54, 162, 235, 1)" 
+          label="Post Impressions Over Time"
+          title="Post Impressions Over Time"
+        />
+      </div>
+      <div className="col-span-1">
+        <BarGraph
+          data={postMetrics}
+          metrics={['post_likes', 'post_shares', 'post_comments']}
+          colors={['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)']}
+          label="Likes, Shares, and Comments"
+          title="Likes, Shares, and Comments Comparison"
+        />
+      </div>
+      <div className="col-span-1">
+        <BarGraph
+          data={postMetrics}
+          metrics={['post_engagement_rate']}
+          colors={['rgba(255, 206, 86, 0.6)']}
+          label="Engagement Rate"
+          title="Engagement Rate Comparison"
+        />
+      </div>
+      <div className="col-span-1">
+        <PieChart
+          data={postMetrics}
+          metrics={['post_likes', 'post_shares', 'post_comments']}
+          colors={['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)']}
+          title="Distribution of Different Interactions"
+        />
+      </div>
+
+      <LineGraph
+  data={postMetrics}
+  metric="post_sentiment"
+  color="rgba(255, 99, 132, 1)"
+  label="Post Sentiment  Over Time"
+  title="Post Sentiment Rate Over Time"
+/>
+
+<LineGraph
+  data={postMetrics}
+  metric="post_profile_visits"
+  color="rgba(255, 99, 132, 1)"
+  label="Post Profile visits  Over Time"
+  title="Post Profile vists  Over Time"
+/>
+
+
+
     </>
   );
 };
 
-export default DashboardPage;
+export default Dashboard;

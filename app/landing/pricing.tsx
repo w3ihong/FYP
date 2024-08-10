@@ -1,159 +1,137 @@
-"use server";
+"use client";
 
-import React from 'react';
+import React, { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { twMerge } from "tailwind-merge";
+
+const pricingTiers = [
+  {
+    title: "Free",
+    monthlyPrice: 0,
+    buttonText: "Get started for free",
+    inverse: false,
+    features: [
+      "Small-scale metrics",
+      "Basic Support",
+    ],
+  },
+  {
+    title: "Pro",
+    monthlyPrice: 39,
+    buttonText: "Sign up now",
+    inverse: true,
+    features: [
+      "Visual Analytics",
+      "Sentiment Analysis",
+      "Trend Analysis",
+      "Comparative Analysis",
+    ]
+  }
+]
 
 const Pricing = () => {
+  const headingRef = useRef(null);
+  const isHeadingInView = useInView(headingRef, { once: true });
+  const cardRef = useRef(null);
+  const isInView = useInView(cardRef, { once: true });
+
   return (
-    <section id="pricing" className="body-font overflow-hidden ">
+    <section id="pricing" className="py-24">
+      <div className="container">
+        <motion.h2 
+          ref={headingRef}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isHeadingInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="section-title"
+        >
+          Pricing
+        </motion.h2>
 
-      {/* Text */}
-      <div className="container border-blue-400 px-5 py-24 mx-auto">
-        <div className="flex flex-col text-center w-full mb-10">
-          <h1 className="sm:text-4xl text-3xl font-bold font-raleway title-font mb-2 text-accent">Pricing</h1>
-          <p className="lg:w-2/3 mx-auto font-sans font-medium leading-relaxed text-base text-accent">Manage all your social medias in one place.</p>
-        </div>
+        <motion.p 
+          ref={headingRef}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isHeadingInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="section-description"
+        >
+          Free forever. Upgrade for exclusive features.
+        </motion.p>
 
-        {/* Pricing Boxes */}
-        <div className="flex flex-wrap -m-4 justify-center">
-          
-          {/* First Box */}
-          <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-            <div className="h-full p-6 rounded-xl border-2 border-accent flex flex-col relative overflow-hidden bg-primary shadow-lg">
-              <h2 className="text-sm tracking-widest title-font mb-1 font-mono font-medium">BASIC</h2>
-              <h1 className="text-5xl text-accent pb-4 mb-4 border-b border-accent leading-none">Free</h1>
-              <p className="flex items-center mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Cross-platform Posting
-              </p>
-              <p className="flex items-center mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Analysis Dashboard
-              </p>
-              <p className="flex items-center mb-6">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Mixtape chillwave tumeric
-              </p>
-              <button className="flex items-center mt-auto text-white bg-accent border-0 py-2 px-4 w-full focus:outline-none hover:bg-blue-900 rounded">Learn More
-                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
-              </button>
-              
-            </div>
-          </div>
+        <motion.div
+          ref={cardRef}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col gap-6 items-center mt-10 lg:flex-row lg:items-end lg:justify-center"
+        >
+          {pricingTiers.map(({ title, monthlyPrice, buttonText, inverse, features }) => (
+            <motion.div
+              key={title}
+              className={twMerge(
+                "card",
+                inverse && 'border-accent bg-accent text-white'
+              )}
+              whileHover={{ 
+                scale: 1.03, 
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)' 
+              }}
+              transition={{ 
+                type: 'tween', 
+                duration: 0.3 
+              }}
+            >
+              <h3 className={twMerge(
+                "text-lg font-bold text-accent",
+                inverse && 'text-white'
+              )}>
+                {title}
+              </h3>
+              <div className="flex items-baseline gap-1 mt-[30px]">
+                <span className="text-4xl font-bold tracking-tighter leading-none">
+                  ${monthlyPrice}
+                </span>
+                <span className={twMerge(
+                  'tracking-light font-bold text-black/50',
+                  inverse && 'text-white/50'
+                )}>
+                  SGD/month
+                </span>
+              </div>
 
-          {/* Second Box */}
-          <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-            <div className="h-full p-6 rounded-xl border-2 border-yellow-300 flex flex-col relative overflow-hidden bg-primary shadow-lg">
-              <span className="bg-yellow-300 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl">POPULAR</span>
-              <h2 className="text-sm tracking-widest title-font mb-1 font-mono font-medium">PREMIUM</h2>
-              <h1 className="text-5xl text-accent-900 leading-none flex items-center pb-4 mb-4 border-b border-accent">
-                <span>$38</span>
-                <span className="text-lg ml-1 font-normal text-accent-500">/mo</span>
-              </h1>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Vexillologist pitchfork
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Tumeric plaid portland
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Hexagon neutra unicorn
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-6">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Mixtape chillwave tumeric
-              </p>
-
-              <button className="flex items-center mt-auto text-white bg-yellow-300 border-0 py-2 px-4 w-full focus:outline-none hover:bg-yellow-500 rounded">Learn More
-                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
+              <button className={twMerge(
+                "text-white bg-accent hover:bg-blue-800 font-bold font-raleway rounded-lg text-sm w-full py-2.5 me-2 mb-2 mt-[30px]",
+                inverse && 'text-accent bg-white hover:bg-gray-400'
+              )}>
+                {buttonText}
               </button>
 
-            </div>
-          </div>
+              <ul className="flex flex-col gap-5 mt-8">
+                {features.map(feature => (
+                  <li key={feature} className="text-sm flex items-center gap-4">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      fill="none" viewBox="0 0 24 24" 
+                      strokeWidth="1.5" stroke="currentColor" 
+                      className="size-6"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="m4.5 12.75 6 6 9-13.5" 
+                      />
+                    </svg>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </motion.div>
 
-          {/* Third Box */}
-          <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-            <div className="h-full p-6 rounded-xl border-2 border-accent flex flex-col relative overflow-hidden bg-primary shadow-lg">
-              <h2 className="text-sm tracking-widest title-font mb-1 font-mono font-medium">BUSINESS</h2>
-              <h1 className="text-5xl text-accent-900 leading-none flex items-center pb-4 mb-4 border-b border-accent">
-                <span>$56</span>
-                <span className="text-lg ml-1 font-normal text-accent-500">/mo</span>
-              </h1>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Vexillologist pitchfork
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Tumeric plaid portland
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-2">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Hexagon neutra unicorn
-              </p>
-
-              <p className="flex items-center text-accent-600 mb-6">
-                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-green text-cgreen rounded-full flex-shrink-0">
-                  <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
-                </span>Mixtape chillwave tumeric
-              </p>
-
-              <button className="flex items-center mt-auto text-white bg-accent border-0 py-2 px-4 w-full focus:outline-none hover:bg-blue-900 rounded">Learn More
-                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default Pricing;

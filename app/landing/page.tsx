@@ -3,6 +3,10 @@ import Hero from "./hero";
 import Navbar from "./landing-navbar";
 import Pricing from "./pricing";
 import Features from "./features";
+import FAQs from "./FAQs";
+import FreeTrial from "./freetrial";
+import Testimonials from "./testimonials";
+
 
 export default function LoginPage() {  
   return (
@@ -19,6 +23,16 @@ export default function LoginPage() {
 
       {/* Pricing */}
       <Pricing />
+
+      {/* Testimonials */}
+      <Testimonials />
+
+      {/* FAQ */}
+      <FAQs />
+
+      {/* Free Trial */}
+      <FreeTrial />
+
 
     </div>
   );

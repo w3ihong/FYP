@@ -1,20 +1,18 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import ChangePayment from '@/components/change';
 import Link from 'next/link';
 import ChangeAddress from '@/components/changeAddress';
 import SuccessSubscription from '@/components/successSub';
-import { billingDetails } from '@/app/actions';
-import { planType } from '@/app/actions';
-import { downgradeSubscription } from '@/app/actions';
+import { billingDetails, planType, downgradeSubscription } from '@/app/actions';
 
 const CheckmarkIcon = () => (
-  <svg className="h-5 w-5 text-cyan-950 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className="h-5 w-5 text-cyan-950 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
   </svg>
 );
 
-// to match with the plan type/user_type    
 const planCosts = {
   premium: '$39/month',
   basic: 'Free'
@@ -24,7 +22,7 @@ const Billing = () => {
   const [billingDetailsState, setBillingDetailsState] = useState({
     full_name: '',
     planType: '',
-    billingCycle: '12 march', // set to the 1st day of the coming month
+    billingCycle: '12 March', // set to the 1st day of the coming month
     planCost: '',
     credit_card_no: '',
     credit_card_expiry: '',
@@ -63,21 +61,20 @@ const Billing = () => {
     }
 
     fetchBillingDetails();
-    fetchPlanType(); // Fetch the user type and set it in the state
+    fetchPlanType();
   }, []);
 
   const handleDowngrade = async () => {
     try {
-      await downgradeSubscription('premium'); // Downgrade the subscription to premium
+      await downgradeSubscription('basic');
       setBillingDetailsState(prevState => ({
         ...prevState,
-        planType: 'Premium',
-        planCost: planCosts.premium
+        planType: 'basic',
+        planCost: planCosts.basic
       }));
-      setIsSuccessModalOpen(true); // Open the success modal
+      setIsSuccessModalOpen(true);
     } catch (error) {
       console.error('Error downgrading subscription:', error);
-      // Optionally, handle errors or display error messages
     }
   };
 
@@ -89,56 +86,79 @@ const Billing = () => {
     });
   };
 
+  // Mask the card number
+  const maskCardNumber = (cardNumber: string) => {
+    const cardStr = String(cardNumber);
+    return cardStr.slice(0, -4).replace(/\d/g, '*') + cardStr.slice(-4);
+  };
+
+  const renderPlanDetails = () => (
+    <div className="flex flex-col space-y-3 justify-center pl-20">
+      <div className="flex items-center">
+        <CheckmarkIcon />
+        <span>In-depth Visual Insights</span>
+      </div>
+      <div className="flex items-center">
+        <CheckmarkIcon />
+        <span>Competitive Analysis</span>
+      </div>
+      <div className="flex items-center">
+        <CheckmarkIcon />
+        <span>Sentiment Analysis</span>
+      </div>
+      <div className="flex items-center">
+        <CheckmarkIcon />
+        <span>Trend Indicator</span>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-raleway">
       <main className="flex-grow container mx-auto px-5 py-24">
-        <section className="text-gray-600 body-font">
-          <div className="container mx-auto flex flex-col items-center">
+        <section className="body-font">
+          <div className="container mx-auto flex flex-col items-start px-20">
+            <h1 className="w-full mb-1 text-4xl font-bold text-left lg:w-4/5">Billing</h1>
+            <p className="w-full mb-6 font-bold text-left lg:w-4/5">Manage your billing and payment details</p>
             {!isChangingPayment && !isChangingAddress ? (
               <>
                 {/* Current Plan Summary */}
-                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full lg:w-4/5">
-                  <h2 className="bg-gray-100 rounded p-2 text-2xl font-semibold mb-4 text-accent">Current Plan Summary</h2>
-                  <div className="grid grid-cols-3 gap-0">
-                    <div className="flex-1">
-                      <label htmlFor="planType" className="text-xs">
-                        PLAN TYPE:
-                      </label>
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full">
+                  <h2 className="rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Current Plan Summary</h2>
+                  <div className="flex justify-center items-center space-x-4 text-center">
+                    <div className="flex flex-col items-center">
+                      <label htmlFor="planType" className="text-xs font-semibold">PLAN TYPE:</label>
                       <input
                         type="text"
                         id="planType"
                         name="planType"
                         value={billingDetailsState.planType}
                         onChange={handleInputChange}
-                        className="border-none font-bold"
+                        className="border-none font-bold text-center"
                         readOnly
                       />
                     </div>
-                    <div className="flex-1">
-                      <label htmlFor="billingCycle" className="text-xs">
-                        BILLING CYCLE:
-                      </label>
+                    <div className="flex flex-col items-center">
+                      <label htmlFor="billingCycle" className="text-xs font-semibold">BILLING CYCLE:</label>
                       <input
                         type="text"
                         id="billingCycle"
                         name="billingCycle"
                         value={billingDetailsState.billingCycle}
                         onChange={handleInputChange}
-                        className="border-none font-bold"
+                        className="border-none font-bold text-center"
                         readOnly
                       />
                     </div>
-                    <div className="flex-1">
-                      <label htmlFor="planCost" className="text-xs">
-                        PLAN COST:
-                      </label>
+                    <div className="flex flex-col items-center">
+                      <label htmlFor="planCost" className="text-xs font-semibold">PLAN COST:</label>
                       <input
                         type="text"
                         id="planCost"
                         name="planCost"
                         value={billingDetailsState.planCost}
                         onChange={handleInputChange}
-                        className="border-0 font-bold"
+                        className="border-none font-bold text-center"
                         readOnly
                       />
                     </div>
@@ -146,8 +166,8 @@ const Billing = () => {
                 </div>
 
                 {/* Payment Method */}
-                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full lg:w-4/5">
-                  <h2 className="bg-gray-100 rounded p-2 text-2xl font-semibold mb-4 text-accent">Payment Method</h2>
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full">
+                  <h2 className="rounded p-2 text-2xl font-semibold mb-4 text-cyan-950 text-left">Payment Method</h2>
                   <div className="border px-6 py-6 flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <div className="mr-4">
@@ -155,7 +175,7 @@ const Billing = () => {
                       </div>
                       <div>
                         <p className="font-semibold">Master Card</p>
-                        <p>{billingDetailsState.credit_card_no}</p>
+                        <p>{maskCardNumber(billingDetailsState.credit_card_no)}</p>
                         <p>{billingDetailsState.full_name}</p>
                         <p>Billing Address</p>
                         <p>{billingDetailsState.unit}, {billingDetailsState.street}, {billingDetailsState.postalcode}</p>
@@ -163,94 +183,62 @@ const Billing = () => {
                     </div>
                     <div className="flex flex-col">
                       <button
-                        className="bg-cyan-950 text-white px-6 py-1 text-xs rounded hover:bg-cyan-900 mb-2"
+                        className="bg-cyan-950 text-white px-6 py-1 text-s rounded hover:bg-cyan-900 mb-2"
                         onClick={() => setIsChangingPayment(true)}
                       >
-                        Change Payment
+                        {billingDetailsState.credit_card_no ? 'Change Payment' : 'Add Payment Method'}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Upgrade or Downgrade Plan */}
-                {billingDetailsState.planType.toLowerCase() !== 'business' ? (
-                  <div className="bg-white p-8 rounded-lg shadow-lg w-full lg:w-4/5">
-                    <div className='border px-3 py-3'>
-                      {/* outer border */}
-                      <h2 className="text-2xl font-semibold mb-4 text-accent">Upgrade Your Plan</h2>
-                      <div className="flex items-center justify-between ">
-                        <div className="space-x-40 flex items-center">
+                <div className="bg-white p-8 rounded-lg shadow-lg mb-6 w-full">
+                  {billingDetailsState.planType.toLowerCase() !== 'premium' ? (
+                    <div className='border px-6 py-6 flex flex-col items-center lg:items-start'>
+                      <h2 className="text-2xl font-semibold mb-4 text-cyan-950 text-left w-full">Upgrade Your Plan</h2>
+                      <div className="flex flex-col lg:flex-row justify-between items-center w-full">
+                        <div className="flex items-center">
                           <div className="mr-4">
-                            <p className="bg-gray-100 px-9 py-9 text-2xl font-semibold">Business Plan</p>
+                            <p className="px-8 py-10 text-2xl font-semibold">Premium Plan</p>
                           </div>
-                          <div>
-                            <ul className="border px-4 py-4">
-                              <li className="flex items-center">
-                                <CheckmarkIcon />
-                                <span>Includes 2 additional members</span>
-                              </li>
-                              <li className="flex items-center">
-                                <CheckmarkIcon />
-                                <span>Network Visualization</span>
-                              </li>
-                              <li className="flex items-center">
-                                <CheckmarkIcon />
-                                <span>Custom Workflow</span>
-                              </li>
-                            </ul>
+                          <div className=''>
+                            {renderPlanDetails()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-semibold">$99/month</p>
-                          <p className="text-xs text-bg-gray-100">*Additional member at $30/month</p>
+                          <p className="text-2xl font-semibold">$39/month</p>
                           <Link href="/settings/billing/upgrade" passHref>
                             <button className="bg-cyan-950 text-white px-6 py-1 rounded hover:bg-cyan-900 mt-2">Upgrade</button>
                           </Link>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="bg-white p-8 rounded-lg shadow-lg w-full lg:w-4/5">
-                    <div className='border px-3 py-3'>
-                      {/* outer border */}
-                      <h2 className="text-2xl font-semibold mb-4 text-accent">You are on the Business Plan</h2>
-                      <div className="flex items-center justify-between ">
-                        <div className="space-x-40 flex items-center">
+                  ) : (
+                    <div className='border px-6 py-6 flex flex-col items-center lg:items-start'>
+                      <h2 className="text-2xl font-semibold mb-4 text-cyan-950 text-left w-full">You are on the Premium Plan</h2>
+                      <div className="flex flex-col lg:flex-row justify-between items-center w-full">
+                        <div className="flex items-center">
                           <div className="mr-4">
-                            <p className="bg-gray-100 px-9 py-9 text-2xl font-semibold">Business Plan</p>
+                            <p className="px-8 py-10 text-2xl font-semibold">Premium Plan</p>
                           </div>
-                          <div>
-                            <ul className="border px-4 py-4">
-                              <li className="flex items-center">
-                                <CheckmarkIcon />
-                                <span>Includes 2 additional members</span>
-                              </li>
-                              <li className="flex items-center">
-                                <CheckmarkIcon />
-                                <span>Network Visualization</span>
-                              </li>
-                              <li className="flex items-center">
-                                <CheckmarkIcon />
-                                <span>Custom Workflow</span>
-                              </li>
-                            </ul>
+                          <div className=''>
+                            {renderPlanDetails()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-semibold">$99/month</p>
-                          <p className="text-xs text-bg-gray-100">*Additional member at $30/month</p>
+                          <p className="text-2xl font-semibold">$39/month</p>
                           <button
-                            className="bg-red-500 text-white px-6 py-1 rounded hover:bg-red-600 mt-2"
+                            className="bg-red-700 text-white px-6 py-1 rounded-2xl hover:bg-red-600 mt-2"
                             onClick={handleDowngrade}
                           >
-                            Downgrade to Premium
+                            Downgrade
                           </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </>
             ) : isChangingPayment ? (
               <ChangePayment
