@@ -986,7 +986,7 @@ export async function fetchReports()
   try {
     const { data, error } = await supabase
       .from('reports_on_user') // Replace 'users' with your actual table name
-      .select('reason , reporter_id , reportee_id  ');
+      .select('reason , reporter_id , reportee_id , name , email , subject , message , report_id , case_number ');
       
 
     if (error) {
@@ -1641,6 +1641,53 @@ export const toggleBlurEffect = async () => {
   }
 };
 
+const generateRandom = () => {
+  const randomNumber = Math.floor(100000000 + Math.random() * 900000000); // Generates a 9-digit number
+  return `${randomNumber}`;
+};
+
+export async function submitReport(formData: FormData): Promise<string> {
+  const supabase = createClient();
+  const random = generateRandom();
+
+  // Fetch the current highest report_id
+  const { data: highestReportIdData, error: fetchError } = await supabase
+    .from('reports_on_user')
+    .select('report_id')
+    .order('report_id', { ascending: false }) // Change to descending order to get the highest ID
+    .limit(1)
+    .single();
+
+  if (fetchError) {
+    console.error('Error fetching the highest report_id:', fetchError.message);
+    throw new Error('Failed to fetch current report ID. Please try again later.');
+  }
+
+  // Determine the new report_id
+  const currentMaxReportId = highestReportIdData?.report_id || 0;
+  const newReportId = currentMaxReportId + 1;
+
+  const data = {
+    report_id: newReportId,
+    case_number: random, 
+    name: formData.get('name') as string,
+    email: formData.get('email') as string,
+    subject: formData.get('subject') as string,
+    message: formData.get('message') as string,
+  };
+
+  const { error: insertError } = await supabase
+    .from('reports_on_user')
+    .insert([data]);
+
+  if (insertError) {
+    console.error('Error inserting support message:', insertError.message);
+    throw new Error('Failed to submit your message. Please try again later.');
+  }
+
+  console.log('Support message submitted successfully');
+  return "#" + random; // Return the new report ID
+}
 
 
 
