@@ -1641,23 +1641,56 @@ export const toggleBlurEffect = async () => {
   }
 };
 
-export const getAccounts = async (userId: string) => {
+
+type PlatformAccount = {
+  platform_account_id: number;
+  account_username: string;
+  platform: string;
+  profile_picture_url: string;
+};
+export const getAccounts = async (userId: string): Promise<PlatformAccount[]> => {
   const supabase = createClient();
   try {
     const { data, error } = await supabase
       .from('platform_account')
-      .select('*')
+      .select('platform_account_id, account_username, platform, profile_picture_url')
       .eq('user_id', userId);
 
     if (error) throw error;
 
-    return data || [];
+    // Type cast each field in the data
+    const typedData = (data || []).map(item => ({
+      platform_account_id: Number(item.platform_account_id), // Cast to number
+      account_username: String(item.account_username), // Cast to string
+      platform: String(item.platform), // Cast to string
+      profile_picture_url: String(item.profile_picture_url), // Cast to string
+    }));
+
+    return typedData;
   } catch (error) {
     console.error('Error fetching accounts:', error);
     return [];
   }
 };
 
+export const getAccountMetrics = async (userId: number) => {
+  const supabase = createClient();
+  try {
+    const { data, error } = await supabase
+      .from('platform_metrics')
+      .select('*')
+      .eq('platform_account', userId);
+
+    console.log('Account metrics:', data);
+
+    if (error) throw error;
+
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching account metrics:', error);
+    return [];
+  }
+}
 
 
 

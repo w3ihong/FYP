@@ -84,10 +84,6 @@ create table
     constraint post_types_pkey primary key (post_type)
   ) tablespace pg_default;
 
--- needs work
-CREATE TABLE public.platform_followers_demographic_ (
-    
-  )
 
 CREATE TABLE public.platform_metrics (
     platform_metrics_id serial PRIMARY KEY, -- auto generated, you do not need to fill this column

@@ -67,17 +67,19 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
-      <nav className="flex flex-col justify-between h-full border-r shadow-sm">
+      <nav className="flex flex-col justify-between h-full shadow-sm">
         <div>
-          <div className="flex items-center justify-start p-3">
-            <Image src={logo} width={36} height={36} alt="Logo" priority/>
-            <span
-              className={`ml-3 text-white font-semibold overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out opacity-100
-              `}
-            >
-              EchoSphere
-            </span>
-          </div>
+          <Link href="/protected">
+            <div className="flex items-center justify-start p-3" >
+              <Image src={logo} width={36} height={36} alt="Logo" priority/>
+              <span
+                className={`ml-3 text-white font-semibold overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out opacity-100
+                `}
+              >
+                EchoSphere
+              </span>
+            </div>
+          </Link>
           <div className="flex flex-col px-3 overflow-y-auto">
             <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
             <SidebarItem icon={<Map size={20} />} text="Demographics" link="/protected/demographics"/>

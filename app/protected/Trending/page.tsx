@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { countryDictionary } from './countryDictionary';
 
-
 type Trend = {
     value: number;
     query: string;
@@ -278,6 +277,7 @@ const trends = () => {
             setKWLoading(false);
         }
     }
+
     const renderTrends = (trends: { [key: string]: Trend }, type :string) => (
         <div className='w-full'>
           <ul className='space-y-1'>
@@ -293,6 +293,7 @@ const trends = () => {
           </ul>
         </div>
     );
+
 
     return (
     <div className="w-full p-6 ">
