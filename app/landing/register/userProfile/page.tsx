@@ -16,7 +16,7 @@ const ProfileSetForm: React.FC = () => {
   });
   const [showModal, setShowModal] = useState(false);
 
-  const router = useRouter();  // Initialize the useRouter hook
+  const router = useRouter(); 
 
   useEffect(() => {
     // Fetch user profile data when component mounts
@@ -61,7 +61,7 @@ const ProfileSetForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-yellow-100 flex justify-center items-center font-raleway font-accent">
+    <div className="min-h-screen bg-gray-50 flex justify-center items-center font-raleway font-accent">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full">
         <div className='justify-center font-bold text-xl'>
           <h1>Fill in your details</h1>
