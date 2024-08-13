@@ -5,7 +5,6 @@ import { countryDictionary } from './countryDictionary';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { csv } from 'd3-fetch';
-import { useMap } from 'react-leaflet';
 
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -22,8 +21,7 @@ const Trends = () => {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [trends, setCountryTrends] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [mapCoordinates, setMapCoordinates] = useState<[number, number] | null>(null);
-    
+    const [mapCoordinates, setMapCoordinates] = useState(null);
 
     const handleCountryChange = (event) => {
         setSelectedCountry(event.target.value);
@@ -53,16 +51,6 @@ const Trends = () => {
             setMapCoordinates(null);
         }
     }, [selectedCountry]);
-
-    const MapCenterZoom = () => {
-        const map = useMap();
-        useEffect(() => {
-            if (mapCoordinates) {
-                map.setView(mapCoordinates, 5);
-            }
-        }, [map, mapCoordinates]);
-        return null;
-    };
     
     const mapPinIcon = new L.DivIcon({
         html: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -204,12 +192,9 @@ const Trends = () => {
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         />
                         {mapCoordinates && (
-                            <>
-                                <MapCenterZoom />
-                                <Marker position={mapCoordinates} icon={mapPinIcon}>
-                                    <Popup>{selectedCountry}</Popup>
-                                </Marker>
-                            </>
+                            <Marker position={mapCoordinates} icon={mapPinIcon}>
+                                <Popup>{selectedCountry}</Popup>
+                            </Marker>
                         )}
                     </MapContainer>
                 </div>
