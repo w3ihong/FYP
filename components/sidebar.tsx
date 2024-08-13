@@ -62,7 +62,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
   return (
     <aside
       className={`fixed top-0 left-0 bottom-0 h-full bg-accent transition-all duration-300 ease-in-out z-10 ${
-        expanded ? 'w-60' : 'w-16'
+        expanded ? 'w-[13rem]' : 'w-16'
       }`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
@@ -81,12 +81,11 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
             </div>
           </Link>
           <div className="flex flex-col px-3 overflow-y-auto">
-            <SidebarItem icon={<BarChart3 size={20} />} text="Analysis Dashboard" link="/protected/analytics" />
-            <SidebarItem icon={<Map size={20} />} text="Demographics" link="/protected/demographics"/>
-            <SidebarItem icon={<TrendingUp size={20} />} text="Sentiment Analysis" link="/protected/Sentiment" />
-            <SidebarItem icon={<LineChart size={20} />} text="Trending Topics" link="/protected/Trending" />
-            <SidebarItem icon={<PieChart size={20} />} text="Comparative Analysis" link="/protected/comparative" />
             <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
+            <SidebarItem icon={<BarChart3 size={20} />} text="Analytics" link="/protected/Sentiment" />
+            <SidebarItem icon={<Map size={20} />} text="Demographics" link="/protected/demographics"/>
+            <SidebarItem icon={<LineChart size={20} />} text="Trends " link="/protected/Trending" />
+            <SidebarItem icon={<PieChart size={20} />} text="Comparative " link="/protected/comparative" />
             <div className='my-4' /> 
           </div>
         </div>

@@ -122,7 +122,7 @@ export default function Index() {
           </div>
           
           {/* Display Posts */}
-          <div className="bg-white p-4 rounded-lg shadow-md mt-4 px-6">
+          <div className="bg-white p-6 pt-4 rounded-lg shadow-md mt-4 ">
 
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-accent">Performance</h2>
@@ -144,58 +144,62 @@ export default function Index() {
             
             <div className="w-full gap-4 mt-4">
               {hasAccount ? (
-                <div className="grid grid-cols-1  md:grid-cols-3 gap-4">
-                  <div className="col-span-3 ">
-                    <TotalStatsCard
-                    followers={platform_followers}
-                    likes={platform_likes}
-                    shares={platform_shares}
-                    comments={platform_comments}
-                    saved={platform_saves}
-                    />
-                  </div>
+                selectedAccountId ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="col-span-3">
+                      <TotalStatsCard
+                        followers={platform_followers}
+                        likes={platform_likes}
+                        shares={platform_shares}
+                        comments={platform_comments}
+                        saved={platform_saves}
+                      />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Total Post Views" metricData={viewsData} dates={dates} color="rgba(75, 192, 192, 1)" />
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Total Post Views" metricData={viewsData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Follower Count" metricData={followersData} dates={dates} color="rgba(153, 102, 255, 1)"/>
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Follower Count" metricData={followersData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1  ">
-                    <LineChart metricName="Total Likes" metricData={likesData} dates={dates} color="rgba(255, 159, 64, 1)" />
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Total Likes" metricData={likesData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Total Shares" metricData={sharesData} dates={dates} color="rgba(54, 162, 235, 1)"/>
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Total Shares" metricData={sharesData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Total Impressions" metricData={impressionData} dates={dates} color='rgba(75, 192, 192, 0.6)'/>
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Total Impressions" metricData={impressionData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Average Virality Rate" metricData={viralityData} dates={dates} color='rgba(255, 206, 86, 0.6)' />
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Average Virality Rate" metricData={viralityData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Average Sentiment" metricData={sentimentData} dates={dates} color="rgba(75, 192, 192, 1)" />
-                  </div>
+                    <div className="col-span-1">
+                      <LineChart metricName="Average Sentiment" metricData={sentimentData} dates={dates} />
+                    </div>
 
-                  <div className="col-span-1 ">
-                    <LineChart metricName="Average Engagement Rate" metricData={engagementData} dates={dates} color="rgba(255, 159, 64, 1)" />
+                    <div className="col-span-1">
+                      <LineChart metricName="Average Engagement Rate" metricData={engagementData} dates={dates} />
+                    </div>
                   </div>
-
-                </div>
-                
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-80 w-full">
+                    <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                    <p className="text-lg font-bold text-center text-gray-600">Select an account to view performace metrics.</p>
+                  </div>
+                )
               ) : (
-                <div className="flex flex-col items-center justify-center h-80 w-full ">
+                <div className="flex flex-col items-center justify-center h-80 w-full">
                   <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
-                  <p className="text-lg font-bold justify-center text-center text-gray-600">Connect to an account first.</p>
+                  <p className="text-lg font-bold text-center text-gray-600">Connect to an account first.</p>
                 </div>
               )}
-
             </div>
           </div>
         </motion.div>
