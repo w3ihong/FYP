@@ -205,7 +205,7 @@ const Trends = () => {
                         />
                         {mapCoordinates && (
                             <>
-                                <MapCenterZoom /> 
+                                <MapCenterZoom />
                                 <Marker position={mapCoordinates} icon={mapPinIcon}>
                                     <Popup>{selectedCountry}</Popup>
                                 </Marker>
