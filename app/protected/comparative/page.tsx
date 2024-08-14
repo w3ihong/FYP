@@ -185,13 +185,13 @@ export default function ComparePosts() {
   const [bestTimes, setBestTimes] = useState<{ hour: number, averageEngagement: number, averageComments: number, averageLikes: number, averageReach: number }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
-  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false); // Ensure the type is boolean
+  const [isPremiumUser, setIsPremiumUser] = useState<string | null>(null); // Ensure the type is boolean
 
   useEffect(() => {
     // Example logic for setting premium status
     async function fetchPlanType() {
       try {
-        const type = await planType(); // Assuming planType is a function that returns the type
+        const type = await  planType(); // Assuming planType is a function that returns the type
         setIsPremiumUser(type);
       } catch (error) {
         console.error("Error fetching plan type:", error);

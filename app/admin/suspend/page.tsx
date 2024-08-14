@@ -115,7 +115,7 @@ export default function AdminSuspend() {
   console.log("Suspended Users:", suspendedUsers);
 
   return (
-    <main className="flex-1 max-w-full p-8">
+    <main className="bg-gray-50 flex-1 max-w-full p-8 ">
       <h1 className="text-3xl font-extrabold text-gray-800 mb-8">Suspended Users</h1>
       <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-6 max-h-[80vh] overflow-auto">
         <div className="mb-6">
