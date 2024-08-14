@@ -235,59 +235,66 @@ const Dashboard = () => {
         <div className="">
           {hasAccount ? (
             selectedAccountId ? (
-              <div className="grid grid-cols-4 gap-4">
-                {posts.map(post => {
-                  const caption = `${post.caption}`;
-                  const formattedDate = formatDate(post.created_at);
-                  const sentimentIcon = getSentimentIcon(post.post_metrics?.[post.post_metrics.length - 1]?.post_sentiment);
+              posts.length > 0 ? (
+                <div className="grid grid-cols-4 gap-4">
+                  {posts.map(post => {
+                    const caption = `${post.caption}`;
+                    const formattedDate = formatDate(post.created_at);
+                    const sentimentIcon = getSentimentIcon(post.post_metrics?.[post.post_metrics.length - 1]?.post_sentiment);
 
-                  return (
-                    <div key={post.id} className="border p-4 rounded bg-white hover:scale-105 transition-transform duration-300 shadow" 
-                        onClick={() =>{openModal(); setPostMetrics(post.post_metrics); setSelectedPost(post)}}>
-                      
-                      <div className="h-[14rem] w-full bg-white mb-4 rounded overflow-hidden">
-                        {post.post_type === 'VIDEO' ? (
-                          <video className="w-full h-full object-cover" controls>
-                            <source src={post.media_url} type="video/mp4" />
-                          </video>
-                        ) : (
-                          <img src={post.media_url} alt={post.caption} className="w-full h-full object-cover" />
-                        )}
-                      </div>
-                      
-                      <p className="h-[10rem] overflow-auto mb-4">{caption}</p>
-                      <p className="text-gray-600">
-                        Sentiment: {sentimentIcon}
-                      </p>
-                      <p className="text-gray-600">Date posted: {formattedDate}</p>
-                      <div className='flex justify-between mt-2'>
-                        <p className="text-gray-600 gap-2 flex">
-                          <span className="">
-                            <FontAwesomeIcon icon={faHeart} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_likes}
-                          </span>
-                          <span>
-                            <FontAwesomeIcon icon={faBookmark} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_saved}
-                          </span>
-                          <span>
-                            <FontAwesomeIcon icon={faComment} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_comments}
-                          </span>
-                          <span>
-                            <FontAwesomeIcon icon={faShare} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_shares}
-                          </span>
+                    return (
+                      <div key={post.id} className="border p-4 rounded bg-white hover:scale-105 transition-transform duration-300 shadow" 
+                          onClick={() =>{openModal(); setPostMetrics(post.post_metrics); setSelectedPost(post)}}>
+                        
+                        <div className="h-[14rem] w-full bg-white mb-4 rounded overflow-hidden">
+                          {post.post_type === 'VIDEO' ? (
+                            <video className="w-full h-full object-cover" controls>
+                              <source src={post.media_url} type="video/mp4" />
+                            </video>
+                          ) : (
+                            <img src={post.media_url} alt={post.caption} className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                        
+                        <p className="h-[10rem] overflow-auto mb-4">{caption}</p>
+                        <p className="text-gray-600">
+                          Sentiment: {sentimentIcon}
                         </p>
-                        <Link href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
-                          <FontAwesomeIcon icon={faExternalLink}/>
-                        </Link>
+                        <p className="text-gray-600">Date posted: {formattedDate}</p>
+                        <div className='flex justify-between mt-2'>
+                          <p className="text-gray-600 gap-2 flex">
+                            <span className="">
+                              <FontAwesomeIcon icon={faHeart} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_likes}
+                            </span>
+                            <span>
+                              <FontAwesomeIcon icon={faBookmark} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_saved}
+                            </span>
+                            <span>
+                              <FontAwesomeIcon icon={faComment} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_comments}
+                            </span>
+                            <span>
+                              <FontAwesomeIcon icon={faShare} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_shares}
+                            </span>
+                          </p>
+                          <Link href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
+                            <FontAwesomeIcon icon={faExternalLink}/>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-80 w-full">
+                    <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                    <p className="text-lg font-bold text-center text-gray-600">No posts found.</p>
+                  </div>
+                )
               ) : (
                 <div className="flex flex-col items-center justify-center h-80 w-full">
-                <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
-                <p className="text-lg font-bold text-center text-gray-600">Select an account to view performace metrics.</p>
-              </div>
+                  <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                  <p className="text-lg font-bold text-center text-gray-600">Select an account to view performace metrics.</p>
+                </div>
             )
           ) : (
             <div className="flex flex-col items-center justify-center h-80 w-full">

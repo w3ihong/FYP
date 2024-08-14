@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import VoiceflowChat from '@/components/chatbot'; // Import the VoiceflowChat component
+
 
 const Hero: React.FC = () => {
   return (
@@ -47,10 +47,6 @@ const Hero: React.FC = () => {
           />
         </div>
       </div>
-
-      {/* Add VoiceflowChat component here */}
-      <VoiceflowChat />
-
     </motion.section>
   );
 };
