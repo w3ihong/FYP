@@ -117,7 +117,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-4 gap-4">
           {posts.map(post => {
             const sentimentEmoji = post.post_metrics?.[0]?.sentiment_emoji || '';
-            const captionWithEmoji = `${post.caption} ${sentimentEmoji}`;
+            const captionWithEmoji = `${post.caption} `;
 
             return (
               <div key={post.id} className="border p-4 rounded">
