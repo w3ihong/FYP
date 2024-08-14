@@ -15,7 +15,7 @@ const MapUpdater = ({ mapCoordinates }: { mapCoordinates: [number, number] | nul
 
     useEffect(() => {
         if (map && mapCoordinates) {
-            map.setView(mapCoordinates, map.getZoom());
+            map.setView(mapCoordinates, 6); 
         }
     }, [map, mapCoordinates]);
 
@@ -36,7 +36,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ mapCoordinates, selectedCou
     });
 
     return (
-        <MapContainer center={mapCoordinates || [0, 0]} zoom={2} minZoom={2} maxZoom={6} scrollWheelZoom={true} maxBounds={[[-90, -180], [90, 180]]} maxBoundsViscosity={1.0} style={{ height: '100%', width: '100%' }}>
+        <MapContainer center={mapCoordinates || [0, 0]} zoom={2} minZoom={2} maxZoom={18} scrollWheelZoom={true} maxBounds={[[-90, -180], [90, 180]]} maxBoundsViscosity={1.0} style={{ height: '100%', width: '100%' }}>
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
