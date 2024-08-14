@@ -74,7 +74,7 @@ const Demographics = () => {
             setPlatformAccountId(data[0].platform_account_id);
             setAccountNames(data.map(account => account.account_username));
             setSelectedAccount(data[0].account_username);
-            console.log('Selected platform account ID:', data[0].platform_account_id);  // Log selected platform account ID
+            console.log('Selected platform account ID:', data[0].platform_account_id);  
           } else {
             setError('No platform accounts found');
           }
@@ -95,7 +95,7 @@ const Demographics = () => {
         } else {
           demographicsData = await getDemographicsData(platformAccountId, viewType, timeframe);
         }
-        console.log('Fetched demographics data:', demographicsData);  // Log fetched demographics data
+        console.log('Fetched demographics data:', demographicsData); 
   
         if (demographicsData.error) {
           setError(demographicsData.error);
