@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import VoiceflowChat from '@/components/chatbot'; // Import the VoiceflowChat component
 
 const Hero: React.FC = () => {
   return (
@@ -23,15 +24,18 @@ const Hero: React.FC = () => {
             EchoSphere empowers you to cultivate your audience organically. As a values-centric company, we offer budget-friendly, user-friendly marketing solutions tailored for driven individuals and teams.
           </p>
           <div className="flex justify-center">
-
             {/* Get Started Button */}
             <Link href='/landing/register'>
-            <button type="button" className="text-white bg-accent hover:bg-blue-800 font-bold font-raleway rounded-lg text-sm px-8 py-2.5 me-2 mb-2">Get Started</button>
+              <button type="button" className="text-white bg-accent hover:bg-blue-800 font-bold font-raleway rounded-lg text-sm px-8 py-2.5 me-2 mb-2">
+                Get Started
+              </button>
             </Link>
 
             {/* Log in Button */}
             <Link href='/landing/login'>
-            <button type="button" className="text-accent bg-white border border-accent hover:bg-gray-100 font-bold font-raleway rounded-lg text-sm px-10 py-2.5 me-2 mb-2">Log In</button>
+              <button type="button" className="text-accent bg-white border border-accent hover:bg-gray-100 font-bold font-raleway rounded-lg text-sm px-10 py-2.5 me-2 mb-2">
+                Log In
+              </button>
             </Link>
           </div>
         </div>
@@ -43,6 +47,10 @@ const Hero: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Add VoiceflowChat component here */}
+      <VoiceflowChat />
+
     </motion.section>
   );
 };

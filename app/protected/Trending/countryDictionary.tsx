@@ -13,7 +13,6 @@ export const countryDictionary = {
   "South Korea": { sc: "south_korea", abbv: "KR" },
   "Mexico": { sc: "mexico", abbv: "MX" },
   "Italy": { sc: "italy", abbv: "IT" },
-  "Spain": { sc: "spain", abbv: "ES" },
   "South Africa": { sc: "south_africa", abbv: "ZA" },
   "Netherlands": { sc: "netherlands", abbv: "NL" },
   "Sweden": { sc: "sweden", abbv: "SE" },
