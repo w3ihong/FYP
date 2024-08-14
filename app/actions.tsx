@@ -1293,9 +1293,6 @@ export const getPostsMetrics = async (
     return [];
   }
 
-  console.log('Posts:', postsList);
-  console.log('metrics:', postsList[0].post_metrics[0]);
-  console.log('last Metrics:', postsList[0].post_metrics[postsList[0].post_metrics.length - 1]);
   return postsList;
 };
 

@@ -1,3 +1,4 @@
+"use client"
 import { useEffect } from 'react';
 
 const VoiceflowChat = () => {
@@ -14,6 +15,12 @@ const VoiceflowChat = () => {
         });
       };
       document.body.appendChild(script);
+
+      // Cleanup function to remove the script when the component unmounts
+      return () => {
+        document.body.removeChild(script);
+        delete (window as any).voiceflow;  // Optional: clean up the global object if necessary
+      };
     };
 
     loadVoiceflowChat();
