@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { countryDictionary } from './countryDictionary';
 import { useEffect } from 'react';
+import { planType } from '@/app/actions';
 
 type Trend = {
     value: number;
@@ -42,6 +43,7 @@ const trends = () => {
     const [KWloading, setKWLoading] = useState(false);
     const [keyword, setKeyword] = useState('');
     const [KWError, setKWError] = useState(null);
+    const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
   
     const handleKWCountryChange = (event) => {
         setSelectedKWCountry(event.target.value);
@@ -55,6 +57,16 @@ const trends = () => {
     const handleKWChange = (event) => {
         setKeyword(event.target.value);
     }
+
+    useEffect(() => {
+        const checkPlanType = async () => {
+          const type = await planType();
+          console.log('Plan Type:', type);
+          setUserPlanType(type);
+        };
+        
+        checkPlanType();
+      }, []);
 
     const handleKeywordSubmit = async (event) => {
         event.preventDefault();
@@ -147,7 +159,8 @@ const trends = () => {
             </div>
         </div>
         {/* Search trends */}
-        <div className='bg-white rounded-md shadow p-5 w-full h-[40rem] flex-col'>
+        <div className={`bg-white rounded-md shadow p-6 w-full h-[40rem] flex-col ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
+            
             <div className='w-full'>
                 <h1 className='text-xl font-bold '>Search a keyword</h1>
                 <p className='text-sm mb-4'>Hint: dont be too specific</p>
