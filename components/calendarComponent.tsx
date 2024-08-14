@@ -158,7 +158,7 @@ const CalendarComponent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 font-raleway">
+    <div className="min-h-screen font-raleway">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h1 className="font-bold text-3xl text-accent">Calendar</h1>

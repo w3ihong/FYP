@@ -14,9 +14,9 @@ const BigModalContainer: React.FC<ModalContainerProps> = ({ children, isOpen, on
 
   return (
     <ModalBackdrop onClick={onClose}>
-      <div className="relative bg-white rounded-lg shadow-md w-[800px] h-[600px] p-8" onClick={(e) => e.stopPropagation()}>
+      <div className="relative bg-white rounded-lg shadow-md w-[80rem] h-[40rem] p-8" onClick={(e) => e.stopPropagation()}>
         <button
-          className="absolute top-4 left-4 text-gray-600 hover:text-gray-900 text-2xl"
+          className="absolute top-4 left-4 text-gray-600 hover:text-gray-900 text-2xl bg-white rounded-full shadow-md "
           onClick={onClose}
           style={{ fontSize: '24px', padding: '8px' }}
         >
