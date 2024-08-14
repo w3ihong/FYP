@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { countryDictionary } from './countryDictionary';
-
+import { useEffect } from 'react';
 
 type Trend = {
     value: number;
@@ -19,7 +19,7 @@ const trends = () => {
     };
   
     const handleCountryTrendsSubmit = async (event) => {
-      event.preventDefault();
+      
       if (!selectedCountry) return;
   
       setLoading(true);
@@ -29,6 +29,10 @@ const trends = () => {
       setCountryTrends(data);
       setLoading(false);
     };
+
+    useEffect(() => {
+        handleCountryTrendsSubmit(selectedCountry); // Fetch data on page load
+    }, [selectedCountry]);
 
     const [selectedKWCountry, setSelectedKWCountry] = useState('');
     const [selectedTopic, setSelectedTopic] = useState('');
@@ -107,18 +111,16 @@ const trends = () => {
         <div className='flex justify-between space-x-8 mb-8'>
             <div className='bg-white rounded-md shadow w-1/3 p-4 flex-col h-[40rem] justify-start '>
 
-                <form onSubmit={handleCountryTrendsSubmit}>
+                <form >
                     <div className='flex items-center h-10 px-1 '>
                         <span className="text-lg font-bold mr-2">By Country :</span>
                         <select className='rounded-md' value={selectedCountry} onChange={handleCountryChange}>
-                            <option  value="">Select a country</option>
                             {Object.keys(countryDictionary).map((country) => (
                                 <option key={country} value={country}>
                                 {country}
                                 </option>
                             ))}
                         </select>
-                        <button className='ml-auto bg-accent text-white px-4 py-2 rounded shadow transition-transform duration-200 transform hover:-translate-y-1 hover:bg-blue-700 text-gray-699'type="submit">Search</button>
                     </div>
                 </form>
                 <div className='mt-4 h-8 bg-gray-100 rounded shadow flex items-center px-4'>

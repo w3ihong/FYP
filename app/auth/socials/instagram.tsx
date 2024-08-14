@@ -3,13 +3,13 @@ const display = 'page';
 const extras = '{"setup":{"channel":"IG_API_ONBOARDING"}}';
 
 //local host  URi
-const redirectUri = 'http://localhost:3000/auth/socials/callback/instagram'
+// const redirectUri = 'http://localhost:3000/auth/socials/callback/instagram'
 
 // master branch Url
 // const redirectUri = 'https://fyp-git-master-weih0ngs-projects.vercel.app/auth/socials/callback/instagram' // Replace with your redirect URI
 
 // production url
-// const redirectUri = 'https://fyp-flame.vercel.app/auth/socials/callback/instagram'
+const redirectUri = 'https://fyp-flame.vercel.app/auth/socials/callback/instagram'
 
 const scope = 'instagram_basic,instagram_content_publish,instagram_manage_comments,instagram_manage_insights,pages_show_list,pages_read_engagement,business_management'; // Replace with the required scopes
 const responseType = 'token';
