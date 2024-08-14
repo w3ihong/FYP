@@ -1288,7 +1288,10 @@ export const getPostsMetrics = async (
     console.error('Error fetching posts:', postsListError.message);
     return [];
   }
-
+  if (postsList.length === 0) {
+    console.error('No posts found');
+    return [];
+  }
 
   console.log('Posts:', postsList);
   console.log('metrics:', postsList[0].post_metrics[0]);
