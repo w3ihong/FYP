@@ -19,7 +19,7 @@ const VoiceflowChat = () => {
     loadVoiceflowChat();
   }, []);
 
-  return;
+  return null;
 };
 
 export default VoiceflowChat;

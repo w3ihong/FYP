@@ -6,6 +6,8 @@ import Features from "./features";
 import FAQs from "./FAQs";
 import FreeTrial from "./freetrial";
 import Testimonials from "./testimonials";
+import chatbot from '@/components/chatbot';
+
 
 
 export default function LoginPage() {  
@@ -32,6 +34,9 @@ export default function LoginPage() {
 
       {/* Free Trial */}
       <FreeTrial />
+
+     
+      
 
 
     </div>
