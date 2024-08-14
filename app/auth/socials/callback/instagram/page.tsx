@@ -30,7 +30,7 @@ export default async function InstagramConnectRedirect() {
           const success =  await addInstagramAccount(data.access_token)
 
           if (success) {
-            router.push('/protected');
+            router.push('/landing');
 
           } else {  
 
