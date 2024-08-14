@@ -1,71 +1,182 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import LineGraph from '@/components/lineGraph';
-import BarGraph from '@/components/barChart';
-import PieChart from '@/components/pieChart';
-import TotalStatsCard from '@/components/totalStatsCard';
-import { getPlatformMetricDatesTwo } from '@/app/actions'; // Import the updated method
+import { getPostsMetrics, getAccounts, fetchUserName} from '@/app/actions'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart ,faExternalLink, faFrown, faMeh, faSmile, faComment,faBookmark, faBook, faShare} from '@fortawesome/free-solid-svg-icons';
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import LineChart from '@/components/lineChart';
+import { planType } from '@/app/actions'; 
+import Modal from '@/components/bigModalContainer';
+import Link from 'next/link';
+
+type SortOrder = 'asc' | 'desc';
+
+interface PostMetrics {
+  post_id: string;
+  post_likes: number;
+  post_shares: number;
+  post_saved: number;
+  post_comments: number;
+  post_impressions: number;
+  post_reach: number;
+  post_profile_visits: number;
+  post_virality_rate: number;
+  post_amplification_rate: number;
+  post_engagement_rate: number;
+  post_sentiment: number;
+  date_retrieved: string;
+  post_video_views: number;
+}
+
+interface Post {
+  id: string;
+  created_at: string;
+  post_type: 'IMAGE' | 'VIDEO';
+  caption: string;
+  media_url: string;
+  permalink: string;
+  post_metrics?: PostMetrics[];
+}
 
 const Dashboard = () => {
-  const [metrics, setMetrics] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null); // State for selected account
-  const [accounts, setAccounts] = useState<{ id: string; name: string }[]>([]); // State for account options
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasAccount, setHasAccount] = useState(false);
+  const [accounts, setAccounts] = useState<{ id: number; account_username: string ; platform: string; picture_url: string}[]>([]); // the social accounts name
+  const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
+  const [postMetrics, setPostMetrics] = useState<PostMetrics[]>([]);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
+  const dates = postMetrics.map(item => new Date(item.date_retrieved).toLocaleDateString());
+  
+  const visitsData = postMetrics.map(item => item.post_profile_visits);
+  const likesData = postMetrics.map(item => item.post_likes);
+  const commentCount = postMetrics.map(item => item.post_comments);
+  const savesData = postMetrics.map(item => item.post_saved);
+  const sharesData = postMetrics.map(item => item.post_shares);
+  const impressionData = postMetrics.map(item => item.post_impressions);
+  const viralityData = postMetrics.map(item => item.post_virality_rate);
+  const engagementData = postMetrics.map(item => item.post_engagement_rate);
+  const sentimentData = postMetrics.map(item => item.post_sentiment);
+
+
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
-    // Fetch account options for the dropdown
-    const fetchAccounts = async () => {
-      // Replace with your logic to fetch account options
-      // Example: const { data, error } = await supabase.from('accounts').select('*');
-      const accountOptions = [
-        { id: '17841466917978018', name: 'Account 1' },
-        { id: '12345678901234567', name: 'Account 2' }
-      ]; // Example data
-      setAccounts(accountOptions);
-      setSelectedAccount(accountOptions[0]?.id || null); // Set default selected account
-    };
-
-    fetchAccounts();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (selectedAccount) {
-        try {
-          // Fetch metrics data using the combined method with the selected account
-          const data = await getPlatformMetricDatesTwo(selectedAccount, null, null);
-
-          // Separate the combined data into post metrics and platform metrics
-          const postMetrics = data.filter((item: any) => item.date_retrieved && item.post_likes !== undefined);
-          const platformMetricsData = data.find((item: any) => item.platform_followers !== undefined) || {};
-
-          setMetrics(postMetrics);
-
-          // If there's only one set of platform metrics
-          if (Object.keys(platformMetricsData).length) {
-            const { platform_followers = 0, platform_likes = 0, platform_comments = 0, platform_saves = 0, platform_shares = 0 } = platformMetricsData;
-            setMetrics(prevMetrics => [...prevMetrics, {
-              platform_followers,
-              platform_likes,
-              platform_comments,
-              platform_saves,
-              platform_shares
-            }]);
+    const initialize = async () => {
+      try {
+        // Fetch user data
+        const userData = await fetchUserName();
+        if (userData) {
+  
+          // Fetch accounts for the user
+          const accountsData = await getAccounts(userData.user_id);
+          console.log(accountsData);
+          if (accountsData.length > 0) {
+            setHasAccount(true);
+  
+            // Map the accountsData to match the expected structure
+            const formattedAccounts = accountsData.map(account => ({
+              id: account.platform_account_id,
+              account_username: account.account_username,
+              platform: account.platform,
+              picture_url: account.profile_picture_url,
+            }));
+  
+            setAccounts(formattedAccounts);
+            return;
           }
-
-          setLoading(false);
-        } catch (error) {
-          console.error('Fetch error:', error);
-          setError((error as Error).message);
-          setLoading(false);
+          return;
         }
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
+  
+    initialize();
+  }, []);
 
-    fetchData();
-  }, [selectedAccount]); // Refetch data when selectedAccount changes
+
+  const fetchData = async (id:number, order: SortOrder, start?: string, end?: string) => {
+    try {
+      // Fetch posts with sentiment
+      const postsData = await getPostsMetrics(id, order, start, end);
+
+      if (!postsData) {
+        setError('Error fetching posts with sentiment');
+        setLoading(false);
+        return;
+      }
+
+      const sortedPostsList = postsData?.map((post: Post) => ({
+        ...post,
+        post_metrics: post.post_metrics.sort(
+          (a, b) => new Date(a.date_retrieved).getTime() - new Date(b.date_retrieved).getTime()
+        ),
+      }));
+    
+
+      setPosts(sortedPostsList);
+      setLoading(false);
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setError((error as Error).message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(selectedAccountId,sortOrder, startDate, endDate);
+  }, [selectedAccountId, sortOrder, startDate, endDate]);
+
+  useEffect(() => {
+    const checkPlanType = async () => {
+      const type = await planType();
+      console.log('Plan Type:', type);
+      setUserPlanType(type);
+    };
+    
+    checkPlanType();
+  }, []);
+
+  const toggleSortOrder = () => {
+    setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
+  };
+  
+  const getSentimentIcon = (sentiment) => {
+    if (sentiment > 0.5) return <FontAwesomeIcon icon={faSmile} className='text-green-400'/>; // Happy
+    if (sentiment < -0.5) return <FontAwesomeIcon icon={faFrown} className='text-red-500'/>; // Sad
+    return <FontAwesomeIcon icon={faMeh} className='text-yellow-300'/>; // Neutral
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'startDate') setStartDate(value);
+    if (name === 'endDate') setEndDate(value);
+  };
+
+  const handleAccountSelect = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const accountId = Number(event.target.value);
+    setSelectedAccountId(accountId);
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -75,118 +186,194 @@ const Dashboard = () => {
     return <div>Error: {error}</div>;
   }
 
-  const totalStats = metrics.find((item: any) => item.platform_followers !== undefined) || {};
-  const postMetrics = metrics.filter((item: any) => item.date_retrieved && item.post_likes !== undefined);
-
-  const { platform_followers = 0, platform_likes = 0, platform_comments = 0, platform_saves = 0, platform_shares = 0 } = totalStats;
-
   return (
-    <>
-      <div className="flex justify-between items-center mb-4">
-        <select
-          value={selectedAccount || ''}
-          onChange={(e) => setSelectedAccount(e.target.value)}
-          className="p-2 border rounded"
-        >
-          {accounts.map(account => (
-            <option key={account.id} value={account.id}>
-              {account.name}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className={` p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
 
-      <div className="col-span-3">
-        <TotalStatsCard
-          followers={platform_followers}
-          likes={platform_likes}
-          shares={platform_shares}
-          comments={platform_comments}
-          saved={platform_saves}
-        />
-      </div>
-      <div className="col-span-1">
-        <LineGraph 
-          data={postMetrics} 
-          metric="post_likes" 
-          color="rgba(75, 192, 192, 1)" 
-          label="Post Likes Over Time"
-          title="Post Likes Over Time"
-        />
-      </div>
-      <div className="col-span-1">
-        <LineGraph 
-          data={postMetrics} 
-          metric="post_shares" 
-          color="rgba(153, 102, 255, 1)" 
-          label="Post Shares Over Time"
-          title="Post Shares Over Time"
-        />
-      </div>
-      <div className="col-span-1">
-        <LineGraph 
-          data={postMetrics} 
-          metric="post_comments" 
-          color="rgba(255, 159, 64, 1)" 
-          label="Post Comments Over Time"
-          title="Post Comments Over Time"
-        />
-      </div>
-      <div className="col-span-1">
-        <LineGraph 
-          data={postMetrics} 
-          metric="post_impressions" 
-          color="rgba(54, 162, 235, 1)" 
-          label="Post Impressions Over Time"
-          title="Post Impressions Over Time"
-        />
-      </div>
-      <div className="col-span-1">
-        <BarGraph
-          data={postMetrics}
-          metrics={['post_likes', 'post_shares', 'post_comments']}
-          colors={['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)']}
-          label="Likes, Shares, and Comments"
-          title="Likes, Shares, and Comments Comparison"
-        />
-      </div>
-      <div className="col-span-1">
-        <BarGraph
-          data={postMetrics}
-          metrics={['post_engagement_rate']}
-          colors={['rgba(255, 206, 86, 0.6)']}
-          label="Engagement Rate"
-          title="Engagement Rate Comparison"
-        />
-      </div>
-      <div className="col-span-1">
-        <PieChart
-          data={postMetrics}
-          metrics={['post_likes', 'post_shares', 'post_comments']}
-          colors={['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)']}
-          title="Distribution of Different Interactions"
-        />
-      </div>
+        <h2 className="text-2xl font-semibold">Post Analytics</h2>
+        <p className="text-gray-600 mb-4">
+          View analytics for your posts. Sort by date and filter by start and end date.
+        </p>
+        <div className="bg-white p-4 rounded shadow flex mb-4 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <p className=''> Sort: </p>
+            <button
+              onClick={toggleSortOrder}
+              className="h-9 w-24 bg-accent text-white rounded"
+              >
+              {sortOrder === 'asc' ? 'Oldest' : 'Newest'}
+            </button>
+            <label className="ml-4">Start Date:</label>
+            <input
+              type="date"
+              name="startDate"
+              value={startDate}
+              onChange={handleDateChange}
+              className=" rounded h-9 w-[10rem] "
+              />
+            <label className="ml-4">End Date:</label>
+            <input
+              type="date"
+              name="endDate"
+              value={endDate}
+              onChange={handleDateChange}
+              className="border rounded h-9 w-[10rem] "
+              />
+          </div>
+          <div className="">
+            <select className="rounded-md w-48 h-10 bg-accent text-white" onChange={handleAccountSelect} value={selectedAccountId || ''}>
+              <option value="" disabled>Select an account</option>
+              {accounts.map(account => (
+                <option key={account.id} value={account.id}>
+                  {account.account_username}
+                  
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-      <LineGraph
-  data={postMetrics}
-  metric="post_sentiment"
-  color="rgba(255, 99, 132, 1)"
-  label="Post Sentiment  Over Time"
-  title="Post Sentiment Rate Over Time"
-/>
+        <div className="">
+          {hasAccount ? (
+            selectedAccountId ? (
+              posts.length > 0 ? (
+                <div className="grid grid-cols-4 gap-4">
+                  {posts.map(post => {
+                    const caption = `${post.caption}`;
+                    const formattedDate = formatDate(post.created_at);
+                    const sentimentIcon = getSentimentIcon(post.post_metrics?.[post.post_metrics.length - 1]?.post_sentiment);
 
-<LineGraph
-  data={postMetrics}
-  metric="post_profile_visits"
-  color="rgba(255, 99, 132, 1)"
-  label="Post Profile visits  Over Time"
-  title="Post Profile vists  Over Time"
-/>
+                    return (
+                      <div key={post.id} className="border p-4 rounded bg-white hover:scale-105 transition-transform duration-300 shadow" 
+                          onClick={() =>{openModal(); setPostMetrics(post.post_metrics); setSelectedPost(post)}}>
+                        
+                        <div className="h-[14rem] w-full bg-white mb-4 rounded overflow-hidden">
+                          {post.post_type === 'VIDEO' ? (
+                            <video className="w-full h-full object-cover" controls>
+                              <source src={post.media_url} type="video/mp4" />
+                            </video>
+                          ) : (
+                            <img src={post.media_url} alt={post.caption} className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                        
+                        <p className="h-[10rem] overflow-auto mb-4">{caption}</p>
+                        <p className="text-gray-600">
+                          Sentiment: {sentimentIcon}
+                        </p>
+                        <p className="text-gray-600">Date posted: {formattedDate}</p>
+                        <div className='flex justify-between mt-2'>
+                          <p className="text-gray-600 gap-2 flex">
+                            <span className="">
+                              <FontAwesomeIcon icon={faHeart} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_likes}
+                            </span>
+                            <span>
+                              <FontAwesomeIcon icon={faBookmark} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_saved}
+                            </span>
+                            <span>
+                              <FontAwesomeIcon icon={faComment} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_comments}
+                            </span>
+                            <span>
+                              <FontAwesomeIcon icon={faShare} /> {post.post_metrics?.[post.post_metrics.length - 1]?.post_shares}
+                            </span>
+                          </p>
+                          <Link href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
+                            <FontAwesomeIcon icon={faExternalLink}/>
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-80 w-full">
+                    <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                    <p className="text-lg font-bold text-center text-gray-600">No posts found.</p>
+                  </div>
+                )
+              ) : (
+                <div className="flex flex-col items-center justify-center h-80 w-full">
+                  <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                  <p className="text-lg font-bold text-center text-gray-600">Select an account to view performace metrics.</p>
+                </div>
+            )
+          ) : (
+            <div className="flex flex-col items-center justify-center h-80 w-full">
+              <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+              <p className="text-lg font-bold text-center text-gray-600">Connect to an account first.</p>
+            </div>
+          )}
 
+        </div>
 
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        {selectedPost ? (
 
-    </>
+          <div className="w-full h-full flex gap-2">
+            {/* post and latest metrics and commetns */}
+            <div className="h-full w-1/4">
+              <div className="h-1/3 w-full bg-white mb-4 rounded overflow-hidden">
+                {selectedPost.post_type === 'VIDEO' ? (
+                  <video className="w-full h-full object-cover" controls>
+                    <source src={selectedPost.media_url} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={selectedPost.media_url} alt={selectedPost.caption} className="w-full h-full object-cover" />
+                )}
+              </div>
+              <p className="h-1/4 overflow-auto mb-2">{selectedPost.caption}</p>
+              <p className="text-gray-600">
+                        Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
+                      </p>
+                      <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
+              <div className='flex justify-between mt-2'>
+                <p className="text-gray-600 gap-2 flex">
+                  <span className="">
+                    <FontAwesomeIcon icon={faHeart} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_likes}
+                  </span>
+                  <span>
+                    <FontAwesomeIcon icon={faBookmark} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_saved}
+                  </span>
+                  <span>
+                    <FontAwesomeIcon icon={faComment} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_comments}
+                  </span>
+                  <span>
+                    <FontAwesomeIcon icon={faShare} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_shares}
+                  </span>
+                </p>
+                <Link href={selectedPost.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
+                  <FontAwesomeIcon icon={faExternalLink}/>
+                </Link>
+              </div>
+              {/* comments */}
+              <div>
+
+              </div>
+            </div>
+          {/* post metrics */}
+          <div className="h-full w-3/4 flex gap-2">
+            <div className="h-full w-1/2  gap-2 overflow-auto">
+              <LineChart metricName="Post Likes" metricData={likesData} dates={dates} />
+              <LineChart metricName="Post Impressions" metricData={impressionData} dates={dates} />
+              <LineChart metricName="Post Engagements" metricData={engagementData} dates={dates} />
+              <LineChart metricName="Post Sentiemnt" metricData={sentimentData} dates={dates} />
+           
+            </div>
+            <div className="h-full w-1/2 gap-2 overflow-auto">
+              <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
+              <LineChart metricName="Post Virality Rate" metricData={viralityData} dates={dates} />
+              <LineChart metricName="Acount visists from post" metricData={visitsData} dates={dates} />
+            </div>
+          </div>
+        </div>
+        
+      ):(
+        <div className="w-full h-full flex items-center justify-center">
+          <p className="text-gray-600">No data available for this post.</p>
+        </div>
+      )}
+      </Modal>
+
+    </div>
   );
 };
 

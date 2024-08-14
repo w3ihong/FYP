@@ -3,7 +3,7 @@ import CalendarComponent from '@/components/calendarComponent';
 
 const CalendarPage: React.FC = () => {
   return (
-    <div>
+    <div className='p-6'>
       <CalendarComponent />
     </div>
   );

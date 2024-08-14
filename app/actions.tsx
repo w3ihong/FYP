@@ -3,11 +3,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
-
+import axios from 'axios';
 import {  toZonedTime, format } from 'date-fns-tz';
+import { tree } from 'next/dist/build/templates/app-page';
+import { access } from 'fs';
 
 const otpStore = new Map();
 
@@ -1256,7 +1257,8 @@ export const getPostsWithMetrics = async () => {
 
 
 
-export const getPostsWithSentiment = async (
+export const getPostsMetrics = async (
+  id:number,
   sortDirection: 'asc' | 'desc' = 'desc',
   startDate?: string,
   endDate?: string
@@ -1264,19 +1266,6 @@ export const getPostsWithSentiment = async (
   const supabase = createClient();
 
   // Fetch the authenticated user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-  if (userError) {
-    console.error('Error fetching authenticated user:', userError.message);
-    return [];
-  }
-
-  const userId = user?.id;
-
-  if (!userId) {
-    console.error('User ID not found');
-    return [];
-  }
 
   // Construct the date filter
   const dateFilter: any = {};
@@ -1288,279 +1277,31 @@ export const getPostsWithSentiment = async (
       ? [dateFilter['created_at'], `lte.${endDate}`]
       : `lte.${endDate}`;
   }
-
   // Fetch posts with their sentiment metrics for the authenticated user's platform account
-  const { data: postsWithSentiment, error: postsWithSentimentError } = await supabase
+  const { data: postsList, error: postsListError } = await supabase
     .from('posts')
     .select(`
       *,
       post_metrics!inner (
-        post_id,
-        post_sentiment, 
-        post_impressions, 
-        date_retrieved,
-        post_likes
-      ),
-      platform_account!inner (
-        user_id, account_username, platform
+        *
       )
     `)
-    .eq('platform_account.user_id', userId)
+    .eq('platform_account', id)
     .filter('created_at', 'gte', startDate || '1970-01-01')
     .filter('created_at', 'lte', endDate || new Date().toISOString())
-    .order('created_at', { ascending: sortDirection === 'asc' })
-    .limit(20);
-
-  if (postsWithSentimentError) {
-    console.error('Error fetching posts with sentiment:', postsWithSentimentError.message);
+    .order('created_at', { ascending: sortDirection === 'asc' });
+    
+  if (postsListError) {
+    console.error('Error fetching posts:', postsListError.message);
+    return [];
+  }
+  if (postsList.length === 0) {
+    console.error('No posts found');
     return [];
   }
 
-  // Convert date_retrieved to Singapore Time (SGT) and add emoji based on sentiment
-  const timeZone = 'Asia/Singapore';
-  const getSentimentEmoji = (sentiment) => {
-    if (sentiment > 0.5) return '😀';
-    if (sentiment < -0.5) return '😞';
-    return '😐';
-  };
-
-  const postsWithConvertedDatesAndEmojis = postsWithSentiment.map(post => {
-    const postMetrics = post.post_metrics || [];
-    const convertedMetrics = postMetrics.map(metric => {
-      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
-      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
-      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
-      const sentimentEmoji = getSentimentEmoji(metric.post_sentiment);
-      return {
-        ...metric,
-        date_retrieved: formattedSgtDate,
-        sentiment_emoji: sentimentEmoji,
-      };
-    });
-    return {
-      ...post,
-      post_metrics: convertedMetrics,
-      platform: post.platform_account?.platform // Ensure platform data is included
-    };
-  });
-
-  return postsWithConvertedDatesAndEmojis;
+  return postsList;
 };
-
-
-
-export const getPlatformMetricDates = async () => {
-  const supabase = createClient();
-  const timeZone = 'Asia/Singapore';
-
-  try {
-    // Fetch platform metrics
-    const { data: platformMetrics, error: platformError } = await supabase
-      .from('platform_metrics')
-      .select('*');
-
-    if (platformError) {
-      console.error('Supabase error fetching platform metrics:', platformError);
-      return [];
-    }
-
-    // Convert date_retrieved to Singapore Time (SGT)
-    const formattedMetrics = platformMetrics.map(metric => {
-      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
-      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
-      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
-      return {
-        ...metric,
-        date_retrieved: formattedSgtDate,
-      };
-    });
-
-    return formattedMetrics;
-  } catch (error) {
-    console.error('Fetch error:', error);
-    return [];
-  }
-};
-
-
-
-export const getPlatformMetricDatesThree = async () => {
-  const supabase = createClient();
-  const timeZone = 'Asia/Singapore';
-
-  try {
-    // Fetch post metrics and platform metrics in one query
-    const { data: postMetrics, error: postError } = await supabase
-      .from('post_metrics')
-      .select('*, platform_metrics(platform_account, post_likes, post_shares, post_impressions)')
-      .order('date_retrieved', { ascending: false });
-
-    if (postError) {
-      console.error('Supabase error fetching post metrics:', postError);
-      return [];
-    }
-
-    // Convert date_retrieved to Singapore Time (SGT)
-    const formattedMetrics = postMetrics.map(metric => {
-      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
-      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
-      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
-      return {
-        ...metric,
-        date_retrieved: formattedSgtDate,
-      };
-    });
-
-    return formattedMetrics;
-  } catch (error) {
-    console.error('Fetch error:', error);
-    return [];
-  }
-};
-
-
-
-export const getPlatformMetricDatesTwo = async (
-  accountId: string | null,
-  startDate: Date | null,
-  endDate: Date | null
-) => {
-  const supabase = createClient();
-  const timeZone = 'Asia/Singapore';
-
-  try {
-    // Initialize query
-    let query = supabase.from('post_metrics').select('*').order('date_retrieved', { ascending: true }).limit(12);
-
-    // Apply date range filter if provided
-    if (startDate && endDate) {
-      query = query.gte('date_retrieved', startDate.toISOString()).lte('date_retrieved', endDate.toISOString());
-    }
-
-    // Fetch recent post metrics
-    const { data: postMetrics, error: postError } = await query;
-
-    if (postError) {
-      console.error('Supabase error fetching post metrics:', postError);
-      return [];
-    }
-
-    // Fetch total platform metrics if an account ID is provided
-    const platformQuery = supabase.from('platform_metrics').select('*');
-    if (accountId) {
-      platformQuery.eq('platform_account', accountId);
-    }
-
-    const { data: platformMetricsData, error: platformError } = await platformQuery;
-
-    if (platformError) {
-      console.error('Supabase error fetching platform metrics:', platformError);
-      return [];
-    }
-
-    // Combine post metrics and platform metrics
-    const joinedData = [...postMetrics, ...platformMetricsData];
-
-    // Convert date_retrieved to Singapore Time (SGT)
-    const formattedMetrics = joinedData.map(metric => {
-      const utcDate = metric.date_retrieved ? new Date(metric.date_retrieved) : null;
-      const sgtDate = utcDate ? toZonedTime(utcDate, timeZone) : null;
-      const formattedSgtDate = sgtDate ? format(sgtDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone }) : null;
-      return {
-        ...metric,
-        date_retrieved: formattedSgtDate,
-      };
-    });
-
-    return formattedMetrics;
-  } catch (error) {
-    console.error('Fetch error:', error);
-    return [];
-  }
-};
-
-
-export const getDateRetrievedFromMetrics = async () => {
-  const supabase = createClient();
-
-  // Fetch the authenticated user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-  if (userError) {
-    console.error('Error fetching authenticated user:', userError.message);
-    return [];
-  }
-
-  const userId = "17841466917978018";
-
- // const userId = user?.id;
-
-  if (!userId) {
-    console.error('User ID not found');
-    return [];
-  }
-
-  // Fetch date_retrieved from platform_metrics table
-  const { data: metrics, error: metricsError } = await supabase
-    .from('platform_metrics')
-    .select('date_retrieved')
-    .eq('platform_account', userId); // Assuming you want to filter by user_id
-
-  if (metricsError) {
-    console.error('Error fetching metrics:', metricsError.message);
-    return [];
-  }
-
-  // Return the date_retrieved fields
-  return metrics.map(metric => metric.date_retrieved);
-};
-
-export const test = async (
-  sortDirection: 'asc' | 'desc' = 'desc',
-  startDate?: string,
-  endDate?: string
-) => {
-  const supabase = createClient();
-
-  // Fetch the authenticated user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-  if (userError) {
-    console.error('Error fetching authenticated user:', userError.message);
-    return [];
-  }
-
-  const userId = user?.id;
-
-  if (!userId) {
-    console.error('User ID not found');
-    return [];
-  }
-
-  // Fetch posts with their sentiment metrics
-  const { data: postsWithSentiment, error: postsWithSentimentError } = await supabase
-    .from('post_metrics')
-    .select(`
-      *,
-      platform_metrics!inner (
-        date_retrieved
-      )
-    `)
-    .order('created_at', { ascending: sortDirection === 'asc' })
-    .limit(10);
-
-  if (postsWithSentimentError) {
-    console.error('Error fetching posts with sentiment:', postsWithSentimentError.message);
-    return [];
-  }
-
-  // Convert date_retrieved to Singapore Time (SGT)
-  const postsWithConvertedDates = convertDateToSGT(postsWithSentiment);
-
-  return postsWithConvertedDates;
-};
-
-
 
 const timeZone = 'Asia/Singapore';
 
@@ -1576,28 +1317,28 @@ export const convertDatesToSGT = async (data: any[]) => {
   });
 };
 
+// export const getPostComments = async (
+//   postId: number,
+//   platformACCid: string,
+// ) => {
+  
+//   const supabase = createClient();
+//   const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+
+//   // Fetch comments for the specified post
+//   const endpoint = `https://graph.facebook.com/v20.0/${postId}/comments?access_token=${accessToken}`
+//   const response =  await axios.get(endpoint)
+  
+
+//   return comments;
+// }
 
 
 
 
 
 
-
-
-
-function convertDateToSGT(postsWithSentiment: any[]) {
-  return postsWithSentiment.map(post => {
-    const date = new Date(post.date_retrieved);
-    if (isNaN(date.getTime())) {
-      console.error('Invalid date format:', post.date_retrieved);
-      return post;
-    }
-    // Convert to SGT (UTC+8)
-    const sgtOffset = 8 * 60; // SGT is UTC+8
-    const sgtDate = new Date(date.getTime() + sgtOffset * 60 * 1000);
-    return { ...post, date_retrieved: sgtDate.toISOString() };
-  });
-}
 
 
 export const toggleBlurEffect = async () => {

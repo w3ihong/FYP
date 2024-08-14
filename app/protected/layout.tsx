@@ -2,9 +2,7 @@ import React from 'react';
 import Sidebar from '@/components/sidebar';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { planType } from '../actions';
-
-const plan = planType;
+import VoiceflowChat from '@/components/chatbot'; // Import the VoiceflowChat component
 
 export default async function ProtectedLayout({
     children,
@@ -23,32 +21,6 @@ export default async function ProtectedLayout({
 
        return redirect("../../landing/login");
      }
-
-     // Fetch user profile to check user_type
-  const { data: profile, error } = await supabase
-  .from('users')
-  .select('user_type')
-  .eq('user_id', user.id)
-  .single();
-
-if (error) {
-  console.error('Error fetching user profile:', error.message);
-  return redirect("../../landing/login");
-}
-
-// Check if the user is an admin
-if (profile.user_type === 'admin') {
-  return redirect("/admin");
-  
-} 
-
-
-
-     
-     
-     
-
-
     
     const userObj = JSON.parse(JSON.stringify(user));
 
@@ -61,6 +33,7 @@ if (profile.user_type === 'admin') {
             <div className="flex-1 w-full flex flex-col gap-6 p-6">
                 {children}
             </div>
+            <VoiceflowChat /> 
         </div>
 
         

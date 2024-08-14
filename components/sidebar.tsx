@@ -82,7 +82,7 @@ export default function Sidebar({ email, userType }: { email: string, userType: 
           </Link>
           <div className="flex flex-col px-3 overflow-y-auto">
             <SidebarItem icon={<Calendar size={20} />} text="Calendar" link="/protected/calendar"/>
-            <SidebarItem icon={<BarChart3 size={20} />} text="Analytics" link="/protected/Sentiment" />
+            <SidebarItem icon={<BarChart3 size={20} />} text="Analytics" link="/protected/analytics" />
             <SidebarItem icon={<Map size={20} />} text="Demographics" link="/protected/demographics"/>
             <SidebarItem icon={<LineChart size={20} />} text="Trends " link="/protected/Trending" />
             <SidebarItem icon={<PieChart size={20} />} text="Comparative " link="/protected/comparative" />

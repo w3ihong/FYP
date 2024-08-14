@@ -26,7 +26,7 @@ export default function Index() {
   const { platform_followers = 0, platform_likes = 0, platform_comments = 0, platform_saves = 0, platform_shares = 0 } = totalStats;
 
   const dates = accountMetrics.map(item => new Date(item.date_retrieved).toLocaleDateString());
-  const viewsData = accountMetrics.map(item => item.platform_profile_visits);
+  const visitsData = accountMetrics.map(item => item.platform_profile_visits);
   const followersData = accountMetrics.map(item => item.platform_followers);
   const likesData = accountMetrics.map(item => item.platform_likes);
   const commentCount = accountMetrics.map(item => item.platform_comments);
@@ -100,10 +100,10 @@ export default function Index() {
 
 
   return (
-    <div className="flex">
+    <div className="flex p-6">
       <div className="flex-1 ml-1">
         <motion.div
-          className="p-6 -mt-4"
+          className=""
           initial="hidden"
           animate="visible"
           exit="exit"
@@ -157,7 +157,7 @@ export default function Index() {
                     </div>
 
                     <div className="col-span-1">
-                      <LineChart metricName="Total Post Views" metricData={viewsData} dates={dates} />
+                      <LineChart metricName="Visits From Posts" metricData={visitsData} dates={dates} />
                     </div>
 
                     <div className="col-span-1">
@@ -205,8 +205,6 @@ export default function Index() {
         </motion.div>
       </div>
 
-      {/* Status element */}
-      <div id="status" className="hidden"></div>
 
       {/* Manage Account Modal */}
       <ModalContainer isOpen={isAccountModalOpen} onClose={() => setAccountModalOpen(false)}>
