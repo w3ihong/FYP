@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server';
+import { supabase } from '@/utils/supabase/client';
 import axios from 'axios';
 
 export async function addInstagramAccount(accessToken:string) {
@@ -98,7 +99,6 @@ export async function getAssociatedDetails(accessToken:string ) {
 }
 
 
-
 export const getDemographicsData = async (platformAccountId, viewType, timeframe) => {
     const supabase = createClient();
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -147,6 +147,29 @@ export const getDemographicsData = async (platformAccountId, viewType, timeframe
       return { error: 'Failed to fetch demographics data' };
     }
   };
+
+  export const getFollowersDemographics = async (platformAccountId) => {
+    try {
+      const { data: demographicsData, error: demographicsError } = await supabase
+        .from('follower_demographics')
+        .select('*')
+        .eq('platform_account', platformAccountId)
+        .order('date_retrieved', { ascending: false })
+        .limit(1);
+  
+      if (demographicsError || !demographicsData.length) {
+        console.error('Error fetching follower demographics:', demographicsError);
+        return { error: 'No follower demographics found' };
+      }
+  
+      return demographicsData[0];
+    } catch (error) {
+      console.error('Error fetching follower demographics:', error);
+      return { error: 'Failed to fetch follower demographics' };
+    }
+  };
+  
+  
 
 export async function getLongLivedToken(accessToken: string) {
     const APPID = '2153953224988805'
