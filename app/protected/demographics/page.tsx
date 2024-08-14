@@ -43,7 +43,7 @@ const MapSetter: React.FC<{ center: LatLngTuple }> = ({ center }) => {
 const Demographics = () => {
   const [demographics, setDemographics] = useState<DemographicsData | null>(null);
   const [countries, setCountries] = useState<CountryData[]>([]);
-  const [viewType, setViewType] = useState<'reached' | 'engaged' | 'followers'>('reached');
+  const [viewType, setViewType] = useState<'reached' | 'engaged' | 'followers'>('followers');
   const [timeframe, setTimeframe] = useState<'this_month' | 'this_week'>('this_month');
   const [platformAccountId, setPlatformAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -60,11 +60,11 @@ const Demographics = () => {
         }
 
         const user = sessionData?.session?.user;
-        console.log('User:', user);  // Log user information
+        console.log('User:', user); 
 
         if (user) {
           const { data, error } = await supabase.from('platform_account').select('*').eq('user_id', user.id);
-          console.log('Platform accounts data:', data);  // Log fetched platform accounts data
+          console.log('Platform accounts data:', data);  
 
           if (error) {
             setError('Error fetching platform accounts: ' + error.message);
@@ -174,9 +174,9 @@ const Demographics = () => {
       <div className="grid grid-cols-1 gap-2">
         <div className="flex justify-between mb-2">
           <div className="flex space-x-2">
+          <button onClick={() => setViewType('followers')} className={`text-white bg-accent hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 ${viewType === 'followers' ? 'bg-accent text-white' : ''}`}>Followers</button>
             <button onClick={() => setViewType('reached')} className={`text-white bg-accent hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 ${viewType === 'reached' ? 'bg-accent text-white' : ''}`}>Reached</button>
             <button onClick={() => setViewType('engaged')} className={`text-white bg-accent hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 ${viewType === 'engaged' ? 'bg-accent text-white' : ''}`}>Engaged</button>
-            <button onClick={() => setViewType('followers')} className={`text-white bg-accent hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 ${viewType === 'followers' ? 'bg-accent text-white' : ''}`}>Followers</button>
           </div>
           <div className="flex space-x-4">
             <select value={selectedAccount || ''} onChange={(e) => setSelectedAccount(e.target.value)} className="px-4 py-2 bg-white text-accent hover:bg-gray-100 font-medium text-sm rounded-lg">
