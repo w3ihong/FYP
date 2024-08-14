@@ -25,6 +25,7 @@ interface Post {
   };
 }
 
+
 function analyzeBestTimes(posts: Post[]) {
   const timeEngagement: Record<number, {
     totalEngagement: number;
@@ -185,21 +186,7 @@ export default function ComparePosts() {
   const [bestTimes, setBestTimes] = useState<{ hour: number, averageEngagement: number, averageComments: number, averageLikes: number, averageReach: number }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
-  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false); // Ensure the type is boolean
-
-  useEffect(() => {
-    // Example logic for setting premium status
-    async function fetchPlanType() {
-      try {
-        const type = await planType(); // Assuming planType is a function that returns the type
-        setIsPremiumUser(type);
-      } catch (error) {
-        console.error("Error fetching plan type:", error);
-      }
-    }
-
-    fetchPlanType();
-  }, []);
+  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
 
   useEffect(() => {
     async function fetchData() {
@@ -218,6 +205,15 @@ export default function ComparePosts() {
     }
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const checkPlanType = async () => {
+      const type = await planType();
+      setUserPlanType(type);
+    };
+    
+    checkPlanType();
   }, []);
 
   const handleSelectPost = (post: Post) => {
@@ -250,7 +246,7 @@ export default function ComparePosts() {
     : posts.filter(post => post.platform.toLowerCase() === selectedPlatform);
 
   return (
-    <div className={`p-6 ${!isPremiumUser ? 'blur-md' : ''}`}>
+    <div className={`p-6  ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-accent">Compare Posts</h1>
         <div className="flex items-center space-x-4">

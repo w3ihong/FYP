@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ChangeAddress from '@/components/changeAddress';
 import SuccessSubscription from '@/components/successSub';
 import { billingDetails, planType, downgradeSubscription } from '@/app/actions';
+import { motion } from 'framer-motion';
 
 const CheckmarkIcon = () => (
   <svg className="h-5 w-5 text-cyan-950 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -22,7 +23,7 @@ const Billing = () => {
   const [billingDetailsState, setBillingDetailsState] = useState({
     full_name: '',
     planType: '',
-    billingCycle: '12 March', // set to the 1st day of the coming month
+    billing_cycle: '',
     planCost: '',
     credit_card_no: '',
     credit_card_expiry: '',
@@ -44,7 +45,8 @@ const Billing = () => {
       if (billingInfo) {
         setBillingDetailsState(prevState => ({
           ...prevState,
-          ...billingInfo
+          ...billingInfo,
+          billing_cycle: calculateNextBillingDate(billingInfo.billing_cycle)
         }));
       }
     }
@@ -63,6 +65,21 @@ const Billing = () => {
     fetchBillingDetails();
     fetchPlanType();
   }, []);
+
+  function calculateNextBillingDate(billingCycleDate) {
+    const currentDate = new Date(billingCycleDate);
+  
+    let nextMonth = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+  
+    if (nextMonth.getDate() < currentDate.getDate()) {
+      nextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 0);
+    }
+  
+    const formattedBillingCycle = nextMonth.toLocaleDateString('en-GB');
+  
+    return formattedBillingCycle;
+  }
+  
 
   const handleDowngrade = async () => {
     try {
@@ -113,9 +130,39 @@ const Billing = () => {
     </div>
   );
 
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+      y: 50
+    },
+    in: {
+      opacity: 1,
+      y: 0
+    },
+    out: {
+      opacity: 0,
+      y: -50
+    }
+  };
+
+  const pageTransition = {
+    type: 'tween',
+    ease: 'anticipate',
+    duration: 0.5
+  };
+
+
   return (
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+
+    >
     <div className="flex flex-col min-h-screen font-raleway">
-      <main className="flex-grow container mx-auto px-5 py-24">
+      <main className="flex-grow container mx-auto px-5 py-10">
         <section className="body-font">
           <div className="container mx-auto flex flex-col items-start px-20">
             <h1 className="w-full mb-1 text-4xl font-bold text-left lg:w-4/5">Billing</h1>
@@ -139,12 +186,12 @@ const Billing = () => {
                       />
                     </div>
                     <div className="flex flex-col items-center">
-                      <label htmlFor="billingCycle" className="text-xs font-semibold">BILLING CYCLE:</label>
+                      <label htmlFor="billingCycle" className="text-xs font-semibold">NEXT BILLING DATE:</label>
                       <input
                         type="text"
                         id="billingCycle"
                         name="billingCycle"
-                        value={billingDetailsState.billingCycle}
+                        value={billingDetailsState.billing_cycle}
                         onChange={handleInputChange}
                         className="border-none font-bold text-center"
                         readOnly
@@ -258,6 +305,7 @@ const Billing = () => {
       </main>
       <SuccessSubscription isOpen={isSuccessModalOpen} onRequestClose={() => setIsSuccessModalOpen(false)} />
     </div>
+    </motion.div>
   );
 };
 

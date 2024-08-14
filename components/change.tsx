@@ -65,7 +65,7 @@ const ChangePayment: React.FC<ChangePaymentProps> = ({ billingDetails, onBilling
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg w-full lg:w-3/4">
+    <div className="bg-white p-8 rounded-lg shadow-lg w-full">
       <h2 className="bg-gray-100 rounded p-2 text-2xl font-semibold mb-4 text-accent">Enter Payment Details</h2>
       <form onSubmit={handlePaymentChangeSubmit} className="text-gray-700 space-y-4">
         <div className='border px-4 py-4 space-y-4'>
@@ -237,7 +237,7 @@ const ChangePayment: React.FC<ChangePaymentProps> = ({ billingDetails, onBilling
             Your payments will be processed internationally. Additional bank fees may apply.
           </p>
           <p className="text-gray-600 mt-4">
-            By ticking the tickbox below, you agree that EchoSphere will automatically continue your membership and charge the membership fee (currently $99/month) to your payment method until you cancel. You may cancel at any time to avoid future charges.
+            By ticking the tickbox below, you agree that EchoSphere will automatically continue your membership and charge the membership fee (currently $39/month) to your payment method until you cancel. You may cancel at any time to avoid future charges.
           </p>
           <div className="flex items-center mt-4">
             <input

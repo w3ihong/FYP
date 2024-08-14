@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getPostsWithSentiment } from '@/app/actions'; // Adjust the path as needed
+import { getPostsWithSentiment, planType } from '@/app/actions'; // Adjust the path as needed
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faArrowDown } from '@fortawesome/free-solid-svg-icons';
-import { planType } from '@/app/actions'; // Adjust the path as needed
+import DatePicker, { DateRangeType } from 'react-tailwindcss-datepicker';
+import { format } from 'date-fns';
 
 type SortOrder = 'asc' | 'desc';
 
@@ -23,6 +24,8 @@ interface Post {
   media_url: string;
   permalink: string;
   post_metrics?: PostMetrics[];
+  created_at: string;
+  platform: string;
 }
 
 const Dashboard = () => {
@@ -30,13 +33,11 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
+  const [userPlanType, setUserPlanType] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRangeType>({ startDate: null, endDate: null });
 
   const fetchData = async (order: SortOrder, start?: string, end?: string) => {
     try {
-      // Fetch posts with sentiment
       const postsWithSentiment = await getPostsWithSentiment(order, start, end);
 
       if (!postsWithSentiment) {
@@ -55,13 +56,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchData(sortOrder, startDate, endDate);
-  }, [sortOrder, startDate, endDate]);
+    const start = dateRange.startDate ? format(new Date(dateRange.startDate), 'yyyy-MM-dd') : '';
+    const end = dateRange.endDate ? format(new Date(dateRange.endDate), 'yyyy-MM-dd') : '';
+    fetchData(sortOrder, start, end);
+  }, [sortOrder, dateRange]);
 
   useEffect(() => {
     const checkPlanType = async () => {
       const type = await planType();
-      console.log('Plan Type:', type);
       setUserPlanType(type);
     };
     
@@ -72,10 +74,8 @@ const Dashboard = () => {
     setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === 'startDate') setStartDate(value);
-    if (name === 'endDate') setEndDate(value);
+  const handleDateChange = (newRange: DateRangeType) => {
+    setDateRange(newRange);
   };
 
   if (loading) {
@@ -86,36 +86,40 @@ const Dashboard = () => {
     return <div>Error: {error}</div>;
   }
 
+  const filteredPosts = posts.filter(post => {
+    const postDate = new Date(post.created_at);
+    const startDate = dateRange.startDate ? new Date(dateRange.startDate) : null;
+    const endDate = dateRange.endDate ? new Date(dateRange.endDate) : null;
+
+    if (startDate && postDate < startDate) return false;
+    if (endDate && postDate > endDate) return false;
+
+    return true;
+  });
+
   return (
     <div className={`grid grid-cols-4 gap-4 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
       <div className="col-span-4">
         <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
-        <button
-          onClick={toggleSortOrder}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Toggle Sort Order ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
-        </button>
-        <div className="mb-4">
-          <label className="mr-2">Start Date:</label>
-          <input
-            type="date"
-            name="startDate"
-            value={startDate}
+        <div className="flex justify-end items-center mb-4">
+          <button
+            onClick={toggleSortOrder}
+            className="px-4 py-2 bg-accent shadow text-white rounded mr-4"
+          >
+            Toggle Sort Order ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
+          </button>
+          <div className="w-60">
+          <DatePicker
+            value={dateRange}
             onChange={handleDateChange}
-            className="border p-2 rounded"
+            displayFormat="MM/DD/YYYY"
+            placeholder="Select Date Range"
+            useRange={false}
           />
-          <label className="ml-4 mr-2">End Date:</label>
-          <input
-            type="date"
-            name="endDate"
-            value={endDate}
-            onChange={handleDateChange}
-            className="border p-2 rounded"
-          />
+          </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          {posts.map(post => {
+          {filteredPosts.map(post => {
             const sentimentEmoji = post.post_metrics?.[0]?.sentiment_emoji || '';
             const captionWithEmoji = `${post.caption} ${sentimentEmoji}`;
 

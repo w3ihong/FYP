@@ -1,9 +1,7 @@
 'use server'
-
-
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-
+import { supabase } from '@/utils/supabase/client';
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
 
@@ -11,6 +9,17 @@ import {  toZonedTime, format } from 'date-fns-tz';
 
 const otpStore = new Map();
 
+export async function forgotPassword(email: string) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'http://localhost:3000/landing/updatePassword'
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
 
 export async function login(formData: FormData) {
   const supabase = createClient();
@@ -205,6 +214,10 @@ export async function updateCardDetails(cardDetails: any) {
       return false;
     }
 
+    // Get today's date
+    const today = new Date();
+    const billingCycleDate = today.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+
     // Check if user exists in billing table
     const { data: existingBillingUsers, error: billingError } = await supabase
       .from('billing')
@@ -231,7 +244,8 @@ export async function updateCardDetails(cardDetails: any) {
           city: cardDetails.city,
           street: cardDetails.street,
           unit: cardDetails.unit,
-          postalcode: cardDetails.postalcode
+          postalcode: cardDetails.postalcode,
+          billing_cycle: billingCycleDate // Set the billing cycle date to today's date
         });
 
       if (insertError) {
@@ -253,7 +267,8 @@ export async function updateCardDetails(cardDetails: any) {
           city: cardDetails.city,
           street: cardDetails.street,
           unit: cardDetails.unit,
-          postalcode: cardDetails.postalcode
+          postalcode: cardDetails.postalcode,
+          billing_cycle: billingCycleDate // Update the billing cycle date to today's date
         })
         .eq('user_id', userId);
 
@@ -268,6 +283,7 @@ export async function updateCardDetails(cardDetails: any) {
     throw new Error(`Error updating card details: ${error.message}`);
   }
 }
+
 
 
 export async function planType() {
@@ -1657,7 +1673,6 @@ export const getAccounts = async (userId: string) => {
     return [];
   }
 };
-
 
 
 
