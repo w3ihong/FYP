@@ -43,7 +43,7 @@ const MapSetter: React.FC<{ center: LatLngTuple }> = ({ center }) => {
 const Demographics = () => {
   const [demographics, setDemographics] = useState<DemographicsData | null>(null);
   const [countries, setCountries] = useState<CountryData[]>([]);
-  const [viewType, setViewType] = useState<'reached' | 'engaged' | 'followers'>('reached');
+  const [viewType, setViewType] = useState<'reached' | 'engaged' | 'followers'>('followers');
   const [timeframe, setTimeframe] = useState<'this_month' | 'this_week'>('this_month');
   const [platformAccountId, setPlatformAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

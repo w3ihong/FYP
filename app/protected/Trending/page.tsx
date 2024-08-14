@@ -1,16 +1,18 @@
 "use client";
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic'; 
+import dynamic from 'next/dynamic';
 import { countryDictionary } from './countryDictionary';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { csv } from 'd3-fetch';
 
-
+// Dynamically import Leaflet components with SSR disabled
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+
+// Import d3-fetch for CSV data handling
+import { csv } from 'd3-fetch';
 
 type Trend = {
     value: number;
@@ -21,23 +23,18 @@ const Trends = () => {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [trends, setCountryTrends] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [mapCoordinates, setMapCoordinates] = useState(null);
+    const [mapCoordinates, setMapCoordinates] = useState<[number, number] | null>(null);
 
-    const handleCountryChange = (event) => {
-        setSelectedCountry(event.target.value);
-    };
-
+    // Load country coordinates when a country is selected
     useEffect(() => {
         if (selectedCountry) {
             csv('/countries.csv').then(data => {
-                console.log('Parsed CSV data:', data); 
                 const countryData = data.find(d => d.name === selectedCountry);
                 if (countryData) {
                     const latitude = parseFloat(countryData.latitude);
                     const longitude = parseFloat(countryData.longitude);
                     if (!isNaN(latitude) && !isNaN(longitude)) {
                         setMapCoordinates([latitude, longitude]);
-                        console.log('Set coordinates:', latitude, longitude);
                     } else {
                         console.error('Invalid coordinates:', countryData.latitude, countryData.longitude);
                     }
@@ -51,7 +48,7 @@ const Trends = () => {
             setMapCoordinates(null);
         }
     }, [selectedCountry]);
-    
+
     const mapPinIcon = new L.DivIcon({
         html: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -60,9 +57,13 @@ const Trends = () => {
         `,
         className: 'heroicon-map-pin',
         iconSize: [24, 24],
-        iconAnchor: [12, 24], 
-        popupAnchor: [0, -24]  
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -24]
     });
+
+    const handleCountryChange = (event) => {
+        setSelectedCountry(event.target.value);
+    };
 
     const handleCountryTrendsSubmit = async (event) => {
         event.preventDefault();
@@ -142,17 +143,15 @@ const Trends = () => {
             </ul>
         </div>
     );
-    
 
     return (
-        <div className="w-full p-6 ">
-            <h1 className="text-2xl font-bold mb-6">See What's Trending! </h1>
+        <div className="w-full p-6">
+            <h1 className="text-2xl font-bold mb-6">See What's Trending!</h1>
             {/* by country */}
             <div className='flex justify-between space-x-8 mb-8'>
-                <div className='bg-white rounded-md shadow w-1/3 p-4 flex-col h-[40rem] justify-start '>
-
+                <div className='bg-white rounded-md shadow w-1/3 p-4 flex-col h-[40rem] justify-start'>
                     <form onSubmit={handleCountryTrendsSubmit}>
-                        <div className='flex items-center h-10 px-1 '>
+                        <div className='flex items-center h-10 px-1'>
                             <span className="text-lg font-bold mr-2">By Country:</span>
                             <select className='rounded-md' value={selectedCountry} onChange={handleCountryChange}>
                                 <option value="">Select a country</option>
@@ -169,82 +168,80 @@ const Trends = () => {
                         <div className='text-md font-bold w-1/5'>Rank </div>
                         <div className='text-md w-4/5 ml-3 font-bold'> Topic</div>
                     </div>
-                    <div className="mt-4  w-full flex overflow-auto h-[31rem]">
+                    <div className="mt-4 w-full flex overflow-auto h-[31rem]">
                         {loading ? (
                             <p className='pl-4'>Loading...</p>
                         ) : (
-                        <ul className='w-full space-y-1'>
-                            {Object.entries(trends).map(([key, value], index) => (
-                                <li key={`country-${index}`} className='bg-white rounded-md shadow w-full flex h-8 items-center px-4'>
-                                    <div className='text-md font-bold w-1/5 ml-3'>{Number(key) + 1}</div>
-                                    <div className='text-md w-4/5'>{value}</div>
-                                </li>
-                            ))}
-                        </ul>
+                            <ul className='w-full space-y-1'>
+                                {Object.entries(trends).map(([key, value], index) => (
+                                    <li key={`country-${index}`} className='bg-white rounded-md shadow w-full flex h-8 items-center px-4'>
+                                        <div className='text-md font-bold w-1/5 ml-3'>{Number(key) + 1}</div>
+                                        <div className='text-md w-4/5'>{value}</div>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 </div>
                 <div className='w-2/3 bg-white rounded-md shadow p-4 flex-col h-[40rem]'>
                     {/* Add a map for the current country chosen */}
-                    <MapContainer center={mapCoordinates || [0, 0]} zoom={2} minZoom={2} maxZoom={6} scrollWheelZoom={true} maxBounds={[[-90, -180], [90, 180]]} maxBoundsViscosity={1.0} style={{ height: '100%', width: '100%' }}>
-                        <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        {mapCoordinates && (
+                    {mapCoordinates && (
+                        <MapContainer center={mapCoordinates} zoom={2} minZoom={2} maxZoom={6} scrollWheelZoom={true} maxBounds={[[-90, -180], [90, 180]]} maxBoundsViscosity={1.0} style={{ height: '100%', width: '100%' }}>
+                            <TileLayer
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            />
                             <Marker position={mapCoordinates} icon={mapPinIcon}>
                                 <Popup>{selectedCountry}</Popup>
                             </Marker>
-                        )}
-                    </MapContainer>
+                        </MapContainer>
+                    )}
                 </div>
             </div>
             {/* Search trends */}
             <div className='bg-white rounded-md shadow p-5 w-full h-[40rem] flex-col'>
                 <div className='w-full'>
                     <h1 className='text-xl font-bold '>Search a keyword</h1>
-                    <p className='text-sm mb-4'>Hint: dont be too specific</p>
+                    <p className='text-sm mb-4'>Hint: don't be too specific</p>
                 </div>
-                {/* search bar and options  */}
+                {/* search bar and options */}
                 <div className='w-full'>
                     <form className='w-full' onSubmit={handleKeywordSubmit}>
                         <div className='flex items-center space-x-4'>
-                            <input className='w-1/3 h-10 rounded-md px-4 ' type="text" placeholder='Keyword' onChange={handleKWChange}/>
-                            <select className='w-15 h-10 rounded-md px-4 'value={selectedTopic} onChange={handleTopicChange}>
+                            <input className='w-1/3 h-10 rounded-md px-4 ' type="text" placeholder='Keyword' onChange={handleKWChange} />
+                            <select className='w-15 h-10 rounded-md px-4 ' value={selectedTopic} onChange={handleTopicChange}>
                                 <option value="" >Type</option>
                                 <option value="related_queries">Query</option>
                                 <option value="related_topics">Topic</option>
                             </select>
-                            <select className='h-10 rounded-md px-4 'value={selectedKWCountry} onChange={handleKWCountryChange}>
+                            <select className='h-10 rounded-md px-4 ' value={selectedKWCountry} onChange={handleKWCountryChange}>
                                 <option value="" >Country</option>
                                 {Object.keys(countryDictionary).map((country) => (
                                     <option key={country} value={country}>
-                                    {country}
+                                        {country}
                                     </option>
                                 ))}
                             </select>
-                            <select className='h-10 rounded-md px-4 'value={selectedTimeframe} onChange={handleTimeframeChange}>
+                            <select className='h-10 rounded-md px-4 ' value={selectedTimeframe} onChange={handleTimeframeChange}>
                                 <option value="" >Timeframe</option>
                                 <option value="now 4-H">Past 4 hours</option>
                                 <option value="now 1-d">Past day</option>
-                                <option value="now 7-d">Past 7 day</option>
+                                <option value="now 7-d">Past 7 days</option>
                                 <option value="today 1-m">Past month</option>
                                 <option value="today 3-m">Past 3 months</option>
                                 <option value="today 12-m">Past year</option>
                                 <option value="today 5-y">Past 5 years</option>
                             </select>
-
                             <button className='ml-auto bg-accent text-white px-4 py-2 rounded shadow hover:bg-accent-hover transition-transform duration-200 transform hover:-translate-y-1 hover:bg-blue-700 text-gray-699'>Search</button>
-                            
-                        </div>  
-                    </form> 
+                        </div>
+                    </form>
                 </div>
                 {/* output header */}
                 <div className='w-full flex items-center bg-gray-100 rounded h-8 mt-4 shadow space-x-4'>
                     <div className='w-1/2 flex px-4'>
                         <div className='text-md font-bold w-1/6 '>Rank</div>
                         <div className='text-md font-bold w-4/6 '>Rising</div>
-                        <div className='text-md font-bold w-1/6 '>% Increase </div>
+                        <div className='text-md font-bold w-1/6 '>% Increase</div>
                     </div>
                     <div className='w-1/2 flex px-4'>
                         <div className='text-md font-bold w-1/6 '>Rank</div>

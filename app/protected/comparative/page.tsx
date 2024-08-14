@@ -269,7 +269,6 @@ export default function ComparePosts() {
           >
             <option value="all">All Platforms</option>
             <option value="instagram">Instagram</option>
-            <option value="facebook">Facebook</option>
           </select>
         </div>
       </div>

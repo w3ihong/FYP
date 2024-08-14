@@ -109,7 +109,7 @@ export default function Index() {
           exit="exit"
           variants={containerVariants}
         >
-          <h1 className="text-2xl font-bold text-accent">Welcome Back, {userName ? `${userName.first_name}${userName.last_name}` : ''}!</h1>
+          <h1 className="text-2xl font-bold text-accent">Welcome Back, {userName ? `${userName.first_name} ${userName.last_name}` : ''}!</h1>
           <p className="text-sm text-gray-600">Feel free to explore around</p>
           <div className="bg-white p-4 rounded-lg shadow-md mt-4 flex items-center px-6">
             <h2 className="text-xl font-bold text-accent">Account Overview</h2>
@@ -129,7 +129,7 @@ export default function Index() {
               <div className="flex gap-4">
                 
               {/*  account selection */}
-              <select className="rounded-md w-48 h-10 bg-accent text-white" onChange={handleAccountSelect} value={selectedAccountId || ''}>
+              <select className="cursor-pointer rounded-md w-48 h-10 bg-accent text-white" onChange={handleAccountSelect} value={selectedAccountId || ''}>
                 <option value="" disabled>Select an account</option>
                 {accounts.map(account => (
                   <option key={account.id} value={account.id}>
