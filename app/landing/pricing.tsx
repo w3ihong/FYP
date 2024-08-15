@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 
 const pricingTiers = [
   {
+    
     title: "Free",
     monthlyPrice: 0,
     buttonText: "Get started for free",
