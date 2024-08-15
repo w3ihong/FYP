@@ -173,7 +173,7 @@ const FormComponent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-yellow-100 flex justify-center items-center font-raleway">
+    <div className="min-h-screen bg-gray-50 flex justify-center items-center font-raleway">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full">
         <div className="flex justify-center">
           <h1 className="text-center font-bold text-xl">Select Your Interests</h1>

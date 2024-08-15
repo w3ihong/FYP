@@ -2,10 +2,13 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic'; 
 import { countryDictionary } from './countryDictionary';
-import { csv } from 'd3-fetch';
+
 import { planType } from '@/app/actions';
 
 const MapComponent = dynamic(() => import('@/components/mapComponent'), { ssr: false });
+
+// Import d3-fetch for CSV data handling
+import { csv } from 'd3-fetch';
 
 type Trend = {
     value: number;
@@ -13,7 +16,7 @@ type Trend = {
 };
 
 const Trends = () => {
-    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState('United States');
     const [trends, setCountryTrends] = useState([]);
     const [loading, setLoading] = useState(false);
     const [mapCoordinates, setMapCoordinates] = useState(null);
@@ -22,6 +25,7 @@ const Trends = () => {
         setSelectedCountry(event.target.value);
     };
 
+    // Load country coordinates when a country is selected
     useEffect(() => {
         if (selectedCountry) {
             csv('/countries.csv').then(data => {
@@ -48,7 +52,6 @@ const Trends = () => {
     }, [selectedCountry]);
     
     const handleCountryTrendsSubmit = async (event) => {
-        event.preventDefault();
         if (!selectedCountry) return;
 
         setLoading(true);
@@ -58,6 +61,10 @@ const Trends = () => {
         setCountryTrends(data);
         setLoading(false);
     };
+    
+    useEffect(() => {
+        handleCountryTrendsSubmit(selectedCountry);
+    }, [selectedCountry]);
 
     const [selectedKWCountry, setSelectedKWCountry] = useState('');
     const [selectedTopic, setSelectedTopic] = useState('');
@@ -141,24 +148,23 @@ const Trends = () => {
     return (
         <div className="w-full p-6 ">
             <h1 className="text-2xl font-bold mb-6">See What's Trending! </h1>
-            {/* by country */}
+            {/* Country trends*/}
             <div className='flex justify-between space-x-8 mb-8'>
                 <div className='bg-white rounded-md shadow w-1/3 p-4 flex-col h-[40rem] justify-start '>
 
-                    <form onSubmit={handleCountryTrendsSubmit}>
-                        <div className='flex items-center h-10 px-1 '>
-                            <span className="text-lg font-bold mr-2">By Country:</span>
-                            <select className='rounded-md' value={selectedCountry} onChange={handleCountryChange}>
-                                <option value="">Select a country</option>
-                                {Object.keys(countryDictionary).map((country) => (
-                                    <option key={country} value={country}>
-                                        {country}
-                                    </option>
-                                ))}
-                            </select>
-                            <button className='ml-auto bg-accent text-white px-4 py-2 rounded shadow transition-transform duration-200 transform hover:-translate-y-1 hover:bg-blue-700 text-gray-699' type="submit">Search</button>
-                        </div>
-                    </form>
+                   
+                    <div className='flex items-center h-10 px-1 '>
+                        <span className="text-lg font-bold mr-2">By Country:</span>
+                        <select className='rounded-md' value={selectedCountry} onChange={handleCountryChange}>
+                            
+                            {Object.keys(countryDictionary).map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    
                     <div className='mt-4 h-8 bg-gray-100 rounded shadow flex items-center px-4'>
                         <div className='text-md font-bold w-1/5'>Rank </div>
                         <div className='text-md w-4/5 ml-3 font-bold'> Topic</div>

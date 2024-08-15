@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { supabase } from '@/utils/supabase/client';
 import axios from 'axios';
 
+
 export async function addInstagramAccount(accessToken:string) {
     const supabase = createClient();  
     const { data: { user }, error: userError } = await supabase.auth.getUser();

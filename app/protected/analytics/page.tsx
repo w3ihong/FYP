@@ -9,6 +9,8 @@ import LineChart from '@/components/lineChart';
 import { planType } from '@/app/actions'; 
 import Modal from '@/components/bigModalContainer';
 import Link from 'next/link';
+import DatePicker, { DateRangeType } from 'react-tailwindcss-datepicker';
+import { format } from 'date-fns';
 
 type SortOrder = 'asc' | 'desc';
 
@@ -44,6 +46,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [dateRange, setDateRange] = useState<DateRangeType>({ startDate: null, endDate: null });
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
@@ -139,6 +142,15 @@ const Dashboard = () => {
     fetchData(selectedAccountId,sortOrder, startDate, endDate);
   }, [selectedAccountId, sortOrder, startDate, endDate]);
 
+
+  useEffect(() => {
+    const start = dateRange.startDate ? format(new Date(dateRange.startDate), 'yyyy-MM-dd') : '';
+    const end = dateRange.endDate ? format(new Date(dateRange.endDate), 'yyyy-MM-dd') : '';
+    if (selectedAccountId) {
+      fetchData(selectedAccountId, sortOrder, start, end);
+    }
+  }, [selectedAccountId, sortOrder, dateRange]);
+
   useEffect(() => {
     const checkPlanType = async () => {
       const type = await planType();
@@ -173,6 +185,11 @@ const Dashboard = () => {
     if (name === 'endDate') setEndDate(value);
   };
 
+  const handleDateRangeChange = (range: DateRangeType) => {
+    setDateRange(range);
+  };
+
+
   const handleAccountSelect = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const accountId = Number(event.target.value);
     setSelectedAccountId(accountId);
@@ -202,22 +219,18 @@ const Dashboard = () => {
               >
               {sortOrder === 'asc' ? 'Oldest' : 'Newest'}
             </button>
-            <label className="ml-4">Start Date:</label>
-            <input
-              type="date"
-              name="startDate"
-              value={startDate}
-              onChange={handleDateChange}
-              className=" rounded h-9 w-[10rem] "
-              />
-            <label className="ml-4">End Date:</label>
-            <input
-              type="date"
-              name="endDate"
-              value={endDate}
-              onChange={handleDateChange}
-              className="border rounded h-9 w-[10rem] "
-              />
+            <div className="w-60 ml-4">
+            <DatePicker
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              displayFormat="DD/MM/YYYY"
+              placeholder="Select date range"
+              showShortcuts={true}
+              asSingle={false}
+              useRange={false}
+              inputClassName="rounded h-9 w-full"
+            />
+          </div>
           </div>
           <div className="">
             <select className="rounded-md w-48 h-10 bg-accent text-white" onChange={handleAccountSelect} value={selectedAccountId || ''}>
@@ -322,9 +335,9 @@ const Dashboard = () => {
               </div>
               <p className="h-1/4 overflow-auto mb-2">{selectedPost.caption}</p>
               <p className="text-gray-600">
-                        Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
-                      </p>
-                      <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
+                Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
+              </p>
+              <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
               <div className='flex justify-between mt-2'>
                 <p className="text-gray-600 gap-2 flex">
                   <span className="">

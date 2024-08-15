@@ -5,7 +5,7 @@ interface ChangeAddressProps {
   billingDetails: {
     full_name: string;
     planType: string;
-    billingCycle: string;
+    billing_cycle: string;
     planCost: string;
     credit_card_no: string;
     credit_card_expiry: string;

@@ -17,7 +17,7 @@ const Upgrade = () => {
   const newPlan = 'Premium Plan';
   const newPlanDetails = ["In-depth Visual Insights", "Competitive Analysis", "Sentiment Analysis", "Trend Indicator"];
   const currentPlanCost = '$0';
-  const newPlanCost = '$99';
+  const newPlanCost = '$39';
 
   const handleUpgradeClick = () => {
     setIsModalOpen(true);

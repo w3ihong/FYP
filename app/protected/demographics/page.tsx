@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { getDemographicsData, getFollowersDemographics } from "@/app/auth/socials/actions";
 import { LatLngTuple } from 'leaflet';
 import { supabase } from '@/utils/supabase/client';
+import BarGraph from "@/components/barChart";
 import { planType } from "@/app/actions";
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -58,6 +59,7 @@ const Demographics = () => {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) {
           setError('Error fetching session: ' + sessionError.message);
+          window.location.href = '/landing';
           return;
         }
 
@@ -225,6 +227,7 @@ const Demographics = () => {
             })}
           </MapContainer>
           <div className="col-span-1">
+
             <div className="bg-white p-4 shadow rounded-lg mb-2">
               <h2 className="text-lg font-semibold">Gender Distribution</h2>
               <div className="relative h-8 bg-gray-200 rounded">
@@ -245,7 +248,9 @@ const Demographics = () => {
               </div>
               <Tooltip id="tooltip-gender" />
             </div>
+
             <div className="grid grid-cols-2 gap-4">
+
               <div className="bg-white p-6 shadow rounded-lg" style={{ maxHeight: '400px' }}>
                 <h2 className="text-lg font-semibold">Age Distribution</h2>
                 {Object.keys(demographics.age).map(age => (
@@ -256,6 +261,7 @@ const Demographics = () => {
                 ))}
                 <Tooltip id="tooltip-age" />
               </div>
+
               <div className="bg-white p-6 shadow rounded-lg overflow-y-auto" style={{ maxHeight: '400px' }}>
                 <h2 className="text-lg font-semibold">City Distribution</h2>
                 {Object.keys(demographics.city).map(city => (
@@ -266,7 +272,9 @@ const Demographics = () => {
                 ))}
                 <Tooltip id="tooltip-city" />
               </div>
+
             </div>
+
           </div>
         </div>
       </div>
