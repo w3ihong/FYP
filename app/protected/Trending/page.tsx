@@ -96,7 +96,7 @@ const Trends = () => {
             const country = countryDictionary[selectedKWCountry];
             const res = await fetch(`https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}&geo=${country.abbv}`);
             const data = await res.json();
-
+            console.log('Keyword data:', data);
             if ('error' in data) {
                 if (data['error'] === 'Query failed') {
                     setKWError('Query limit reached. Please try again later.');
@@ -143,7 +143,6 @@ const Trends = () => {
                     <div className='flex items-center h-10 px-1 '>
                         <span className="text-lg font-bold mr-2">By Country:</span>
                         <select className='rounded-md' value={selectedCountry} onChange={handleCountryChange}>
-                            
                             {Object.keys(countryDictionary).map((country) => (
                                 <option key={country} value={country}>
                                     {country}
