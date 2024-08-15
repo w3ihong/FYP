@@ -322,9 +322,9 @@ const Dashboard = () => {
               </div>
               <p className="h-1/4 overflow-auto mb-2">{selectedPost.caption}</p>
               <p className="text-gray-600">
-                        Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
-                      </p>
-                      <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
+                Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
+              </p>
+              <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
               <div className='flex justify-between mt-2'>
                 <p className="text-gray-600 gap-2 flex">
                   <span className="">

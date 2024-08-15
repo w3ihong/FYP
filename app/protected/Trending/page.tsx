@@ -10,7 +10,7 @@ type Trend = {
   
 
 const trends = () => {
-    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState('united states');
     const [trends, setCountryTrends] = useState([]);
     const [loading, setLoading] = useState(false);
   
@@ -88,6 +88,7 @@ const trends = () => {
             setKWLoading(false);
         }
     }
+
     const renderTrends = (trends: { [key: string]: Trend }, type :string) => (
         <div className='w-full'>
           <ul className='space-y-1'>
