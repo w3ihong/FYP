@@ -50,7 +50,7 @@ export async function login(formData: FormData) {
   // Check if the user account is disabled
   const { data: foundUser, error: findError } = await supabase
     .from('users')
-    .select('disabled, FA, profile_complete , suspended')
+    .select('disabled, FA, profile_complete , suspended , user_type')
     .eq('user_id', userId)
     .single();
 
@@ -93,6 +93,13 @@ export async function login(formData: FormData) {
     redirect('/landing/login?message=Your account has been suspended ');
  //   return;
   }
+
+  if(foundUser.user_type == "admin")
+  {
+    redirect('/admin');
+  }
+
+  
   
 
   

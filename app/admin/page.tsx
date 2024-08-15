@@ -91,7 +91,8 @@ export default function AdminHome() {
   );
 
   return (
-    <main className="flex-1 p-8">
+    <div className='bg-gray-50'>
+    <main className="flex-1 p-8 ">
       <h1 className="text-3xl font-extrabold text-gray-800 mb-8">User Management</h1>
       <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-6 max-h-[80vh] overflow-auto">
         <div className="mb-6">
@@ -114,7 +115,7 @@ export default function AdminHome() {
         <div className="space-y-4">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user, index) => (
-              <div key={index} className="bg-yellow-50 rounded-lg shadow-sm p-4 flex justify-between items-center">
+              <div key={index} className="bg-gray-50 rounded-lg shadow-sm p-4 flex justify-between items-center">
                 <div className="w-1/3 text-lg font-medium text-gray-700 text-center">{user.first_name}</div>
                 <div className="w-1/3 text-lg font-medium text-gray-700 text-center">{user.user_id}</div>
                 <div className="w-1/3 text-lg font-medium text-gray-700 text-center">{user.suspended ? 'Suspended' : 'Active'}</div>
@@ -132,7 +133,7 @@ export default function AdminHome() {
         </div>
       </div>
       <ModalContainer isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2 className="text-2xl font-extrabold text-gray-800 mb-4">{selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
+        <h2 className="my-6 text-2xl font-extrabold text-gray-800 mb-4">{selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
         <label className="block text-lg font-medium text-gray-700 mb-2">Reason for {selectedUser?.suspended ? 'Unsuspending' : 'Suspending'}:</label>
         <textarea
           className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4 resize-none"
@@ -156,5 +157,6 @@ export default function AdminHome() {
         </div>
       </ModalContainer>
     </main>
+    </div>
   );
 }
