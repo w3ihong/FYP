@@ -23,7 +23,6 @@ export const countryDictionary = {
   "Argentina": { sc: "argentina", abbv: "AR" },
   "Belgium": { sc: "belgium", abbv: "BE" },
   "Austria": { sc: "austria", abbv: "AT" },
-  "New Zealand": { sc: "new_zealand", abbv: "NZ" },
   "Saudi Arabia": { sc: "saudi_arabia", abbv: "SA" },
   "Israel": { sc: "israel", abbv: "IL" },
   "Ireland": { sc: "ireland", abbv: "IE" },
@@ -34,8 +33,6 @@ export const countryDictionary = {
   "Vietnam": { sc: "vietnam", abbv: "VN" },
   "Thailand": { sc: "thailand", abbv: "TH" },
   "Egypt": { sc: "egypt", abbv: "EG" },
-  "Pakistan": { sc: "pakistan", abbv: "PK" },
-  "Bangladesh": { sc: "bangladesh", abbv: "BD" },
   "Nigeria": { sc: "nigeria", abbv: "NG" },
   "Poland": { sc: "poland", abbv: "PL" },
   "Greece": { sc: "greece", abbv: "GR" },
@@ -46,10 +43,5 @@ export const countryDictionary = {
   "Finland": { sc: "finland", abbv: "FI" },
   "Chile": { sc: "chile", abbv: "CL" },
   "Colombia": { sc: "colombia", abbv: "CO" },
-  "Peru": { sc: "peru", abbv: "PE" },
-  "Venezuela": { sc: "venezuela", abbv: "VE" },
-  "Ukraine": { sc: "ukraine", abbv: "UA" },
-  "Kazakhstan": { sc: "kazakhstan", abbv: "KZ" },
-  "Morocco": { sc: "morocco", abbv: "MA" },
-  "United Arab Emirates": { sc: "united_arab_emirates", abbv: "AE" }
+  "Ukraine": { sc: "ukraine", abbv: "UA" }
 };
