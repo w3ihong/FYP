@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic'; 
 import { countryDictionary } from './countryDictionary';
-import { csv } from 'd3-fetch';
+
 
 const MapComponent = dynamic(() => import('@/components/mapComponent'), { ssr: false });
 
