@@ -12,6 +12,9 @@ import Link from 'next/link';
 import DatePicker, { DateRangeType } from 'react-tailwindcss-datepicker';
 import { format } from 'date-fns';
 
+
+
+
 type SortOrder = 'asc' | 'desc';
 
 interface PostMetrics {
@@ -56,6 +59,7 @@ const Dashboard = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
   const [postMetrics, setPostMetrics] = useState<PostMetrics[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isModalOpenPremium, setIsModalOpenPremium] = useState(false); // State to handle modal visibility
 
   const dates = postMetrics.map(item => new Date(item.date_retrieved).toLocaleDateString());
   
@@ -156,10 +160,22 @@ const Dashboard = () => {
       const type = await planType();
       console.log('Plan Type:', type);
       setUserPlanType(type);
+
+       // Trigger modal if user is not premium
+       if (type !== 'premium') {
+        setIsModalOpenPremium(true);
+    }
+
+      
+
     };
     
     checkPlanType();
   }, []);
+
+  
+
+
 
   const toggleSortOrder = () => {
     setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
@@ -204,33 +220,51 @@ const Dashboard = () => {
   }
 
   return (
-    <div className={` p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
-
+    <>
+      {/* Overlay that covers the whole page when user is not premium */}
+      {isModalOpenPremium && (
+        <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 z-0 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center justify-center ">
+          <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+            <h2 className="text-xl font-bold mb-4 text-center">Upgrade to Premium</h2>
+            
+            <p className="mb-4 text-center">You need a premium account to access this feature.</p>
+            
+            <Link href="/settings/billing" className="bg-accent text-white px-4 py-2 rounded shadow">
+               Upgrade to Premium
+              
+            </Link>
+          </div>
+        </div>
+      )}
+  
+      <div className={`p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
+  
         <h2 className="text-2xl font-semibold">Post Analytics</h2>
         <p className="text-gray-600 mb-4">
           View analytics for your posts. Sort by date and filter by start and end date.
         </p>
         <div className="bg-white p-4 rounded shadow flex mb-4 items-center justify-between">
           <div className="flex items-center gap-2">
-            <p className=''> Sort: </p>
+            <p className=''>Sort:</p>
             <button
               onClick={toggleSortOrder}
               className="h-9 w-24 bg-accent text-white rounded"
-              >
+            >
               {sortOrder === 'asc' ? 'Oldest' : 'Newest'}
             </button>
             <div className="w-60 ml-4">
-            <DatePicker
-              value={dateRange}
-              onChange={handleDateRangeChange}
-              displayFormat="DD/MM/YYYY"
-              placeholder="Select date range"
-              showShortcuts={true}
-              asSingle={false}
-              useRange={false}
-              inputClassName="rounded h-9 w-full"
-            />
-          </div>
+              <DatePicker
+                value={dateRange}
+                onChange={handleDateRangeChange}
+                displayFormat="DD/MM/YYYY"
+                placeholder="Select date range"
+                showShortcuts={true}
+                asSingle={false}
+                useRange={false}
+                inputClassName="rounded h-9 w-full"
+              />
+            </div>
           </div>
           <div className="">
             <select className="rounded-md w-48 h-10 bg-accent text-white" onChange={handleAccountSelect} value={selectedAccountId || ''}>
@@ -238,13 +272,12 @@ const Dashboard = () => {
               {accounts.map(account => (
                 <option key={account.id} value={account.id}>
                   {account.account_username}
-                  
                 </option>
               ))}
             </select>
           </div>
         </div>
-
+  
         <div className="">
           {hasAccount ? (
             selectedAccountId ? (
@@ -254,10 +287,10 @@ const Dashboard = () => {
                     const caption = `${post.caption}`;
                     const formattedDate = formatDate(post.created_at);
                     const sentimentIcon = getSentimentIcon(post.post_metrics?.[post.post_metrics.length - 1]?.post_sentiment);
-
+  
                     return (
                       <div key={post.id} className="border p-4 rounded bg-white hover:scale-105 transition-transform duration-300 shadow" 
-                          onClick={() =>{openModal(); setPostMetrics(post.post_metrics); setSelectedPost(post)}}>
+                          onClick={() => { openModal(); setPostMetrics(post.post_metrics); setSelectedPost(post) }}>
                         
                         <div className="h-[14rem] w-full bg-white mb-4 rounded overflow-hidden">
                           {post.post_type === 'VIDEO' ? (
@@ -290,24 +323,24 @@ const Dashboard = () => {
                             </span>
                           </p>
                           <Link href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
-                            <FontAwesomeIcon icon={faExternalLink}/>
+                            <FontAwesomeIcon icon={faExternalLink} />
                           </Link>
                         </div>
                       </div>
                     );
                   })}
                 </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-80 w-full">
-                    <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
-                    <p className="text-lg font-bold text-center text-gray-600">No posts found.</p>
-                  </div>
-                )
               ) : (
                 <div className="flex flex-col items-center justify-center h-80 w-full">
                   <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
-                  <p className="text-lg font-bold text-center text-gray-600">Select an account to view performace metrics.</p>
+                  <p className="text-lg font-bold text-center text-gray-600">No posts found.</p>
                 </div>
+              )
+            ) : (
+              <div className="flex flex-col items-center justify-center h-80 w-full">
+                <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+                <p className="text-lg font-bold text-center text-gray-600">Select an account to view performance metrics.</p>
+              </div>
             )
           ) : (
             <div className="flex flex-col items-center justify-center h-80 w-full">
@@ -315,79 +348,73 @@ const Dashboard = () => {
               <p className="text-lg font-bold text-center text-gray-600">Connect to an account first.</p>
             </div>
           )}
-
+  
         </div>
-
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        {selectedPost ? (
-
-          <div className="w-full h-full flex gap-2">
-            {/* post and latest metrics and commetns */}
-            <div className="h-full w-1/4">
-              <div className="h-1/3 w-full bg-white mb-4 rounded overflow-hidden">
-                {selectedPost.post_type === 'VIDEO' ? (
-                  <video className="w-full h-full object-cover" controls>
-                    <source src={selectedPost.media_url} type="video/mp4" />
-                  </video>
-                ) : (
-                  <img src={selectedPost.media_url} alt={selectedPost.caption} className="w-full h-full object-cover" />
-                )}
-              </div>
-              <p className="h-1/4 overflow-auto mb-2">{selectedPost.caption}</p>
-              <p className="text-gray-600">
-                Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
-              </p>
-              <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
-              <div className='flex justify-between mt-2'>
-                <p className="text-gray-600 gap-2 flex">
-                  <span className="">
-                    <FontAwesomeIcon icon={faHeart} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_likes}
-                  </span>
-                  <span>
-                    <FontAwesomeIcon icon={faBookmark} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_saved}
-                  </span>
-                  <span>
-                    <FontAwesomeIcon icon={faComment} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_comments}
-                  </span>
-                  <span>
-                    <FontAwesomeIcon icon={faShare} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_shares}
-                  </span>
+  
+        <Modal isOpen={isModalOpen} onClose={closeModal}>
+          {selectedPost ? (
+            <div className="w-full h-full flex gap-2">
+              {/* post and latest metrics and comments */}
+              <div className="h-full w-1/4">
+                <div className="h-1/3 w-full bg-white mb-4 rounded overflow-hidden">
+                  {selectedPost.post_type === 'VIDEO' ? (
+                    <video className="w-full h-full object-cover" controls>
+                      <source src={selectedPost.media_url} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <img src={selectedPost.media_url} alt={selectedPost.caption} className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <p className="h-1/4 overflow-auto mb-2">{selectedPost.caption}</p>
+                <p className="text-gray-600">
+                  Sentiment: {getSentimentIcon(selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_sentiment)}
                 </p>
-                <Link href={selectedPost.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
-                  <FontAwesomeIcon icon={faExternalLink}/>
-                </Link>
+                <p className="text-gray-600">Date posted: {formatDate(selectedPost.created_at)}</p>
+                <div className='flex justify-between mt-2'>
+                  <p className="text-gray-600 gap-2 flex">
+                    <span className="">
+                      <FontAwesomeIcon icon={faHeart} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_likes}
+                    </span>
+                    <span>
+                      <FontAwesomeIcon icon={faBookmark} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_saved}
+                    </span>
+                    <span>
+                      <FontAwesomeIcon icon={faComment} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_comments}
+                    </span>
+                    <span>
+                      <FontAwesomeIcon icon={faShare} /> {selectedPost.post_metrics?.[selectedPost.post_metrics.length - 1]?.post_shares}
+                    </span>
+                  </p>
+                  <Link href={selectedPost.permalink} target="_blank" rel="noopener noreferrer" className="text-gray-600">
+                    <FontAwesomeIcon icon={faExternalLink} />
+                  </Link>
+                </div>
+                {/* comments */}
+                <div>
+                  {/* Add comments section here if needed */}
+                </div>
               </div>
-              {/* comments */}
-              <div>
-
+              {/* post metrics */}
+              <div className="h-full w-3/4 flex gap-2">
+                <div className="h-full w-1/2 gap-2 overflow-auto">
+                  <LineChart metricName="Post Likes" metricData={likesData} dates={dates} />
+                  <LineChart metricName="Post Impressions" metricData={impressionData} dates={dates} />
+                  <LineChart metricName="Post Engagements" metricData={engagementData} dates={dates} />
+                </div>
+                <div className="h-full w-1/2 gap-2 overflow-auto">
+                  <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
+                  <LineChart metricName="Post Saved" metricData={savesData} dates={dates} />
+                  <LineChart metricName="Post Comments" metricData={commentCount} dates={dates} />
+                </div>
               </div>
             </div>
-          {/* post metrics */}
-          <div className="h-full w-3/4 flex gap-2">
-            <div className="h-full w-1/2  gap-2 overflow-auto">
-              <LineChart metricName="Post Likes" metricData={likesData} dates={dates} />
-              <LineChart metricName="Post Impressions" metricData={impressionData} dates={dates} />
-              <LineChart metricName="Post Engagements" metricData={engagementData} dates={dates} />
-              <LineChart metricName="Post Sentiemnt" metricData={sentimentData} dates={dates} />
-           
-            </div>
-            <div className="h-full w-1/2 gap-2 overflow-auto">
-              <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
-              <LineChart metricName="Post Virality Rate" metricData={viralityData} dates={dates} />
-              <LineChart metricName="Acount visists from post" metricData={visitsData} dates={dates} />
-            </div>
-          </div>
-        </div>
-        
-      ):(
-        <div className="w-full h-full flex items-center justify-center">
-          <p className="text-gray-600">No data available for this post.</p>
-        </div>
-      )}
-      </Modal>
-
-    </div>
+          ) : (
+            <div>Loading...</div>
+          )}
+        </Modal>
+      </div>
+    </>
   );
-};
+}
 
 export default Dashboard;

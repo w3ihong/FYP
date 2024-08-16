@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import ComparisonModal from "@/components/comparativeModal";
 import { getPostsWithMetrics, planType } from "@/app/actions";
+import Link from "next/link";
+import InformationCircleIcon from "@heroicons/react/24/outline/InformationCircleIcon";
 
 interface Post {
   id: string;
@@ -159,6 +161,7 @@ function BestHashtagsModal({ bestHashtags, isOpen, onClose }: { bestHashtags: st
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      
       <div className="bg-white rounded-lg p-6 w-3/4 max-w-md">
         <h2 className="text-2xl font-bold mb-4">Best Hashtags to Use</h2>
         <div className="mb-4">
@@ -210,11 +213,21 @@ export default function ComparePosts() {
   useEffect(() => {
     const checkPlanType = async () => {
       const type = await planType();
+      console.log('Plan Type:', type);
       setUserPlanType(type);
+
+       // Trigger modal if user is not premium
+       if (type !== 'premium') {
+        setModalOpen(true);
+    }
+
+      
+
     };
     
     checkPlanType();
   }, []);
+
 
   const handleSelectPost = (post: Post) => {
     let updatedPosts = [...selectedPosts];
@@ -245,56 +258,72 @@ export default function ComparePosts() {
     ? posts
     : posts.filter(post => post.platform.toLowerCase() === selectedPlatform);
 
-  return (
-    <div className={`p-6  ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-accent">Compare Posts</h1>
-        <div className="flex items-center space-x-4">
-          <button
-            className="bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-100 transition-transform duration-200 transform hover:-translate-y-1"
-            onClick={() => setBestTimesModalOpen(true)}
-          >
-            Best Times to Post
-          </button>
-          <button
-            className="bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-100 transition-transform duration-200 transform hover:-translate-y-1"
-            onClick={() => setBestHashtagsModalOpen(true)}
-          >
-            Best Hashtags
-          </button>
-          <select
-            value={selectedPlatform}
-            onChange={(e) => setSelectedPlatform(e.target.value)}
-            className="border border-0 shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1"
-          >
-            <option value="all">All Platforms</option>
-            <option value="instagram">Instagram</option>
-          </select>
-        </div>
-      </div>
-      <p className="text-sm text-gray-600">Select two posts to compare their metrics</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-        {filteredPosts.map((post) => (
-          <div
-            key={post.id}
-            className={`bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105 ${
-              selectedPosts.some(selectedPost => selectedPost.id === post.id) ? 'border-4 border-gray-500' : ''
-            }`}
-            onClick={() => handleSelectPost(post)}
-          >
-            <div className="aspect-square overflow-hidden">
-              {post.post_type === 'VIDEO' ? (
-                <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-              )}
+    return (
+      <>
+        {/* Overlay that covers the whole page when user is not premium */}
+        {isModalOpen && (
+          <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 z-0 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center justify-center relative z-20">
+            <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+              <h2 className="text-xl font-bold mb-4 text-center">Upgrade to Premium</h2>
+              <p className="mb-4 text-center">You need a premium account to access this feature.</p>
+              <Link href="/settings/billing" className="bg-accent text-white px-4 py-2 rounded shadow">
+                Upgrade Now
+              </Link>
             </div>
           </div>
-        ))}
-      </div>
-      <ComparisonModal posts={selectedPosts} isOpen={isModalOpen} onClose={handleCloseModal} />
-      <BestTimesModal bestTimes={bestTimes} isOpen={isBestTimesModalOpen} onClose={() => setBestTimesModalOpen(false)} />
-      <BestHashtagsModal bestHashtags={bestHashtags} isOpen={isBestHashtagsModalOpen} onClose={() => setBestHashtagsModalOpen(false)} />
-    </div>
-  );
-}
+        )}
+    
+        <div className={`p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-accent">Compare Posts</h1>
+            <div className="flex items-center space-x-4">
+              <button
+                className="bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-100 transition-transform duration-200 transform hover:-translate-y-1"
+                onClick={() => setBestTimesModalOpen(true)}
+              >
+                Best Times to Post
+              </button>
+              <button
+                className="bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-100 transition-transform duration-200 transform hover:-translate-y-1"
+                onClick={() => setBestHashtagsModalOpen(true)}
+              >
+                Best Hashtags
+              </button>
+              <select
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                className="border border-0 shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1"
+              >
+                <option value="all">All Platforms</option>
+                <option value="instagram">Instagram</option>
+              </select>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600">Select two posts to compare their metrics</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3">
+            {filteredPosts.map((post) => (
+              <div
+                key={post.id}
+                className={`bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105 ${
+                  selectedPosts.some(selectedPost => selectedPost.id === post.id) ? 'border-4 border-gray-500' : ''
+                }`}
+                onClick={() => handleSelectPost(post)}
+              >
+                <div className="aspect-square overflow-hidden">
+                  {post.post_type === 'VIDEO' ? (
+                    <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <ComparisonModal posts={selectedPosts} isOpen={isModalOpen} onClose={handleCloseModal} />
+          <BestTimesModal bestTimes={bestTimes} isOpen={isBestTimesModalOpen} onClose={() => setBestTimesModalOpen(false)} />
+          <BestHashtagsModal bestHashtags={bestHashtags} isOpen={isBestHashtagsModalOpen} onClose={() => setBestHashtagsModalOpen(false)} />
+        </div>
+      </>
+    );
+  }
