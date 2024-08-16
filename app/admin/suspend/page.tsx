@@ -115,7 +115,7 @@ export default function AdminSuspend() {
   console.log("Suspended Users:", suspendedUsers);
 
   return (
-    <main className="flex-1 max-w-full p-8">
+    <main className="bg-gray-50 flex-1 max-w-full p-8 ">
       <h1 className="text-3xl font-extrabold text-gray-800 mb-8">Suspended Users</h1>
       <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-6 max-h-[80vh] overflow-auto">
         <div className="mb-6">
@@ -177,7 +177,9 @@ export default function AdminSuspend() {
 
       {/* View Suspension Modal */}
       <ModalContainer isOpen={isViewModalOpen} onClose={handleCloseViewModal}>
-        <h2 className="text-2xl font-extrabold text-gray-800 mb-4">Suspension ID: #{viewSuspensionId}</h2>
+        <div className=''>
+        <h2 className="text-2xl font-extrabold text-gray-800 mb-4 my-4 ">Suspension ID: #{viewSuspensionId}</h2>
+        </div>
         <textarea
           className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4 resize-none"
           value={suspensionReason}
@@ -187,7 +189,7 @@ export default function AdminSuspend() {
 
       {/* Confirm Suspension Toggle Modal */}
       <ModalContainer isOpen={isConfirmModalOpen} onClose={handleCloseConfirmModal}>
-        <h2 className="text-2xl font-extrabold text-gray-800 mb-4">Confirm {selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
+        <h2 className="text-2xl font-extrabold text-gray-800 mb-4 my-4">Confirm {selectedUser?.suspended ? 'Unsuspend' : 'Suspend'} User</h2>
         <h3 className="text-lg mb-2">Suspension ID: #{confirmSuspensionId}</h3>
         <label className="block text-lg font-medium text-gray-700 mb-2">Reason for {selectedUser?.suspended ? 'Unsuspending' : 'Suspending'}:</label>
         <textarea

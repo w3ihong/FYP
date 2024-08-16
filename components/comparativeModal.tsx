@@ -45,14 +45,15 @@ const ComparisonModal: React.FC<ComparisonModalProps> = ({ posts, isOpen, onClos
         <div className="grid grid-cols-2 gap-4">
           {[post1, post2].map((post, index) => (
             <div key={post.id} className="bg-gray-100 w-200 rounded-md shadow-md p-4 hover:shadow-xl transition-shadow duration-300">
-              <h3 className="text-s font-semibold text-accent mb-2">{post.caption}</h3>
               <p className="text-sm text-gray-500 mb-4">{post.created_at}</p>
+              
               {post.post_type === 'VIDEO' ? (
                 <img src={post.video_thumbnail} alt="" className="w-70 h-70 object-cover rounded-md mb-4" />
               ) : (
                 <img src={post.media_url} alt="" className="w-70 h-70 object-cover rounded-md mb-4" />
               )}
               <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-500 mb-2 items-center">{post.caption}</p>
                 <p className="flex items-center">
                   <FontAwesomeIcon icon={faComments} className="mr-2 text-gray-600" />
                   Comments: {post.metrics.post_comments || 0} {index === 0 ? calculateDifference(post2.metrics.post_comments, post1.metrics.post_comments) : calculateDifference(post1.metrics.post_comments, post2.metrics.post_comments)}

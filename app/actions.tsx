@@ -1,16 +1,17 @@
 'use server'
-
-
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import nodemailer from 'nodemailer';
 import axios from 'axios';
+import { supabase } from '@/utils/supabase/client';
 import {  toZonedTime, format } from 'date-fns-tz';
 import { tree } from 'next/dist/build/templates/app-page';
 import { access } from 'fs';
 
+
 const otpStore = new Map();
+
 
 
 export async function login(formData: FormData) {
@@ -40,7 +41,7 @@ export async function login(formData: FormData) {
   // Check if the user account is disabled
   const { data: foundUser, error: findError } = await supabase
     .from('users')
-    .select('disabled, FA, profile_complete , suspended')
+    .select('disabled, FA, profile_complete , suspended , user_type')
     .eq('user_id', userId)
     .single();
 
@@ -83,6 +84,13 @@ export async function login(formData: FormData) {
     redirect('/landing/login?message=Your account has been suspended ');
  //   return;
   }
+
+  if(foundUser.user_type == "admin")
+  {
+    redirect('/admin');
+  }
+
+  
   
 
   
@@ -206,6 +214,10 @@ export async function updateCardDetails(cardDetails: any) {
       return false;
     }
 
+    // Get today's date
+    const today = new Date();
+    const billingCycleDate = today.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+
     // Check if user exists in billing table
     const { data: existingBillingUsers, error: billingError } = await supabase
       .from('billing')
@@ -232,7 +244,8 @@ export async function updateCardDetails(cardDetails: any) {
           city: cardDetails.city,
           street: cardDetails.street,
           unit: cardDetails.unit,
-          postalcode: cardDetails.postalcode
+          postalcode: cardDetails.postalcode,
+          billing_cycle: billingCycleDate // Set the billing cycle date to today's date
         });
 
       if (insertError) {
@@ -254,7 +267,8 @@ export async function updateCardDetails(cardDetails: any) {
           city: cardDetails.city,
           street: cardDetails.street,
           unit: cardDetails.unit,
-          postalcode: cardDetails.postalcode
+          postalcode: cardDetails.postalcode,
+          billing_cycle: billingCycleDate // Update the billing cycle date to today's date
         })
         .eq('user_id', userId);
 
@@ -269,6 +283,7 @@ export async function updateCardDetails(cardDetails: any) {
     throw new Error(`Error updating card details: ${error.message}`);
   }
 }
+
 
 
 export async function planType() {
@@ -1003,26 +1018,31 @@ export async function fetchReports()
 
 }
 
-export async function fetchSuspension()
-{
+export async function fetchSuspension() {
   const supabase = createClient();
   try {
     const { data, error } = await supabase
-      .from('suspension') // Replace 'users' with your actual table name
-      .select('reason , user_id  ');
-      
+      .from('suspension')
+      .select('reason, user_id, suspension_id')
+      .order('suspension_id', { ascending: false }); // Fetch the most recent first
 
     if (error) {
       throw error;
     }
 
-    
-    return data;
+    // Optional: You can group suspensions by user_id and only return the latest one for each user
+    const latestSuspensions = data.reduce((acc, suspension) => {
+      if (!acc[suspension.user_id]) {
+        acc[suspension.user_id] = suspension; // Keep the most recent suspension for the user
+      }
+      return acc;
+    }, {});
+
+    return Object.values(latestSuspensions);
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('Error fetching suspensions:', error);
     return [];
   }
-
 }
 
 export async function disableUsers(userId: string) {
@@ -1479,6 +1499,5 @@ export const getAccountMetrics = async (userId: number) => {
     return [];
   }
 }
-
 
 

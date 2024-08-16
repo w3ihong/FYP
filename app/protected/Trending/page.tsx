@@ -2,9 +2,13 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic'; 
 import { countryDictionary } from './countryDictionary';
-import { csv } from 'd3-fetch';
+
+import { planType } from '@/app/actions';
 
 const MapComponent = dynamic(() => import('@/components/mapComponent'), { ssr: false });
+
+// Import d3-fetch for CSV data handling
+import { csv } from 'd3-fetch';
 
 type Trend = {
     value: number;
@@ -21,6 +25,7 @@ const Trends = () => {
         setSelectedCountry(event.target.value);
     };
 
+    // Load country coordinates when a country is selected
     useEffect(() => {
         if (selectedCountry) {
             csv('/countries.csv').then(data => {
@@ -69,6 +74,9 @@ const Trends = () => {
     const [KWloading, setKWLoading] = useState(false);
     const [keyword, setKeyword] = useState('');
     const [KWError, setKWError] = useState(null);
+    const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // State to handle modal visibility
 
     const handleKWCountryChange = (event) => {
         setSelectedKWCountry(event.target.value);
@@ -83,16 +91,41 @@ const Trends = () => {
         setKeyword(event.target.value);
     };
 
+    useEffect(() => {
+        const checkPlanType = async () => {
+          const type = await planType();
+          console.log('Plan Type:', type);
+          setUserPlanType(type);
+
+           // Trigger modal if user is not premium
+           if (type !== 'premium') {
+            setIsModalOpen(true);
+        }
+
+          
+
+        };
+    
+        checkPlanType();
+      }, []);
+
     const handleKeywordSubmit = async (event) => {
         event.preventDefault();
-        if (!selectedKWCountry || !selectedTopic || !selectedTimeframe || !keyword) return;
+        if ( !selectedTopic || !selectedTimeframe || !keyword) return;
 
         setKWLoading(true);
         try {
-            const country = countryDictionary[selectedKWCountry];
-            const res = await fetch(`https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}&geo=${country.abbv}`);
-            const data = await res.json();
+            
+            let url = `https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}`;
 
+                if (selectedKWCountry !== '') {
+                    const country = countryDictionary[selectedKWCountry];
+                    url += `&geo=${country.abbv}`;
+                }
+
+            const res = await fetch(url);
+            const data = await res.json();
+            console.log('Keyword data:', data);
             if ('error' in data) {
                 if (data['error'] === 'Query failed') {
                     setKWError('Query limit reached. Please try again later.');
@@ -129,7 +162,10 @@ const Trends = () => {
     );
 
     return (
-        <div className="w-full p-6 ">
+        
+        <div className={`w-full p-6 ${userPlanType !== 'premium' ? 'blur' : ''}`}>
+            
+
             <h1 className="text-2xl font-bold mb-6">See What's Trending! </h1>
             {/* Country trends*/}
             <div className='flex justify-between space-x-8 mb-8'>
@@ -167,12 +203,13 @@ const Trends = () => {
                         )}
                     </div>
                 </div>
-                <div className='w-2/3 bg-white rounded-md shadow p-4 flex-col h-[40rem]'>
+                <div className={`w-2/3 bg-white rounded-md shadow p-4 flex-col h-[40rem] ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
+
                 <MapComponent mapCoordinates={mapCoordinates} selectedCountry={selectedCountry} />
                 </div>
             </div>
             {/* Search trends */}
-            <div className='bg-white rounded-md shadow p-5 w-full h-[40rem] flex-col'>
+            <div className={`bg-white rounded-md shadow p-5 w-full h-[40rem] flex-col ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
                 <div className='w-full'>
                     <h1 className='text-xl font-bold '>Search a keyword</h1>
                     <p className='text-sm mb-4'>Hint: dont be too specific</p>
@@ -188,7 +225,7 @@ const Trends = () => {
                                 <option value="related_topics">Topic</option>
                             </select>
                             <select className='h-10 rounded-md px-4 'value={selectedKWCountry} onChange={handleKWCountryChange}>
-                                <option value="" >Country</option>
+                                <option value="" >Worldwide</option>
                                 {Object.keys(countryDictionary).map((country) => (
                                     <option key={country} value={country}>
                                     {country}
@@ -248,6 +285,8 @@ const Trends = () => {
                 </div>
             </div>
         </div>
+
+        
     );
 };
 export default Trends;

@@ -15,11 +15,11 @@ const ProfileSetForm: React.FC = () => {
     preference: ''
   });
   const [showModal, setShowModal] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
 
   const router = useRouter(); 
 
   useEffect(() => {
-    // Fetch user profile data when component mounts
     const fetchUserProfile = async () => {
       const profileData = await getUserProfile();
       if (profileData) {
@@ -35,6 +35,13 @@ const ProfileSetForm: React.FC = () => {
     };
 
     fetchUserProfile();
+
+  
+    const hideIntroTimer = setTimeout(() => {
+      setShowIntro(false);
+    }, 3000); 
+
+    return () => clearTimeout(hideIntroTimer);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -62,7 +69,18 @@ const ProfileSetForm: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex justify-center items-center font-raleway font-accent">
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full">
+      {showIntro && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col justify-center items-center bg-gray-50 bg-opacity-70 backdrop-blur-lg z-50 animate-scale-up-fade">
+          <h1 className="text-4xl font-bold text-cyan-950 mb-4">
+            Welcome to <span>EchoSphere</span>!
+          </h1>
+          <p className="text-xl font-medium text-cyan-950">
+            Please create your user profile
+          </p>
+        </div>
+      )}
+
+      <div className={`bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full ${!showIntro ? 'opacity-100' : 'opacity-0'}`}>
         <div className='justify-center font-bold text-xl'>
           <h1>Fill in your details</h1>
         </div>

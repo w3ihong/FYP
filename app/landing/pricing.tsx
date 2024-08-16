@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { twMerge } from "tailwind-merge";
+import Link from 'next/link'; // Import Link component from Next.js
 
 const pricingTiers = [
   {
@@ -99,12 +100,14 @@ const Pricing = () => {
                 </span>
               </div>
 
-              <button className={twMerge(
-                "text-white bg-accent hover:bg-blue-800 font-bold font-raleway rounded-lg text-sm w-full py-2.5 me-2 mb-2 mt-[30px]",
-                inverse && 'text-accent bg-white hover:bg-gray-400'
-              )}>
-                {buttonText}
-              </button>
+              <Link href="/landing/register" passHref>
+                <button className={twMerge(
+                  "text-white bg-accent hover:bg-blue-800 font-bold font-raleway rounded-lg text-sm w-full py-2.5 me-2 mb-2 mt-[30px]",
+                  inverse && 'text-accent bg-white hover:bg-gray-400'
+                )}>
+                  {buttonText}
+                </button>
+              </Link>
 
               <ul className="flex flex-col gap-5 mt-8">
                 {features.map(feature => (

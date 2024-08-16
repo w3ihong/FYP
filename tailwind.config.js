@@ -29,7 +29,22 @@ module.exports = {
       container: {
         padding: '1rem',
         center: true,
-      }
+      },
+      keyframes:{
+        scaleUpFade: {
+          '0%': {
+            opacity: '1',
+            transform: 'scale(0.8)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'scale(1)',
+          },
+        },
+      },
+    },
+    animation: {
+      'scale-up-fade': 'scaleUpFade 3s ease-in-out forwards',
     },
   },
   plugins: [

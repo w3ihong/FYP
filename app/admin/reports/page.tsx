@@ -53,9 +53,9 @@ export default function AdminReports() {
   };
 
   return (
-    <main className="flex-1 max-w-full p-8">
+    <main className="flex-1 p-8 bg-gray-50">
       <h1 className="text-3xl font-extrabold text-gray-800 mb-8">User Reports</h1>
-      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-6 max-h-[80vh] overflow-auto">
+      <div className="bg-gray-50 border border-gray-300 rounded-lg shadow-lg p-6 overflow-auto">
         <div className="mb-6">
           <input
             type="text"
@@ -108,10 +108,10 @@ export default function AdminReports() {
       {/* View Report Modal */}
       <ModalContainer isOpen={isViewModalOpen} onClose={handleCloseViewModal}>
         <div className="space-y-4">
-          <h2 className="text-2xl font-extrabold text-gray-800">Report ID: #{selectedReason}</h2>
+          <h2 className="text-2xl my-6 font-extrabold text-gray-800">Report ID: #{selectedReason}</h2>
           <p className="text-lg font-semibold text-gray-700">Subject: {topic}</p>
           <textarea
-            className="w-full h-60 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4 resize-none"
+            className="w-full h-60 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4 resize-none bg-gray-50"
             value={message}
             readOnly
           />
