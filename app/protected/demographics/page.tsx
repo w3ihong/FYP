@@ -12,6 +12,7 @@ import { getDemographicsData, getFollowersDemographics } from "@/app/auth/social
 import { LatLngTuple } from 'leaflet';
 import { supabase } from '@/utils/supabase/client';
 import BarGraph from "@/components/barChart";
+import { planType } from "@/app/actions";
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
@@ -50,6 +51,7 @@ const Demographics = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [accountNames, setAccountNames] = useState<string[]>([]);
+  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
 
   useEffect(() => {
     const fetchPlatformAccounts = async () => {
@@ -86,6 +88,17 @@ const Demographics = () => {
       }
     };
     fetchPlatformAccounts();
+  }, []);
+
+  useEffect(() => {
+    const checkPlanType = async () => {
+      const type = await planType();
+      console.log('Plan Type:', type);
+      setUserPlanType(type);
+      
+    };
+    
+    checkPlanType();
   }, []);
 
   useEffect(() => {
@@ -143,8 +156,9 @@ const Demographics = () => {
     }
   }, [viewType, timeframe, platformAccountId]);
   
-  if (error) {
-    return (
+ if (error) {
+  return (
+    <div className={`p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
       <div className="flex flex-col items-center justify-center w-full h-full">
         <NoSymbolIcon className="w-12 h-12 mb-4 text-red-500" />
         <p className="text-lg font-raleway text-red-500">{error}</p>
@@ -154,8 +168,11 @@ const Demographics = () => {
           </button>
         )}
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+  
 
   if (!demographics) {
     return (
@@ -171,7 +188,8 @@ const Demographics = () => {
   let cumulativeWidth = 0;
 
   return (
-    <div className="container mx-auto p-4">
+    
+    <div className={`container mx-auto p-4 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
       <h1 className="text-2xl font-bold mb-8">User Demographics</h1>
       <div className="grid grid-cols-1 gap-2">
         <div className="flex justify-between mb-2">

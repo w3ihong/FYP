@@ -74,18 +74,18 @@ const Contact: React.FC = () => {
 
 const styles = {
   container: {
-    backgroundColor: '#FFF3DC',
+    backgroundColor: '#F9FAFB',
     height: '100vh',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
   formContainer: {
-    backgroundColor: '#FFFAF0',
+    backgroundColor: '#FFFFFF',
     padding: '2rem',
     borderRadius: '8px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    width: '500px',
+    width: '850px',
     border: '1px solid #E6E6E6',
   },
   title: {
