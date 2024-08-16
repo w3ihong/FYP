@@ -105,20 +105,27 @@ const Trends = () => {
           
 
         };
-        
+    
         checkPlanType();
       }, []);
 
     const handleKeywordSubmit = async (event) => {
         event.preventDefault();
-        if (!selectedKWCountry || !selectedTopic || !selectedTimeframe || !keyword) return;
+        if ( !selectedTopic || !selectedTimeframe || !keyword) return;
 
         setKWLoading(true);
         try {
-            const country = countryDictionary[selectedKWCountry];
-            const res = await fetch(`https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}&geo=${country.abbv}`);
-            const data = await res.json();
+            
+            let url = `https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}`;
 
+                if (selectedKWCountry !== '') {
+                    const country = countryDictionary[selectedKWCountry];
+                    url += `&geo=${country.abbv}`;
+                }
+
+            const res = await fetch(url);
+            const data = await res.json();
+            console.log('Keyword data:', data);
             if ('error' in data) {
                 if (data['error'] === 'Query failed') {
                     setKWError('Query limit reached. Please try again later.');
@@ -218,7 +225,7 @@ const Trends = () => {
                                 <option value="related_topics">Topic</option>
                             </select>
                             <select className='h-10 rounded-md px-4 'value={selectedKWCountry} onChange={handleKWCountryChange}>
-                                <option value="" >Country</option>
+                                <option value="" >Worldwide</option>
                                 {Object.keys(countryDictionary).map((country) => (
                                     <option key={country} value={country}>
                                     {country}
