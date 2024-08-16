@@ -1027,26 +1027,31 @@ export async function fetchReports()
 
 }
 
-export async function fetchSuspension()
-{
+export async function fetchSuspension() {
   const supabase = createClient();
   try {
     const { data, error } = await supabase
-      .from('suspension') // Replace 'users' with your actual table name
-      .select('reason , user_id  ');
-      
+      .from('suspension')
+      .select('reason, user_id, suspension_id')
+      .order('suspension_id', { ascending: false }); // Fetch the most recent first
 
     if (error) {
       throw error;
     }
 
-    
-    return data;
+    // Optional: You can group suspensions by user_id and only return the latest one for each user
+    const latestSuspensions = data.reduce((acc, suspension) => {
+      if (!acc[suspension.user_id]) {
+        acc[suspension.user_id] = suspension; // Keep the most recent suspension for the user
+      }
+      return acc;
+    }, {});
+
+    return Object.values(latestSuspensions);
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('Error fetching suspensions:', error);
     return [];
   }
-
 }
 
 export async function disableUsers(userId: string) {
