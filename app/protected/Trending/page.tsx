@@ -96,18 +96,25 @@ const Trends = () => {
           console.log('Plan Type:', type);
           setUserPlanType(type);
         };
-        
+    
         checkPlanType();
       }, []);
 
     const handleKeywordSubmit = async (event) => {
         event.preventDefault();
-        if (!selectedKWCountry || !selectedTopic || !selectedTimeframe || !keyword) return;
+        if ( !selectedTopic || !selectedTimeframe || !keyword) return;
 
         setKWLoading(true);
         try {
-            const country = countryDictionary[selectedKWCountry];
-            const res = await fetch(`https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}&geo=${country.abbv}`);
+            
+            let url = `https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}`;
+
+                if (selectedKWCountry !== '') {
+                    const country = countryDictionary[selectedKWCountry];
+                    url += `&geo=${country.abbv}`;
+                }
+
+            const res = await fetch(url);
             const data = await res.json();
             console.log('Keyword data:', data);
             if ('error' in data) {
@@ -156,6 +163,7 @@ const Trends = () => {
                     <div className='flex items-center h-10 px-1 '>
                         <span className="text-lg font-bold mr-2">By Country:</span>
                         <select className='rounded-md' value={selectedCountry} onChange={handleCountryChange}>
+                            
                             {Object.keys(countryDictionary).map((country) => (
                                 <option key={country} value={country}>
                                     {country}
@@ -204,7 +212,7 @@ const Trends = () => {
                                 <option value="related_topics">Topic</option>
                             </select>
                             <select className='h-10 rounded-md px-4 'value={selectedKWCountry} onChange={handleKWCountryChange}>
-                                <option value="" >Country</option>
+                                <option value="" >Worldwide</option>
                                 {Object.keys(countryDictionary).map((country) => (
                                     <option key={country} value={country}>
                                     {country}
