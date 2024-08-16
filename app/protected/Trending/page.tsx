@@ -76,6 +76,7 @@ const Trends = () => {
     const [KWError, setKWError] = useState(null);
     const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
 
+    const [isModalOpen, setIsModalOpen] = useState(false); // State to handle modal visibility
 
     const handleKWCountryChange = (event) => {
         setSelectedKWCountry(event.target.value);
@@ -95,6 +96,14 @@ const Trends = () => {
           const type = await planType();
           console.log('Plan Type:', type);
           setUserPlanType(type);
+
+           // Trigger modal if user is not premium
+           if (type !== 'premium') {
+            setIsModalOpen(true);
+        }
+
+          
+
         };
     
         checkPlanType();
@@ -153,7 +162,10 @@ const Trends = () => {
     );
 
     return (
-        <div className="w-full p-6 ">
+        
+        <div className={`w-full p-6 ${userPlanType !== 'premium' ? 'blur' : ''}`}>
+            
+
             <h1 className="text-2xl font-bold mb-6">See What's Trending! </h1>
             {/* Country trends*/}
             <div className='flex justify-between space-x-8 mb-8'>
@@ -191,7 +203,8 @@ const Trends = () => {
                         )}
                     </div>
                 </div>
-                <div className='w-2/3 bg-white rounded-md shadow p-4 flex-col h-[40rem]'>
+                <div className={`w-2/3 bg-white rounded-md shadow p-4 flex-col h-[40rem] ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
+
                 <MapComponent mapCoordinates={mapCoordinates} selectedCountry={selectedCountry} />
                 </div>
             </div>
@@ -272,6 +285,8 @@ const Trends = () => {
                 </div>
             </div>
         </div>
+
+        
     );
 };
 export default Trends;

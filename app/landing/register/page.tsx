@@ -6,6 +6,7 @@ import { signup } from "../../actions";
 import Modal from "@/components/modalSuccess";
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
+import { motion } from "framer-motion";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -91,7 +92,11 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.0 }}
+        className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
 
         {/* Arrow icon */}
         <div className="absolute top-0 left-0 p-4">
@@ -181,7 +186,7 @@ export default function RegisterPage() {
             {/* Terms and Services */}
                 <div className="ml-3 text-sm">
                   <label htmlFor="terms" className="font-light text-gray-500">
-                    I accept the <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Terms and Conditions</a>
+                    I accept the <a href="/landing/termsnConditions" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Terms and Conditions</a>
                   </label>
                 </div>
 
@@ -210,7 +215,7 @@ export default function RegisterPage() {
         document.body
       )}
 
-      </div>
+      </motion.div>
     );
 }
 
