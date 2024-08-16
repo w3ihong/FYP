@@ -189,14 +189,14 @@ export default function ComparePosts() {
   const [bestTimes, setBestTimes] = useState<{ hour: number, averageEngagement: number, averageComments: number, averageLikes: number, averageReach: number }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
-  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
+  const [userPlanType, setUserPlanType] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const postsWithMetrics = await getPostsWithMetrics();
         if (postsWithMetrics) {
-          console.log("Posts with Metrics:", postsWithMetrics); // Debug log
+          console.log("Posts with Metrics:", postsWithMetrics);
 
           setPosts(postsWithMetrics);
           setBestTimes(analyzeBestTimes(postsWithMetrics));
