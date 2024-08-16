@@ -19,8 +19,6 @@ const Navbar = () => {
           <a href="#pricing" className="mr-10 hover:text-secondary">Pricing</a>
           <a href="#testimonials" className="mr-10 hover:text-secondary">Testimonials</a>
           <a href="#FAQs" className="mr-10 hover:text-secondary">FAQs</a>
-          <a href="#freetrial" className="mr-10 hover:text-secondary">Free Trial</a>
-          
         </nav>
 
         {/* Button */}

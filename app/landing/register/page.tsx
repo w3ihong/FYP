@@ -186,7 +186,7 @@ export default function RegisterPage() {
             {/* Terms and Services */}
                 <div className="ml-3 text-sm">
                   <label htmlFor="terms" className="font-light text-gray-500">
-                    I accept the <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Terms and Conditions</a>
+                    I accept the <a href="/landing/termsnConditions" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Terms and Conditions</a>
                   </label>
                 </div>
 
