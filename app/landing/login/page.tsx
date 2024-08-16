@@ -94,9 +94,6 @@ export default function LoginPage({
                     className="w-4 h-4 border border-gray-300 rounded bg-gray-50"
                   />
                 </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="remember" className="text-gray-500">Remember me</label>
-                </div>
               </div>
               <a href="/landing/forgetPassword" className="text-sm font-medium text-primary-600 hover:underline">Forgot password?</a>
             </div>
