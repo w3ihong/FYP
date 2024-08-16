@@ -13,15 +13,6 @@ import { access } from 'fs';
 const otpStore = new Map();
 
 
-export async function forgotPassword(email: string): Promise<void> {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'http://localhost:3000/landing/updatePassword'
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
 
 export async function login(formData: FormData) {
   const supabase = createClient();
