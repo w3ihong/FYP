@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ComparisonModal from "@/components/comparativeModal";
 import { getPostsWithMetrics, planType } from "@/app/actions";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 interface Post {
   id: string;
@@ -186,14 +187,14 @@ export default function ComparePosts() {
   const [bestTimes, setBestTimes] = useState<{ hour: number, averageEngagement: number, averageComments: number, averageLikes: number, averageReach: number }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
-  const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
+  const [userPlanType, setUserPlanType] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const postsWithMetrics = await getPostsWithMetrics();
         if (postsWithMetrics) {
-          console.log("Posts with Metrics:", postsWithMetrics); // Debug log
+          console.log("Posts with Metrics:", postsWithMetrics);
 
           setPosts(postsWithMetrics);
           setBestTimes(analyzeBestTimes(postsWithMetrics));
@@ -273,28 +274,36 @@ export default function ComparePosts() {
         </div>
       </div>
       <p className="text-sm text-gray-600">Select two posts to compare their metrics</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-        {filteredPosts.map((post) => (
-          <div
-            key={post.id}
-            className={`bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105 ${
-              selectedPosts.some(selectedPost => selectedPost.id === post.id) ? 'border-4 border-gray-500' : ''
-            }`}
-            onClick={() => handleSelectPost(post)}
-          >
-            <div className="aspect-square overflow-hidden">
-              {post.post_type === 'VIDEO' ? (
-                <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-              )}
+      {filteredPosts.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-3">
+          {filteredPosts.map((post) => (
+            <div
+              key={post.id}
+              className={`bg-white rounded-md shadow-md p-3 cursor-pointer transform transition duration-300 ease-in-out hover:scale-105 ${
+                selectedPosts.some(selectedPost => selectedPost.id === post.id) ? 'border-4 border-gray-500' : ''
+              }`}
+              onClick={() => handleSelectPost(post)}
+            >
+              <div className="aspect-square overflow-hidden">
+                {post.post_type === 'VIDEO' ? (
+                  <img src={post.video_thumbnail} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <img src={post.media_url} alt="" className="w-full h-full object-cover" />
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-8">
+          <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+          <p className="text-gray-500">Please connect your social media accounts to view posts.</p>
+        </div>
+      )}
       <ComparisonModal posts={selectedPosts} isOpen={isModalOpen} onClose={handleCloseModal} />
       <BestTimesModal bestTimes={bestTimes} isOpen={isBestTimesModalOpen} onClose={() => setBestTimesModalOpen(false)} />
       <BestHashtagsModal bestHashtags={bestHashtags} isOpen={isBestHashtagsModalOpen} onClose={() => setBestHashtagsModalOpen(false)} />
     </div>
   );
 }
+

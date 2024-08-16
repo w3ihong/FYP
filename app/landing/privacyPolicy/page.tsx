@@ -1,14 +1,11 @@
 // pages/privacy-policy.tsx
-import { NextPage } from 'next';
-import Head from 'next/head';
 
-const PrivacyPolicy: NextPage = () => {
+const PrivacyPolicy = () => {
   return (
     <>
-      <Head>
+      
         <title>Privacy Policy | EchoSphere</title>
         <meta name="description" content="Privacy policy for EchoSphere" />
-      </Head>
       <div className="bg-gray-100 py-12">
         <div className="container mx-auto px-4">
           <div className="bg-white shadow-lg rounded-lg p-8">
