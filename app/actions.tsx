@@ -9,18 +9,18 @@ import {  toZonedTime, format } from 'date-fns-tz';
 import { tree } from 'next/dist/build/templates/app-page';
 import { access } from 'fs';
 
+
 const otpStore = new Map();
 
-export async function forgotPassword(email: string) {
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+
+export async function forgotPassword(email: string): Promise<void> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: 'http://localhost:3000/landing/updatePassword'
   });
 
   if (error) {
     throw new Error(error.message);
   }
-
-  return data;
 }
 
 export async function login(formData: FormData) {
