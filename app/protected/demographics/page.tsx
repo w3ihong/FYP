@@ -13,6 +13,7 @@ import { LatLngTuple } from 'leaflet';
 import { supabase } from '@/utils/supabase/client';
 import BarGraph from "@/components/barChart";
 import { planType } from "@/app/actions";
+import Link from "next/link";
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
@@ -52,7 +53,7 @@ const Demographics = () => {
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [accountNames, setAccountNames] = useState<string[]>([]);
   const [userPlanType, setUserPlanType] = useState<string | null>(null); // State for plan_type
-
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to handle modal visibility
   useEffect(() => {
     const fetchPlatformAccounts = async () => {
       try {
@@ -95,11 +96,19 @@ const Demographics = () => {
       const type = await planType();
       console.log('Plan Type:', type);
       setUserPlanType(type);
+
+       // Trigger modal if user is not premium
+       if (type !== 'premium') {
+        setIsModalOpen(true);
+    }
+
       
+
     };
     
     checkPlanType();
   }, []);
+
 
   useEffect(() => {
     if (platformAccountId) {
@@ -156,21 +165,37 @@ const Demographics = () => {
     }
   }, [viewType, timeframe, platformAccountId]);
   
- if (error) {
-  return (
-    <div className={`p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
-      <div className="flex flex-col items-center justify-center w-full h-full">
-        <NoSymbolIcon className="w-12 h-12 mb-4 text-red-500" />
-        <p className="text-lg font-raleway text-red-500">{error}</p>
-        {error !== 'No platform accounts found' && (
-          <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-accent text-white font-medium rounded-lg">
-            Return
-          </button>
+  if (error) {
+    return (
+      <div>
+        {/* Overlay that covers the whole page when user is not premium */}
+        {userPlanType !== 'premium' && (
+          <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 z-0 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center justify-center">
+            <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+              <h2 className="text-xl font-bold mb-4 text-center">Upgrade to Premium</h2>
+              <p className="mb-4 text-center">You need a premium account to access this feature.</p>
+              <Link href="/settings/billing" className="bg-accent text-white px-4 py-2 rounded shadow">
+                Upgrade Now
+              </Link>
+            </div>
+          </div>
         )}
+        <div className={`p-6 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
+          <div className="flex flex-col items-center justify-center w-full h-full z-0">
+            <NoSymbolIcon className="w-12 h-12 mb-4 text-red-500" />
+            <p className="text-lg font-raleway text-red-500">{error}</p>
+            {error !== 'No platform accounts found' && (
+              <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-accent text-white font-medium rounded-lg">
+                Return
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+  
 
   
 
@@ -188,6 +213,8 @@ const Demographics = () => {
   let cumulativeWidth = 0;
 
   return (
+  
+    
     
     <div className={`container mx-auto p-4 ${userPlanType !== 'premium' ? 'blurred' : ''}`}>
       <h1 className="text-2xl font-bold mb-8">User Demographics</h1>
@@ -279,6 +306,7 @@ const Demographics = () => {
         </div>
       </div>
     </div>
+    
   );
 };
 

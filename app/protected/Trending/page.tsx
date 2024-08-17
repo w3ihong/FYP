@@ -5,10 +5,14 @@ import { countryDictionary } from './countryDictionary';
 
 import { planType } from '@/app/actions';
 
+
 const MapComponent = dynamic(() => import('@/components/mapComponent'), { ssr: false });
 
 // Import d3-fetch for CSV data handling
 import { csv } from 'd3-fetch';
+import NoCrossContainer from '@/components/NoCrossContainer';
+import Link from 'next/link';
+import InformationCircleIcon from '@heroicons/react/24/outline/InformationCircleIcon';
 
 type Query = {
     value: number;
@@ -21,6 +25,7 @@ type Topics = {
 }
 
 const Trends = () => {
+    
     const [selectedCountry, setSelectedCountry] = useState('United States');
     const [trends, setCountryTrends] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -110,13 +115,16 @@ const Trends = () => {
           
 
         };
-    
+        
         checkPlanType();
       }, []);
 
+    
+    
+
     const handleKeywordSubmit = async (event) => {
         event.preventDefault();
-        if ( !selectedTopic || !selectedTimeframe || !keyword) return;
+        if (!selectedKWCountry || !selectedTopic || !selectedTimeframe || !keyword) return;
 
         setKWLoading(true);
         try {
@@ -130,7 +138,7 @@ const Trends = () => {
 
             const res = await fetch(url);
             const data = await res.json();
-            console.log('Keyword data:', data);
+
             if ('error' in data) {
                 if (data['error'] === 'Query failed') {
                     setKWError('Query limit reached. Please try again later.');
@@ -170,7 +178,25 @@ const Trends = () => {
         </div>
     );
 
+    
+
     return (
+
+        <div className="relative w-full z-0 ">
+       {/* Overlay that covers the whole page when user is not premium */}
+{isModalOpen && (
+    <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 z-10 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center justify-center">
+        <InformationCircleIcon className="w-12 h-12 mb-4 text-gray-400" />
+            <h2 className="text-xl font-bold mb-4 text-center">Upgrade to Premium</h2>
+            <p className="mb-4 text-center">You need a premium account to access this feature.</p>
+            <Link href="/settings/billing" className="bg-accent text-white px-4 py-2 rounded shadow">
+                Upgrade Now
+            </Link>
+        </div>
+    </div>
+)}
+
         
         <div className={`w-full p-6 ${userPlanType !== 'premium' ? 'blur' : ''}`}>
             
@@ -192,6 +218,8 @@ const Trends = () => {
                             ))}
                         </select>
                     </div>
+
+                    
                     
                     <div className='mt-4 h-8 bg-gray-100 rounded shadow flex items-center px-4'>
                         <div className='text-md font-bold w-1/5'>Rank </div>
@@ -234,7 +262,7 @@ const Trends = () => {
                                 <option value="related_topics">Topic</option>
                             </select>
                             <select className='h-10 rounded-md px-4 'value={selectedKWCountry} onChange={handleKWCountryChange}>
-                                <option value="" >Worldwide</option>
+                                <option value="" >Country</option>
                                 {Object.keys(countryDictionary).map((country) => (
                                     <option key={country} value={country}>
                                     {country}
@@ -293,8 +321,13 @@ const Trends = () => {
                     )}
                 </div>
             </div>
+
+            
         </div>
 
+
+</div>
+        
         
     );
 };
