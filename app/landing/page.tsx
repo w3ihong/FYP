@@ -6,7 +6,7 @@ import Features from "./features";
 import FAQs from "./FAQs";
 
 import Testimonials from "./testimonials";
-import chatbot from '@/components/chatbot';
+import VoiceflowChat from '@/components/chatbot'; 
 
 
 
@@ -31,6 +31,9 @@ export default function LoginPage() {
 
       {/* FAQ */}
       <FAQs />
+
+      {/* Chatbot */}
+      <VoiceflowChat /> 
 
 
      
