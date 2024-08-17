@@ -404,7 +404,6 @@ const Dashboard = () => {
               
                 </div>
                 <div className="h-full w-1/2 gap-2 overflow-auto">
-                  <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
                   <LineChart metricName="Post Virality Rate" metricData={viralityData} dates={dates} />
                   <LineChart metricName="Acount visits from post" metricData={visitsData} dates={dates} />
                   <LineChart metricName="Post Reach" metricData={reachData} dates={dates} />
