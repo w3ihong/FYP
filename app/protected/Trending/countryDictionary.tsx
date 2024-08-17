@@ -1,6 +1,5 @@
 export const countryDictionary = {
   "United States": { sc: "united_states", abbv: "US" },
-  "United Kingdom": { sc: "united_kingdom", abbv: "UK" },
   "Canada": { sc: "canada", abbv: "CA" },
   "Australia": { sc: "australia", abbv: "AU" },
   "Germany": { sc: "germany", abbv: "DE" },

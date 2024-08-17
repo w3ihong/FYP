@@ -1,14 +1,13 @@
 // pages/terms-and-conditions.tsx
-import { NextPage } from 'next';
-import Head from 'next/head';
 
-const TermsAndConditions: NextPage = () => {
+
+const TermsAndConditions =() => {
   return (
     <>
-      <Head>
+      
         <title>Terms and Conditions | EchoSphere</title>
         <meta name="description" content="Terms and conditions for EchoSphere" />
-      </Head>
+      
       <div className="bg-gray-100 py-12">
         <div className="container mx-auto px-4">
           <div className="bg-white shadow-lg rounded-lg p-8">
