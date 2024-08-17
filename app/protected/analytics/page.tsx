@@ -65,8 +65,8 @@ const Dashboard = () => {
   
   const visitsData = postMetrics.map(item => item.post_profile_visits);
   const likesData = postMetrics.map(item => item.post_likes);
-  const commentCount = postMetrics.map(item => item.post_comments);
   const savesData = postMetrics.map(item => item.post_saved);
+  const reachData = postMetrics.map(item => item.post_reach);
   const sharesData = postMetrics.map(item => item.post_shares);
   const impressionData = postMetrics.map(item => item.post_impressions);
   const viralityData = postMetrics.map(item => item.post_virality_rate);
@@ -407,7 +407,7 @@ const Dashboard = () => {
                   <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
                   <LineChart metricName="Post Virality Rate" metricData={viralityData} dates={dates} />
                   <LineChart metricName="Acount visits from post" metricData={visitsData} dates={dates} />
-                  <LineChart metricName="Post Saves" metricData={savesData} dates={dates} />
+                  <LineChart metricName="Post Reach" metricData={reachData} dates={dates} />
                 </div>
               </div>
             </div>

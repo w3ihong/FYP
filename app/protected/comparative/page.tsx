@@ -293,7 +293,7 @@ export default function ComparePosts() {
               <select
                 value={selectedPlatform}
                 onChange={(e) => setSelectedPlatform(e.target.value)}
-                className="border border-0 shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1"
+                className="border shadow p-2 rounded transition-transform duration-200 transform hover:-translate-y-1"
               >
                 <option value="all">All Platforms</option>
                 <option value="instagram">Instagram</option>
