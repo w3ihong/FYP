@@ -63,12 +63,13 @@ const Dashboard = () => {
 
   const dates = postMetrics.map(item => new Date(item.date_retrieved).toLocaleDateString());
   
-  const visitsData = postMetrics.map(item => item.post_profile_visits);
   const likesData = postMetrics.map(item => item.post_likes);
-  const commentCount = postMetrics.map(item => item.post_comments);
-  const savesData = postMetrics.map(item => item.post_saved);
   const sharesData = postMetrics.map(item => item.post_shares);
+  const savesData = postMetrics.map(item => item.post_saved);
+  const commentsData = postMetrics.map(item => item.post_comments);
   const impressionData = postMetrics.map(item => item.post_impressions);
+  const reachData = postMetrics.map(item => item.post_reach);
+  const visitsData = postMetrics.map(item => item.post_profile_visits);
   const viralityData = postMetrics.map(item => item.post_virality_rate);
   const engagementData = postMetrics.map(item => item.post_engagement_rate);
   const sentimentData = postMetrics.map(item => item.post_sentiment);
@@ -404,10 +405,9 @@ const Dashboard = () => {
               
                 </div>
                 <div className="h-full w-1/2 gap-2 overflow-auto">
-                  <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
                   <LineChart metricName="Post Virality Rate" metricData={viralityData} dates={dates} />
                   <LineChart metricName="Acount visits from post" metricData={visitsData} dates={dates} />
-                  <LineChart metricName="Post Saves" metricData={savesData} dates={dates} />
+                  <LineChart metricName="Post Reach" metricData={reachData} dates={dates} />
                 </div>
               </div>
             </div>
