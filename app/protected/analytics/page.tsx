@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getPostsMetrics, getAccounts, fetchUserName} from '@/app/actions'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart ,faExternalLink, faFrown, faMeh, faSmile, faComment,faBookmark, faBook, faShare} from '@fortawesome/free-solid-svg-icons';
+import { faHeart ,faExternalLink, faFrown, faMeh, faSmile, faComment,faBookmark, faShare} from '@fortawesome/free-solid-svg-icons';
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import LineChart from '@/components/lineChart';
 import { planType } from '@/app/actions'; 
@@ -396,15 +396,18 @@ const Dashboard = () => {
               </div>
               {/* post metrics */}
               <div className="h-full w-3/4 flex gap-2">
-                <div className="h-full w-1/2 gap-2 overflow-auto">
+                <div className="h-full w-1/2  gap-2 overflow-auto">
                   <LineChart metricName="Post Likes" metricData={likesData} dates={dates} />
                   <LineChart metricName="Post Impressions" metricData={impressionData} dates={dates} />
                   <LineChart metricName="Post Engagements" metricData={engagementData} dates={dates} />
+                  <LineChart metricName="Post Sentiemnt" metricData={sentimentData} dates={dates} />
+              
                 </div>
                 <div className="h-full w-1/2 gap-2 overflow-auto">
                   <LineChart metricName="Post Shares" metricData={sharesData} dates={dates} />
-                  <LineChart metricName="Post Saved" metricData={savesData} dates={dates} />
-                  <LineChart metricName="Post Comments" metricData={commentCount} dates={dates} />
+                  <LineChart metricName="Post Virality Rate" metricData={viralityData} dates={dates} />
+                  <LineChart metricName="Acount visits from post" metricData={visitsData} dates={dates} />
+                  <LineChart metricName="Post Saves" metricData={savesData} dates={dates} />
                 </div>
               </div>
             </div>
