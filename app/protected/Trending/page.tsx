@@ -10,10 +10,15 @@ const MapComponent = dynamic(() => import('@/components/mapComponent'), { ssr: f
 // Import d3-fetch for CSV data handling
 import { csv } from 'd3-fetch';
 
-type Trend = {
+type Query = {
     value: number;
     query: string;
 };
+
+type Topics = {
+    formattedValue: string;
+    topic_title: string;
+}
 
 const Trends = () => {
     const [selectedCountry, setSelectedCountry] = useState('United States');
@@ -116,7 +121,7 @@ const Trends = () => {
         setKWLoading(true);
         try {
             
-            let url = `https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword}?timeframe=${selectedTimeframe}`;
+            let url = `https://fyp-ml-ejbkojtuia-ts.a.run.app/${selectedTopic}/${keyword.trim()}?timeframe=${selectedTimeframe}`;
 
                 if (selectedKWCountry !== '') {
                     const country = countryDictionary[selectedKWCountry];
@@ -145,15 +150,19 @@ const Trends = () => {
         }
     };
 
-    const renderTrends = (trends: { [key: string]: Trend }, type: string) => (
+    const renderTrends = (trends: { [key: string]: Query | Topics}, type: string) => (
         <div className='w-full'>
             <ul className='space-y-1'>
                 {Object.entries(trends).map(([key, value], index) => (
                     <li key={`${type}-${index}`} className='bg-white rounded-md shadow flex h-8 items-center px-4'>
                         <div className='text-md font-bold w-1/6 '>{Number(key) + 1}</div>
-                        <div className='text-md w-4/6 '>{value.query}</div>
+                        <div className='text-md w-4/6 '>{"query" in value ? value.query : value.topic_title}</div>
                         <div className='text-md w-1/6 '>
-                            {type === 'rising' ? `${value.value}%` : value.value}
+                            {type === "rising" && "value" in value
+                            ? `+${value.value}%`
+                            : "formattedValue" in value
+                            ? value.formattedValue
+                            : value.value}
                         </div>
                     </li>
                 ))}
