@@ -35,7 +35,7 @@ export async function addInstagramAccount(accessToken:string) {
         const AccountSuccess = await insertNewAcc(IGAccDetails.id,accessToken, "Instagram", user.id, IGAccDetails.username, IGAccDetails.profile_picture_url)
         // await loadIGMediaObj(IGAccDetails.id, accessToken)
         const triggerOnboardEndpoint = `https://fyp-ml-ejbkojtuia-ts.a.run.app/onboard_account/${platform_account_id}`
-        const response = await axios.post(triggerOnboardEndpoint)
+        const response = await axios.get(triggerOnboardEndpoint)
         if (response.data == true && AccountSuccess == true) {
             return true
         } else {
