@@ -30,6 +30,7 @@ export default async function InstagramConnectRedirect() {
           const success =  await addInstagramAccount(data.access_token)
 
           if (success) {
+            alert('Account Connected Successfully, Please re-login');
             router.push('/landing');
 
           } else {  
